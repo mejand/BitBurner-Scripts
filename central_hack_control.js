@@ -106,6 +106,6 @@ export async function main(ns) {
             await ns.sleep(ns.getHackTime(target));
         }
         // await another 20ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
-        await ns.sleep(20);
+        await ns.sleep(100);
     }
 }
