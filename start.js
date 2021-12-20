@@ -9,7 +9,7 @@ export async function main(ns) {
     // inform the user about the success or failure and start the startup script
     if (success) {
         ns.tprint("#### Startup Script download successful ####");
-        ns.spawn("start_automation", 1);
+        ns.spawn("start_automation.js", 1);
     } else {
         ns.alert("#### Download of Startup Script failed ####");
     }
