@@ -38,7 +38,7 @@ export async function main(ns) {
         securityThresh = ns.getServerMinSecurityLevel(target) + 5;
 
         // update the string that will be displayed in the terminal
-        terminal_string = "|" + target + "|" + ns.nFormat(ns.getServerMoneyAvailable(target) / moneyThresh, "000.0") + " %|";
+        terminal_string = "|" + target + "|Money: " + ns.nFormat((ns.getServerMoneyAvailable(target) / moneyThresh) * 100, "000.0") + " %|";
         terminal_string += ns.nFormat(securityThresh, "000.0") + " secLvl / ";
         terminal_string += ns.nFormat(ns.getServerSecurityLevel(target), "000.0") + " secLvl|";
 
