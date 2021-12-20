@@ -19,6 +19,9 @@ export async function main(ns) {
     ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hacknet.js", "hacknet.js");
     ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/server_purchase.js", "server_purchase.js");
     ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/central_hack_control.js", "central_hack_control.js");
+    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hack.js", "hack.js");
+    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/grow.js", "grow.js");
+    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/weaken.js", "weaken.js");
 
     // call the spider script to populate the network map
     ns.run("spider.js", 1, false);
