@@ -22,6 +22,8 @@ export async function main(ns) {
 
     // start the loop to periodically upgrade the hacknet servers
     while (true) {
+        // update the maximum vailable money based on the current player money
+        max_money = ns.getServerMoneyAvailable("home") * money_factor;
         // create an array that holds information about all possible upgrade options currently available
         var options = [];
         // add an object for purchasing a new node
