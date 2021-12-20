@@ -1,7 +1,11 @@
 /** @param {import(".").NS } ns */
+
+/**
+ * Handle the start up of control scripts on the home server at the beginning of a run.
+ * @param {interface} ns 
+ */
 export async function main(ns) {
-    /** A script that handles the startup of control scripts at the beginning of a run.
-    It only needs to be called once during a run. */
+    // download the necessary scripts from the git repository to get newest versions.
 
     // call the spider script to populate the network map
     ns.run("spider.ns", 1, false);
