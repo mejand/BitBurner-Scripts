@@ -85,6 +85,13 @@ export async function main(ns) {
                 // check if enough ports could be opened
                 if (open_ports >= ns.getServerNumPortsRequired(server)) {
                     ns.nuke(server);
+                    // copy the hack scripts to the server if it has ram available
+                    if (ns.getServerMaxRam(server)) {
+                        // copy the scripts to the server
+                        await ns.scp("weaken.js", "home", row);
+                        await ns.scp("grow.js", "home", row);
+                        await ns.scp("hack.js", "home", row);
+                    }
                     // save the server to file
                     await ns.write("network_unlocked.txt", server + "\r\n", "a");
                 }

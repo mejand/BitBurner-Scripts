@@ -56,15 +56,6 @@ export async function main(ns) {
             }
             // get the server name and append it to the array
             servers.push(row);
-            if (row != "home") {
-                // copy the scripts to the server
-                await ns.scp("weaken.js", "home", row);
-                await ns.scp("grow.js", "home", row);
-                await ns.scp("hack.js", "home", row);
-                if (debug) {
-                    ns.tprint(row);
-                }
-            }
         }
 
         // check which action needs to be performed
@@ -114,7 +105,7 @@ export async function main(ns) {
             ns.tprint(terminal_string);
             await ns.sleep(ns.getHackTime(target));
         }
-        // await another 10ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
-        await ns.sleep(10);
+        // await another 20ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
+        await ns.sleep(20);
     }
 }
