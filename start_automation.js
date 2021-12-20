@@ -15,10 +15,16 @@ export async function main(ns) {
     // find all script files on the home server and delete them to remove old files
     var files = ns.ls("home", ".ns");
     files.concat(ns.ls("home", ".js"));
+    if (debug) {
+        ns.tprint(files);
+    }
     // loop through the files and delete everything except the start up scripts
     for (let file of files) {
         if (file != "start.js" && file != "start_automation.js") {
             ns.rm(file, "home");
+            if (debug) {
+                ns.tprint("Deleted " + file);
+            }
         }
     }
     ns.tprint(" #### Files Deleted ####");
