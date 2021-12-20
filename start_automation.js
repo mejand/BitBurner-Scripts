@@ -1,8 +1,6 @@
-/** @param {import(".").NS } ns */
-
 /**
  * Handle the start up of control scripts on the home server at the beginning of a run.
- * @param {interface} ns 
+ * @param {import(".").NS } ns
  */
 export async function main(ns) {
     // download the necessary scripts from the git repository to get newest versions.
