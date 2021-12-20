@@ -14,14 +14,14 @@ export async function main(ns) {
     }
 
     // download the necessary scripts from the git repository to get newest versions.
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/spider.js", "spider.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/unlock.js", "unlock.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hacknet.js", "hacknet.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/server_purchase.js", "server_purchase.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/central_hack_control.js", "central_hack_control.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hack.js", "hack.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/grow.js", "grow.js");
-    ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/weaken.js", "weaken.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/spider.js", "spider.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/unlock.js", "unlock.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hacknet.js", "hacknet.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/server_purchase.js", "server_purchase.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/central_hack_control.js", "central_hack_control.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hack.js", "hack.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/grow.js", "grow.js");
+    await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/weaken.js", "weaken.js");
 
     // define the wait time between starting the individual scripts
     var wait_time = 500;
