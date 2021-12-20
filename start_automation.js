@@ -23,28 +23,31 @@ export async function main(ns) {
     ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/grow.js", "grow.js");
     ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/weaken.js", "weaken.js");
 
+    // define the wait time between starting the individual scripts
+    var wait_time = 500;
+
     // call the spider script to populate the network map
     ns.run("spider.js", 1, false);
     ns.tprint(" #### Network Mapped ####");
-    await ns.sleep(100);
+    await ns.sleep(wait_time);
 
     // start the unlock script with a 10 second period and debugging off
     ns.run("unlock.js", 1, 10000, false);
     ns.tprint(" #### Server Unlocking Started ####");
-    await ns.sleep(100);
+    await ns.sleep(wait_time);
 
     // start the hacknet control script with a 1 second period, a 30% budget and debugging off
     ns.run("hacknet.js", 1, 1000, 0.3, false);
     ns.tprint(" #### Hacknet Upgrading Started ####");
-    await ns.sleep(100);
+    await ns.sleep(wait_time);
 
     // start the server purchase script with a 10 second period and debugging off
     ns.run("server_purchase.js", 1, 10000, 10, 0.75, false);
     ns.tprint(" #### Hacknet Upgrading Started ####");
-    await ns.sleep(100);
+    await ns.sleep(wait_time);
 
     // start the centralized hacking control script
     ns.run("central_hack_control.js", 1, false);
     ns.tprint(" #### Central Hack Control Started ####");
-    await ns.sleep(100);
+    await ns.sleep(wait_time);
 }
