@@ -32,49 +32,57 @@ export async function main(ns) {
 
     // download the necessary scripts from the git repository to get newest versions.
     var success = true;
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/spider.js", "spider.js")) {
+    var url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/spider.js";
+    if (await ns.wget(url, "spider.js")) {
         ns.tprint(" ###  Spider Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Spider Download Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/unlock.js", "unlock.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/unlock.js";
+    if (await ns.wget(url, "unlock.js")) {
         ns.tprint(" ###  Unlock Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Unlock Download Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hacknet.js", "hacknet.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hacknet.js";
+    if (await ns.wget(url, "hacknet.js")) {
         ns.tprint(" ###  Hacknet Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Hacknet Download Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/server_purchase.js", "server_purchase.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/server_purchase.js";
+    if (await ns.wget(url, "server_purchase.js")) {
         ns.tprint(" ###  Server-Purchase Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Server-Purchase Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/central_hack_control.js", "central_hack_control.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/central_hack_control.js";
+    if (await ns.wget(url, "central_hack_control.js")) {
         ns.tprint(" ###  Central-Hack-Control Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Central-Hack-Control Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/hack.js", "hack.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hack.js";
+    if (await ns.wget(url, "hack.js")) {
         ns.tprint(" ###  Hack Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Hack Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/grow.js", "grow.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/grow.js";
+    if (await ns.wget(url, "grow.js")) {
         ns.tprint(" ###  Grow Download Successful  ###");
     } else {
         success = false;
         ns.tprint(" ###  Grow Failed  ###");
     }
-    if (await ns.wget("https://github.com/mejand/BitBurner-Scripts/blob/main/weaken.js", "weaken.js")) {
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/weaken.js";
+    if (await ns.wget(url, "weaken.js")) {
         ns.tprint(" ###  Weaken Download Successful  ###");
     } else {
         success = false;
