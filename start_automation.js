@@ -3,6 +3,12 @@
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
+    // define default values for the arguments and try to get the arguments
+    var debug = true;
+    if (ns.args.length > 0 && typeof (ns.args[0] == Boolean)) {
+        debug = ns.args[0];
+    }
+
     // define the wait time between starting the individual scripts
     var wait_time = 500;
 
