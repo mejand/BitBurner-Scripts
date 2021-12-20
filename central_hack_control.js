@@ -38,8 +38,9 @@ export async function main(ns) {
         securityThresh = ns.getServerMinSecurityLevel(target) + 5;
 
         // update the string that will be displayed in the terminal
-        terminal_string = "|" + target + "|" + moneyThresh + " $ - " + ns.getServerMoneyAvailable(target) + " $|";
-        terminal_string += securityThresh + " secLvl - " + ns.getServerSecurityLevel(target) + " secLvl|";
+        terminal_string = "|" + target + "|" + ns.nFormat(ns.getServerMoneyAvailable(target) / moneyThresh, "000.0") + " %|";
+        terminal_string += ns.nFormat(securityThresh, "000.0") + " secLvl / ";
+        terminal_string += ns.nFormat(ns.getServerSecurityLevel(target), "000.0") + " secLvl|";
 
         // reset the total thread count
         total_threads = 0;
@@ -79,7 +80,7 @@ export async function main(ns) {
                 total_threads += thread_count;
             }
             terminal_string += "Weaken - " + ns.tFormat(ns.getWeakenTime(target)) + "|-";
-            terminal_string += ns.weakenAnalyze(total_threads) + " secLvl|";
+            terminal_string += ns.nFormat(ns.weakenAnalyze(total_threads), "0,0.0") + " secLvl|";
             ns.tprint(terminal_string);
             await ns.sleep(ns.getWeakenTime(target));
         } else if (ns.getServerMoneyAvailable(target) < moneyThresh) {
@@ -94,7 +95,7 @@ export async function main(ns) {
                 total_threads += thread_count;
             }
             terminal_string += "Grow - " + ns.tFormat(ns.getGrowTime(target));
-            terminal_string += "|+" + ns.growthAnalyzeSecurity(total_threads) + " secLvl|";
+            terminal_string += "|+" + ns.nFormat(ns.growthAnalyzeSecurity(total_threads), "0,0.0") + " secLvl|";
             ns.tprint(terminal_string);
             await ns.sleep(ns.getGrowTime(target));
         } else {
@@ -109,7 +110,7 @@ export async function main(ns) {
                 total_threads += thread_count;
             }
             terminal_string += "Hack - " + ns.tFormat(ns.getHackTime(target)) + "|+"
-            terminal_string += ns.hackAnalyzeSecurity(total_threads) + " secLvl|";
+            terminal_string += ns.nFormat(ns.hackAnalyzeSecurity(total_threads), "0,0.0") + " secLvl|";
             ns.tprint(terminal_string);
             await ns.sleep(ns.getHackTime(target));
         }
