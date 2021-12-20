@@ -58,9 +58,9 @@ export async function main(ns) {
             servers.push(row);
             if (row != "home") {
                 // copy the scripts to the server
-                await ns.scp("weaken.ns", "home", row);
-                await ns.scp("grow.ns", "home", row);
-                await ns.scp("hack.ns", "home", row);
+                await ns.scp("weaken.js", "home", row);
+                await ns.scp("grow.js", "home", row);
+                await ns.scp("hack.js", "home", row);
                 if (debug) {
                     ns.tprint(row);
                 }
@@ -72,9 +72,9 @@ export async function main(ns) {
             for (let server of servers) {
                 available_ram = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
                 // If the server's security level is above our threshold, weaken it
-                let thread_count = Math.floor(available_ram / ns.getScriptRam("weaken.ns"));
+                let thread_count = Math.floor(available_ram / ns.getScriptRam("weaken.js"));
                 if (thread_count > 0) {
-                    ns.exec("weaken.ns", server, thread_count, target);
+                    ns.exec("weaken.js", server, thread_count, target);
                 }
                 // update the total thread count
                 total_threads += thread_count;
@@ -87,9 +87,9 @@ export async function main(ns) {
             for (let server of servers) {
                 available_ram = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
                 // If the server's money is less than our threshold, grow it
-                let thread_count = Math.floor(available_ram / ns.getScriptRam("grow.ns"));
+                let thread_count = Math.floor(available_ram / ns.getScriptRam("grow.js"));
                 if (thread_count > 0) {
-                    ns.exec("grow.ns", server, thread_count, target);
+                    ns.exec("grow.js", server, thread_count, target);
                 }
                 // update the total thread count
                 total_threads += thread_count;
@@ -102,9 +102,9 @@ export async function main(ns) {
             for (let server of servers) {
                 available_ram = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
                 // Otherwise, hack it
-                let thread_count = Math.floor(available_ram / ns.getScriptRam("hack.ns"));
+                let thread_count = Math.floor(available_ram / ns.getScriptRam("hack.js"));
                 if (thread_count > 0) {
-                    ns.exec("hack.ns", server, thread_count, target);
+                    ns.exec("hack.js", server, thread_count, target);
                 }
                 // update the total thread count
                 total_threads += thread_count;

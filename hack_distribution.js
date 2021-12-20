@@ -11,9 +11,9 @@ export async function distribution(ns, ram_available) {
     var count_weaken = 0;
 
     // get the ram amount for each script
-    ram_hack = ns.getScriptRam("hack.ns", "home");
-    ram_grow = ns.getScriptRam("grow.ns", "home");
-    ram_weaken = ns.getScriptRam("weaken.ns", "home");
+    ram_hack = ns.getScriptRam("hack.js", "home");
+    ram_grow = ns.getScriptRam("grow.js", "home");
+    ram_weaken = ns.getScriptRam("weaken.js", "home");
 
 
     while (ram_available > count_hack * ram_hack + count_weaken * ram_weaken + count_grow * ram_grow) {
