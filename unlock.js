@@ -26,27 +26,24 @@ export async function main(ns) {
     // read the file to get all servers
     var rows = ns.read("network_map.txt").split("\r\n");
     for (let row of rows) {
-        // extract the individual data from the row
-        var data = row.split(",");
         // Ignore last blank row
-        if (data.length < 7) {
-            break;
+        if (row) {
+            // add the server name to the list
+            servers.push(row);
         }
-        // get the server name and append it to the array
-        servers.push(data[0]);
     }
 
     // start the loop to periodically try to unlock all servers
     while (true) {
         // clear the file of all old entries
         ns.clear("network_unlocked.txt");
+        unlocked_servers = [];
 
-        for (let server of servers) {
-            // check if the server is already unlocked
-            if (ns.hasRootAccess(server)) {
-                // save the server to file
-                await ns.write("network_unlocked.txt", server + "\r\n", "a");
-            } else {
+        for (let server_name of servers) {
+            // get the server object
+            var server = ns.getServer(server_name);
+            // open all possible ports
+            if (!server.hasAdminRights) {
                 // use all available programs to open ports
                 var open_ports = 0;
                 if (ns.fileExists("BruteSSH.exe", "home")) {
@@ -70,17 +67,24 @@ export async function main(ns) {
                     open_ports++;
                 }
                 // check if enough ports could be opened
-                if (open_ports >= ns.getServerNumPortsRequired(server)) {
-                    ns.nuke(server);
+                if (open_ports >= server.numOpenPortsRequired) {
+                    // get root access
+                    ns.nuke(server.hostname);
+                    // update the root access flag
+                    server.hasAdminRights = true;
                     // copy the hack scripts to the server if it has ram available
-                    if (ns.getServerMaxRam(server) > 0) {
+                    if (server.maxRam > 0) {
                         // copy the scripts to the server
-                        await ns.scp("weaken.js", "home", row);
-                        await ns.scp("grow.js", "home", row);
-                        await ns.scp("hack.js", "home", row);
+                        await ns.scp("weaken.js", "home", server.hostname);
+                        await ns.scp("grow.js", "home", server.hostname);
+                        await ns.scp("hack.js", "home", server.hostname);
                     }
+                }
+                if (server.hasAdminRights) {
                     // save the server to file
-                    await ns.write("network_unlocked.txt", server + "\r\n", "a");
+                    await ns.write("network_unlocked.txt", server.hostname + "\r\n", "a");
+                    // add the server to the unlocked servers list
+                    unlocked_servers.push(server);
                 }
             }
             // print to the terminal if debugging is enabled
