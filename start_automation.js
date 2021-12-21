@@ -88,6 +88,13 @@ export async function main(ns) {
         success = false;
         ns.tprint(" ###  Weaken Failed  ###");
     }
+    url = "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/find_target.js";
+    if (await ns.wget(url, "find_target.js")) {
+        ns.tprint(" ###  Find-Target Download Successful  ###");
+    } else {
+        success = false;
+        ns.tprint(" ###  Find-Target Failed  ###");
+    }
     await ns.sleep(wait_time);
 
     if (success) {
