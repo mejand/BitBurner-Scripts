@@ -17,26 +17,41 @@ export async function main(ns) {
   var target = getTarget(ns, debug);
   var servers = getAvailableServers(ns);
 
+  // define values for terminal printing
+  var relativeMoney = (target.moneyAvailable / target.moneyMax) * 100;
+  var deltaSecurity = target.hackDifficulty - target.minDifficulty;
+
   // define a veriable to keep track of how long a script cycle takes
   var cycleTime = 0;
+
+  // define an object to keep track of how many threads are used in total for each script type
+  var threads_total = { hack: 0, grow: 0, weaken: 0 };
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
     // read the target from file and recalculate the thresholds
     target = getTarget(ns, debug);
 
-    // reset the total thread count
-    totalThreads = 0;
-
     // get all servers that are ready for tasking
     servers = getAvailableServers(ns);
 
+    // reset the total thread count
+    threads_total.hack = 0;
+    threads_total.grow = 0;
+    threads_total.weaken = 0;
+
     // loop through all servers and start the scripts
     for (let server of servers) {
+      // get the number of threads per script
       var threads = scriptDistribution(ns, server, target);
+      // start the scripts
       ns.exec("hack.js", server.hostname, threads.hack, target.hostname);
       ns.exec("grow.js", server.hostname, threads.grow, target.hostname);
       ns.exec("weaken.js", server.hostname, threads.weaken, target.hostname);
+      // add the scripts to the total thread count
+      threads_total.hack += threads.hack;
+      threads_total.grow += threads.grow;
+      threads_total.weaken += threads.weaken;
     }
 
     // calculate the wait time of the cycle
@@ -44,6 +59,22 @@ export async function main(ns) {
       ns.getHackTime(target.hostname),
       ns.getGrowTime(target.hostname),
       ns.getWeakenTime(target.hostname)
+    );
+
+    // print the cycle information to screen
+    relativeMoney = (target.moneyAvailable / target.moneyMax) * 100;
+    deltaSecurity = target.hackDifficulty - target.minDifficulty;
+    ns.tprint(
+      ns.sprintf(
+        "|%(hostname)s|Money: %3.1%|Security: %3.1d|Hack: %(hack)i|Grow: %(grow)i|Weaken: %(weaken)i|Time: %s",
+        target,
+        relativeMoney,
+        deltaSecurity,
+        threads_total,
+        threads_total,
+        threads_total,
+        ns.tFormat(cycleTime)
+      )
     );
 
     // await another 100ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
