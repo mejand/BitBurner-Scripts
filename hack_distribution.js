@@ -8,6 +8,8 @@
 export function scriptDistribution(ns, host, target) {
   // define the starting counts for all scripts
   var threads = { hack: 0, grow: 0, weaken: 0 };
+  // define a variable to store the old values during each calculation step
+  var threads_old = threads;
 
   // get the ram amount for each script
   var ram_hack = ns.getScriptRam("hack.js", "home");
@@ -23,7 +25,12 @@ export function scriptDistribution(ns, host, target) {
   // create a variable to store the security increase of grow and hack
   var security_increase = 0;
 
-  while (ram_available > ram_used && hack_absolute < 1.0) {
+  // create a variable to control how long the loop runs for
+  var search = true;
+
+  while (search) {
+    // store the last thread counts before trying out the new values
+    threads_old = threads;
     // increase the number of threads used for hacking
     threads.hack++;
     // calculate the resulting percentage that will be stolen from the host
@@ -44,6 +51,11 @@ export function scriptDistribution(ns, host, target) {
       threads.hack * ram_hack +
       threads.weaken * ram_weaken +
       threads.grow * ram_grow;
+    // go back to the old counts if the new ones are not valid
+    if (ram_available > ram_used && hack_absolute < 1.0) {
+      threads = threads_old;
+      search = false;
+    }
   }
   return threads;
 }
