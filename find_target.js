@@ -5,7 +5,7 @@
  * @param {Boolean} debug - A flag that governs if debug messages shall be printed to the terminal.
  * @returns {import(".").Server} The server object of the most suitable target.
  */
-export async function find_target(ns, unlocked_servers, debug = false) {
+export function find_target(ns, unlocked_servers, debug = false) {
     // define the default target
     var target = ns.getServer("n00dles");
 
