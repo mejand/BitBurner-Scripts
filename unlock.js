@@ -96,7 +96,7 @@ export async function main(ns) {
         target = find_target(unlocked_servers, debug);
         // write the current target to port 1
         ns.clearPort(1);
-        ns.writePort(1, target.hostname);
+        await ns.writePort(1, target.hostname);
         // wait for the next execution
         await ns.sleep(period);
     }
