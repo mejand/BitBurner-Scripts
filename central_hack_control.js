@@ -13,8 +13,8 @@ export async function main(ns) {
     debug = ns.args[0];
   }
 
-  // define the variables for the script
-  var target = getTarget(ns, debug);
+  // define the servers for the script
+  var target = ns.getServer("n00dles");
   var servers = getAvailableServers(ns);
 
   // define values for terminal printing
@@ -30,7 +30,10 @@ export async function main(ns) {
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
     // read the target from file and recalculate the thresholds
-    target = getTarget(ns, debug);
+    if (!debug) {
+      // in debug mode n00dles is used because it has the shortest wait times
+      target = getTarget(ns);
+    }
 
     // get all servers that are ready for tasking
     servers = getAvailableServers(ns);
@@ -110,18 +113,14 @@ function getAvailableServers(ns) {
 /**
  * Read the target from port 1 or provide a replacement.
  * @param {import(".").NS } ns
- * @param {boolean} debug - Specify if debug mesages shall be printed to the terminal.
  * @returns {import(".").Server} The server object of the target.
  */
-function getTarget(ns, debug) {
+function getTarget(ns) {
   var targetName = ns.peek(1);
   if (!targetName || targetName == "NULL PORT DATA") {
     target = ns.getServer("n00dles");
   } else {
     target = ns.getServer(targetName);
-  }
-  if (debug) {
-    ns.tprint("target = " + target.hostname);
   }
   return target;
 }
