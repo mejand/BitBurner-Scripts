@@ -93,7 +93,7 @@ export async function main(ns) {
             }
         }
         // re-calculate the target after the unlock attempt
-        target = find_target(unlocked_servers, debug);
+        target = find_target(ns, unlocked_servers, debug);
         // write the current target to port 1
         ns.clearPort(1);
         await ns.writePort(1, target.hostname);
