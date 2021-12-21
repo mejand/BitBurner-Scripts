@@ -90,6 +90,10 @@ export async function main(ns) {
         }
         // re-calculate the target after the unlock attempt
         target = find_target(unlocked_servers, debug);
+        // write the current target to port 1
+        ns.clearPort(1);
+        ns.writePort(1, target.hostname);
+        // wait for the next execution
         await ns.sleep(period);
     }
 }
