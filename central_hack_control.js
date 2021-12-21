@@ -17,6 +17,9 @@ export async function main(ns) {
   var target = getTarget(ns, debug);
   var servers = getAvailableServers(ns);
 
+  // define a veriable to keep track of how long a script cycle takes
+  var cycleTime = 0;
+
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
     // read the target from file and recalculate the thresholds
@@ -37,7 +40,7 @@ export async function main(ns) {
     }
 
     // calculate the wait time of the cycle
-    var cycleTime = Math.max(
+    cycleTime = Math.max(
       ns.getHackTime(target.hostname),
       ns.getGrowTime(target.hostname),
       ns.getWeakenTime(target.hostname)
