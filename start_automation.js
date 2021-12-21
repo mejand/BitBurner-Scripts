@@ -13,8 +13,7 @@ export async function main(ns) {
     var wait_time = 500;
 
     // find all script files on the home server and delete them to remove old files
-    var files = ns.ls("home", ".ns");
-    files.concat(ns.ls("home", ".js"));
+    var files = ns.ls("home", ".ns").concat(ns.ls("home", ".js"));
     if (debug) {
         ns.tprint(files);
     }
