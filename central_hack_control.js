@@ -30,9 +30,9 @@ export async function main(ns) {
     // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
     while (true) {
         // read the target from file and recalculate the thresholds
-        target = ns.read("target_server.txt");
+        target = ns.readPort(1);
         if (debug) {
-            ns.tprint("read target from file = " + target);
+            ns.tprint("target = " + target);
         }
         moneyThresh = ns.getServerMaxMoney(target) * 0.75;
         securityThresh = ns.getServerMinSecurityLevel(target) + 5;
