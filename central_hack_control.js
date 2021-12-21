@@ -24,7 +24,7 @@ export async function main(ns) {
     // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
     while (true) {
         // read the target from file and recalculate the thresholds
-        target_name = ns.readPort(1);
+        target_name = ns.peek(1);
         if (!target_name || target_name == "NULL PORT DATA") {
             target = ns.getServer("n00dles");
         } else {
