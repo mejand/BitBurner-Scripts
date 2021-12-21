@@ -1,3 +1,5 @@
+import { scriptDistribution } from "./hack_distribution.js";
+
 /**
  * Handle the growing, weakening and hacking scripts from one central server.
  * @param {import(".").NS } ns
@@ -12,10 +14,7 @@ export async function main(ns) {
   }
 
   // define the variables for the script
-  var target_name = "n00dles";
-  var target = ns.getServer(target_name);
-  var moneyThresh = target.moneyMax * 0.75;
-  var securityThresh = target.minDifficulty + 5;
+  var target = getTarget(ns, debug);
   var available_ram = 0;
   var servers = [];
   var terminal_string = "";
@@ -24,15 +23,7 @@ export async function main(ns) {
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
     // read the target from file and recalculate the thresholds
-    target_name = ns.peek(1);
-    if (!target_name || target_name == "NULL PORT DATA") {
-      target = ns.getServer("n00dles");
-    } else {
-      target = ns.getServer(target_name);
-    }
-    if (debug) {
-      ns.tprint("target = " + target.hostname);
-    }
+    target = getTarget(ns, debug);
 
     // calculate the thresholds
     moneyThresh = target.moneyMax * 0.75;
@@ -130,4 +121,23 @@ export async function main(ns) {
     // await another 20ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
     await ns.sleep(100);
   }
+}
+
+/**
+ * Read the target from port 1 or provide a replacement.
+ * @param {import(".").NS } ns
+ * @param {boolean} debug - Specify if debug mesages shall be printed to the terminal.
+ * @returns {import(".").Server} The server object of the target.
+ */
+function getTarget(ns, debug) {
+  var target_name = ns.peek(1);
+  if (!target_name || target_name == "NULL PORT DATA") {
+    target = ns.getServer("n00dles");
+  } else {
+    target = ns.getServer(target_name);
+  }
+  if (debug) {
+    ns.tprint("target = " + target.hostname);
+  }
+  return target;
 }
