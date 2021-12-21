@@ -5,7 +5,7 @@
  * @param {import(".").Server} target - The target server.
  * @returns {Object} An object containing the number of threads for each script type.
  */
-export function distribution(ns, ram_available, target) {
+export function scriptDistribution(ns, ram_available, target) {
   // define the starting counts for all scripts
   var threads = { hack: 0, grow: 0, weaken: 0 };
 
