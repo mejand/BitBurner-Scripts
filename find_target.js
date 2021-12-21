@@ -10,7 +10,7 @@ export function find_target(ns, unlocked_servers, debug = false) {
     var target = ns.getServer("n00dles");
 
     // define the values needed for the search
-    var max_score = 0;
+    var max_score = server.moneyMax / server.minDifficulty;
     var score = 0;
     var player_level = ns.getHackingLevel();
 
@@ -30,7 +30,7 @@ export function find_target(ns, unlocked_servers, debug = false) {
     }
     // print the new target if debugging is enabled
     if (debug) {
-        ns.tprint("#### Best Target: " + target.hostname);
+        ns.tprint("#### Best Target: " + target.hostname + " for hacking lvl " + player_level);
     }
     return target;
 }
