@@ -25,7 +25,7 @@ export async function main(ns) {
     while (true) {
         // read the target from file and recalculate the thresholds
         target_name = ns.readPort(1);
-        if (target_name == "NULL PORT DATA") {
+        if (!target_name || target_name == "NULL PORT DATA") {
             target = ns.getServer("n00dles");
         } else {
             target = ns.getServer(target_name);
