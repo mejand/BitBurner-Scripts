@@ -80,12 +80,12 @@ export async function main(ns) {
                         await ns.scp("hack.js", "home", server.hostname);
                     }
                 }
-                if (server.hasAdminRights) {
-                    // save the server to file
-                    await ns.write("network_unlocked.txt", server.hostname + "\r\n", "a");
-                    // add the server to the unlocked servers list
-                    unlocked_servers.push(server);
-                }
+            }
+            if (server.hasAdminRights) {
+                // save the server to file
+                await ns.write("network_unlocked.txt", server.hostname + "\r\n", "a");
+                // add the server to the unlocked servers list
+                unlocked_servers.push(server);
             }
             // print to the terminal if debugging is enabled
             if (debug) {
@@ -93,7 +93,7 @@ export async function main(ns) {
             }
         }
         // re-calculate the target after the unlock attempt
-        target = find_target(ns, unlocked_servers, true);
+        target = find_target(ns, unlocked_servers, debug);
         // write the current target to port 1
         ns.clearPort(1);
         await ns.writePort(1, target.hostname);
