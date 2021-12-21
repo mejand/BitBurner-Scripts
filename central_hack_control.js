@@ -4,14 +4,7 @@
  */
 export async function main(ns) {
     // clean up the log
-    ns.disableLog("getServerSecurityLevel");
-    ns.disableLog("getServerMaxRam");
-    ns.disableLog("getServerUsedRam");
-    ns.disableLog("getScriptRam");
-    ns.disableLog("getWeakenTime");
-    ns.disableLog("getServerMoneyAvailable");
-    ns.disableLog("getGrowTime");
-    ns.disableLog("getHackTime");
+    ns.disableLog("ALL");
 
     var debug = true;
     if (ns.args.length > 0) {
