@@ -69,7 +69,7 @@ export async function main(ns) {
     deltaSecurity = target.hackDifficulty - target.minDifficulty;
     ns.tprint(
       ns.sprintf(
-        "|%(hostname)s|Money: %3.1%|Security: %3.1d|Hack: %(hack)i|Grow: %(grow)i|Weaken: %(weaken)i|Time: %s",
+        "|%(hostname)s|Money: %3.1d|Security: %3.1d|Hack: %(hack)i|Grow: %(grow)i|Weaken: %(weaken)i|Time: %s",
         target,
         relativeMoney,
         deltaSecurity,
