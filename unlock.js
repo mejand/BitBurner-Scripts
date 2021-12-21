@@ -1,3 +1,5 @@
+import { find_target } from "find_target.js";
+
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
  * Identify the best target and save it to file.
@@ -14,6 +16,11 @@ export async function main(ns) {
         debug = ns.args[1];
     }
 
+    // define the default target
+    var target = ns.getServer("n00dles");
+    // define a list that holds the server objects of all unlocked servers
+    var unlocked_servers = [];
+
     // read all servers from file and put them into an arry
     var servers = [];
     // read the file to get all servers
@@ -29,11 +36,6 @@ export async function main(ns) {
         servers.push(data[0]);
     }
 
-    // set a default target
-    var target_server = "n00dles";
-    var score = ns.getServerMaxMoney(target_server) / ns.getServerMinSecurityLevel(target_server);
-    await ns.write("target_server.txt", target_server, "w");
-
     // start the loop to periodically try to unlock all servers
     while (true) {
         // clear the file of all old entries
@@ -44,21 +46,6 @@ export async function main(ns) {
             if (ns.hasRootAccess(server)) {
                 // save the server to file
                 await ns.write("network_unlocked.txt", server + "\r\n", "a");
-                // calculate a score for the server if the server can be hacked
-                if (ns.getServerRequiredHackingLevel(server) <= ns.getHackingLevel()) {
-                    var score_new = ns.getServerMaxMoney(server) / ns.getServerMinSecurityLevel(server);
-                    if (score_new > score) {
-                        score = score_new;
-                        target_server = server;
-                        await ns.write("target_server.txt", target_server, "w");
-                        if (debug) {
-                            ns.tprint(" #### New Target: " + target_server + " ####");
-                        }
-                    }
-                    if (debug) {
-                        ns.tprint(server + " score = " + score_new);
-                    }
-                }
             } else {
                 // use all available programs to open ports
                 var open_ports = 0;
@@ -86,7 +73,7 @@ export async function main(ns) {
                 if (open_ports >= ns.getServerNumPortsRequired(server)) {
                     ns.nuke(server);
                     // copy the hack scripts to the server if it has ram available
-                    if (ns.getServerMaxRam(server)) {
+                    if (ns.getServerMaxRam(server) > 0) {
                         // copy the scripts to the server
                         await ns.scp("weaken.js", "home", row);
                         await ns.scp("grow.js", "home", row);
@@ -101,6 +88,8 @@ export async function main(ns) {
                 ns.tprint(server + " unlocked = " + ns.hasRootAccess(server));
             }
         }
+        // re-calculate the target after the unlock attempt
+        target = find_target(unlocked_servers, debug);
         await ns.sleep(period);
     }
 }
