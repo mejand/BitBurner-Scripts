@@ -2,25 +2,40 @@
  * Handle the start up of control scripts on the home server at the beginning of a run.
  * @param {import(".").NS } ns
  * @param {number} ram_available - The RAM that is available for use by the scripts.
+ * @param {import(".").Server} target - The target server.
  * @returns {Object} An object containing the number of threads for each script type.
  */
-export async function distribution(ns, ram_available) {
+export function distribution(ns, ram_available, target) {
     // define the starting counts for all scripts
-    var count_hack = 0;
-    var count_grow = 0;
-    var count_weaken = 0;
+    var threads = { hack: 0, grow: 0, weaken: 0 };
 
     // get the ram amount for each script
-    ram_hack = ns.getScriptRam("hack.js", "home");
-    ram_grow = ns.getScriptRam("grow.js", "home");
-    ram_weaken = ns.getScriptRam("weaken.js", "home");
+    var ram_hack = ns.getScriptRam("hack.js", "home");
+    var ram_grow = ns.getScriptRam("grow.js", "home");
+    var ram_weaken = ns.getScriptRam("weaken.js", "home");
+    var ram_used = 0;
 
+    // get the hack amount per thread
+    var hack_relative = ns.hackAnalyze(target.hostname);
+    var hack_absolute = 0;
 
-    while (ram_available > count_hack * ram_hack + count_weaken * ram_weaken + count_grow * ram_grow) {
-        count_hack++;
-        count_grow = ns.growthAnalyze(target, 1 + ns.hackAnalyze(target) * count_hack + target_growth, cores_host)
-        while (ns.weakenAnalyze(count_weaken, cores_host) < ns.growthAnalyzeSecurity(count_grow) + ns.hackAnalyzeSecurity(count_hack) + target_growth) {
-            count_weaken++;
+    // create a variable to store the security increase of grow and hack
+    var security_increase = 0;
+
+    while (ram_available > ram_used && hack_absolute < 1.0) {
+        // increase the number of threads used for hacking
+        threads.hack++;
+        // calculate the resulting percentage that will be stolen from the host
+        hack_absolute = hack_relative * threads.hack;
+        // calculate how many threads need to be dedicated to growing to compensate
+        threads.grow = Math.ceil(ns.growthAnalyze(target.hostname, 1 + hack_absolute));
+        // calculate the resulting increase in security level
+        security_increase = ns.growthAnalyzeSecurity(threads.grow) + ns.hackAnalyzeSecurity(threads.hack);
+        // calculate how many threads need to be dedicated to weaken to compensate the hack and grow actions
+        while (ns.weakenAnalyze(threads.weaken) < security_increase) {
+            threads.weaken++;
         }
+        ram_used = threads.hack * ram_hack + threads.weaken * ram_weaken + threads.grow * ram_grow;
     }
+    return threads;
 }
