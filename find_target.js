@@ -10,7 +10,7 @@ export function find_target(ns, unlocked_servers, debug = false) {
     var target = ns.getServer("n00dles");
 
     // define the values needed for the search
-    var max_score = server.moneyMax / server.minDifficulty;
+    var max_score = target.moneyMax / target.minDifficulty;
     var score = 0;
     var player_level = ns.getHackingLevel();
 
