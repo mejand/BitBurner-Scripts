@@ -65,11 +65,11 @@ function getAvailableServers(ns) {
  * @returns {import(".").Server} The server object of the target.
  */
 function getTarget(ns, debug) {
-  var target_name = ns.peek(1);
-  if (!target_name || target_name == "NULL PORT DATA") {
+  var targetName = ns.peek(1);
+  if (!targetName || targetName == "NULL PORT DATA") {
     target = ns.getServer("n00dles");
   } else {
-    target = ns.getServer(target_name);
+    target = ns.getServer(targetName);
   }
   if (debug) {
     ns.tprint("target = " + target.hostname);
