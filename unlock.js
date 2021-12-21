@@ -89,7 +89,7 @@ export async function main(ns) {
             }
             // print to the terminal if debugging is enabled
             if (debug) {
-                ns.tprint(server + " unlocked = " + ns.hasRootAccess(server));
+                ns.tprint(server.hostname + " unlocked = " + server.hasAdminRights);
             }
         }
         // re-calculate the target after the unlock attempt
