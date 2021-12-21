@@ -28,8 +28,23 @@ export async function main(ns) {
     // get all servers that are ready for tasking
     servers = getAvailableServers(ns);
 
+    // loop through all servers and start the scripts
+    for (let server of servers) {
+      var threads = scriptDistribution(ns, server, target);
+      ns.exec("hack.js", server.hostname, threads.hack, target.hostname);
+      ns.exec("grow.js", server.hostname, threads.grow, target.hostname);
+      ns.exec("weaken.js", server.hostname, threads.weaken, target.hostname);
+    }
+
+    // calculate the wait time of the cycle
+    var cycleTime = Math.max(
+      ns.getHackTime(target.hostname),
+      ns.getGrowTime(target.hostname),
+      ns.getWeakenTime(target.hostname)
+    );
+
     // await another 100ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
-    await ns.sleep(100);
+    await ns.sleep(cycleTime + 100);
   }
 }
 
