@@ -8,9 +8,9 @@ export async function main(ns) {
   if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
     period = ns.args[0];
   }
-  var money_factor = 0.25;
+  var moneyFactor = 0.25;
   if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
-    money_factor = ns.args[1];
+    moneyFactor = ns.args[1];
   }
   var debug = true;
   if (ns.args.length > 2 && typeof (ns.args[2] == "boolean")) {
@@ -18,12 +18,12 @@ export async function main(ns) {
   }
 
   // calculate the maximum available budget
-  var max_money = ns.getServerMoneyAvailable("home") * money_factor;
+  var maxMoney = ns.getServerMoneyAvailable("home") * moneyFactor;
 
   // start the loop to periodically upgrade the hacknet servers
   while (true) {
     // update the maximum vailable money based on the current player money
-    max_money = ns.getServerMoneyAvailable("home") * money_factor;
+    maxMoney = ns.getServerMoneyAvailable("home") * moneyFactor;
     // create an array that holds information about all possible upgrade options currently available
     var options = [];
     // add an object for purchasing a new node
@@ -50,15 +50,15 @@ export async function main(ns) {
     }
     // loop through all options and find the cheapest
     var result = null;
-    var min_cost = null;
+    var minCost = null;
     for (let option of options) {
-      if (!min_cost || option.cost < min_cost) {
-        min_cost = option.cost;
+      if (!minCost || option.cost < minCost) {
+        minCost = option.cost;
         result = option;
       }
     }
     // execute the option if one was chosen and it is within the budget
-    if (result && result.cost <= max_money) {
+    if (result && result.cost <= maxMoney) {
       // decide which type of action was selected
       // buy node:	type 0
       // buy level: 	type 1
