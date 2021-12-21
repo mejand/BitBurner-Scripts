@@ -124,8 +124,8 @@ export async function main(ns) {
     ns.tprint(" #### Server Unlocking Started ####");
     await ns.sleep(wait_time);
 
-    // start the hacknet control script with a 1 second period, a 30% budget and debugging off
-    ns.run("hacknet.js", 1, 1000, 0.3, false);
+    // start the hacknet control script with a 5 second period, a 50% budget and debugging off
+    ns.run("hacknet.js", 1, 5000, 0.5, false);
     ns.tprint(" #### Hacknet Upgrading Started ####");
     await ns.sleep(wait_time);
 
