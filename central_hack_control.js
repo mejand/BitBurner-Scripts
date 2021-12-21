@@ -69,13 +69,13 @@ export async function main(ns) {
     deltaSecurity = target.hackDifficulty - target.minDifficulty;
     ns.tprint(
       ns.sprintf(
-        "|%(hostname)s|Money: %3.1d|Security: %3.1d|Hack: %(hack)i|Grow: %(grow)i|Weaken: %(weaken)i|Time: %s",
-        target,
+        "|%s|Money: %3.1f|Security: %3.1f|Hack: %10i|Grow: %10i|Weaken: %10i|Time: %s",
+        target.hostname,
         relativeMoney,
         deltaSecurity,
-        threads_total,
-        threads_total,
-        threads_total,
+        threads_total.hack,
+        threads_total.grow,
+        threads_total.weaken,
         ns.tFormat(cycleTime)
       )
     );
