@@ -5,7 +5,7 @@
 export async function main(ns) {
     // define default values for the arguments and try to get the arguments
     var debug = true;
-    if (ns.args.length > 0 && typeof (ns.args[0] == Boolean)) {
+    if (ns.args.length > 0 && typeof (ns.args[0] == "boolean")) {
         debug = ns.args[0];
     }
 

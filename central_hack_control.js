@@ -7,7 +7,7 @@ export async function main(ns) {
     ns.disableLog("ALL");
 
     var debug = true;
-    if (ns.args.length > 0) {
+    if (ns.args.length > 0 && typeof (ns.args[0]) == "boolean") {
         debug = ns.args[0];
     }
 

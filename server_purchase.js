@@ -5,21 +5,21 @@
 export async function main(ns) {
     // get the arguments or use the default values
     var period = 10000;
-    if (ns.args.length > 0) {
+    if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
         period = ns.args[0];
     }
     var min_ram_level = 1;
-    if (ns.args.length > 1) {
+    if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
         min_ram_level = ns.args[1];
         // limit the ram level to the maximum possible
         min_ram_level = Math.min(min_ram_level, Math.sqrt(ns.getPurchasedServerMaxRam()));
     }
     var max_money_factor = 0.25;
-    if (ns.args.length > 2) {
+    if (ns.args.length > 2 && typeof (ns.args[2] == "number")) {
         max_money = ns.args[2];
     }
     var debug = true;
-    if (ns.args.length > 3) {
+    if (ns.args.length > 3 && typeof (ns.args[3] == "boolean")) {
         debug = ns.args[3];
     }
 

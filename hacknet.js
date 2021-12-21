@@ -5,15 +5,15 @@
 export async function main(ns) {
     // get the arguments or use the default values
     var period = 10000;
-    if (ns.args.length > 0) {
+    if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
         period = ns.args[0];
     }
     var money_factor = 0.25;
-    if (ns.args.length > 1) {
+    if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
         money_factor = ns.args[1];
     }
     var debug = true;
-    if (ns.args.length > 2) {
+    if (ns.args.length > 2 && typeof (ns.args[2] == "boolean")) {
         debug = ns.args[2];
     }
 

@@ -5,7 +5,7 @@
 export async function main(ns) {
     // get the arguments the script was started with.
     var target = "n00dles";
-    if (ns.args.length > 0) {
+    if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
         target = ns.args[0];
     }
 
