@@ -8,11 +8,11 @@ import { find_target } from "find_target.js";
 export async function main(ns) {
     // get the arguments or use the default values
     var period = 10000;
-    if (ns.args.length > 0) {
+    if (ns.args.length > 0 && typeof (ns.args[0]) == Number) {
         period = ns.args[0];
     }
     var debug = true;
-    if (ns.args.length > 1) {
+    if (ns.args.length > 1 && typeof (ns.args[1]) == Boolean) {
         debug = ns.args[1];
     }
 
