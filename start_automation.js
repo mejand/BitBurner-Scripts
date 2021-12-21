@@ -103,6 +103,14 @@ export async function main(ns) {
     success = false;
     ns.tprint(" ###  Find-Target Failed  ###");
   }
+  url =
+    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hack_distribution.js";
+  if (await ns.wget(url, "hack_distribution.js")) {
+    ns.tprint(" ###  Hack-Distribution Download Successful  ###");
+  } else {
+    success = false;
+    ns.tprint(" ###  Hack-Distribution Failed  ###");
+  }
   await ns.sleep(wait_time);
 
   if (success) {
