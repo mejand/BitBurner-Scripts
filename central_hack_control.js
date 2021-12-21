@@ -15,9 +15,7 @@ export async function main(ns) {
 
   // define the variables for the script
   var target = getTarget(ns, debug);
-  var available_ram = 0;
-  var servers = [];
-  var total_threads = 0;
+  var servers = getAvailableServers(ns);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
@@ -25,70 +23,39 @@ export async function main(ns) {
     target = getTarget(ns, debug);
 
     // reset the total thread count
-    total_threads = 0;
+    totalThreads = 0;
 
-    // get the purchase servers as the base of the servers to handle
-    servers = ns.getPurchasedServers();
-    // read the file to get all servers and add them to the purchased servers
-    var rows = ns.read("network_unlocked.txt").split("\r\n");
-    for (let row of rows) {
-      // Ignore last blank row
-      if (row) {
-        // get the server name and append it to the array
-        servers.push(row);
-      }
-    }
+    // get all servers that are ready for tasking
+    servers = getAvailableServers(ns);
 
-    // check which action needs to be performed
-    if (target.hackDifficulty > securityThresh) {
-      for (let server of servers) {
-        available_ram =
-          ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-        // If the server's security level is above our threshold, weaken it
-        let thread_count = Math.floor(
-          available_ram / ns.getScriptRam("weaken.js")
-        );
-        if (thread_count > 0) {
-          ns.exec("weaken.js", server, thread_count, target.hostname);
-        }
-        // update the total thread count
-        total_threads += thread_count;
-      }
-      await ns.sleep(ns.getWeakenTime(target.hostname));
-    } else if (target.moneyAvailable < moneyThresh) {
-      for (let server of servers) {
-        available_ram =
-          ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-        // If the server's money is less than our threshold, grow it
-        let thread_count = Math.floor(
-          available_ram / ns.getScriptRam("grow.js")
-        );
-        if (thread_count > 0) {
-          ns.exec("grow.js", server, thread_count, target.hostname);
-        }
-        // update the total thread count
-        total_threads += thread_count;
-      }
-      await ns.sleep(ns.getGrowTime(target.hostname));
-    } else {
-      for (let server of servers) {
-        available_ram =
-          ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-        // Otherwise, hack it
-        let thread_count = Math.floor(
-          available_ram / ns.getScriptRam("hack.js")
-        );
-        if (thread_count > 0) {
-          ns.exec("hack.js", server, thread_count, target.hostname);
-        }
-        // update the total thread count
-        total_threads += thread_count;
-      }
-      await ns.sleep(ns.getHackTime(target.hostname));
-    }
     // await another 100ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
     await ns.sleep(100);
   }
+}
+
+/**
+ * Get an array of the servers that are ready for tasking.
+ * @param {import(".").NS } ns
+ * @returns {Array} The server objects that are available for tasking.
+ */
+function getAvailableServers(ns) {
+  // get the names of all purchased servers
+  var serverNames = ns.getPurchasedServers();
+  // read the file to get all servers and add them to the purchased servers
+  var rows = ns.read("network_unlocked.txt").split("\r\n");
+  for (let row of rows) {
+    // Ignore last blank row
+    if (row) {
+      // get the server name and append it to the array
+      serverNames.push(row);
+    }
+  }
+  // loop through all the server names and get the associated server objects
+  servers = [];
+  for (let name of serverNames) {
+    servers.push(ns.getServer(name));
+  }
+  return servers;
 }
 
 /**
