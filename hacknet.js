@@ -17,13 +17,16 @@ export async function main(ns) {
     debug = ns.args[2];
   }
 
-  // calculate the maximum available budget
-  var maxMoney = ns.getServerMoneyAvailable("home") * moneyFactor;
+  // define a variable the maximum available budget
+  var maxMoney = 0;
+
+  // adjust the money factor for the period of the script
+  // production is given in $/s -> if the period is longer than 1 second
+  // then more than one second of production has to be considered
+  moneyFactor = moneyFactor * (1000 / period);
 
   // start the loop to periodically upgrade the hacknet servers
   while (true) {
-    // update the maximum vailable money based on the current player money
-    maxMoney = ns.getServerMoneyAvailable("home") * moneyFactor;
     // create an array that holds information about all possible upgrade options currently available
     var options = [];
     // add an object for purchasing a new node
@@ -34,6 +37,8 @@ export async function main(ns) {
     });
     // loop through all nodes and gather the different upgrade options
     for (var i = 0; i < ns.hacknet.numNodes(); i++) {
+      // get the node object and sum up the current node production
+      maxMoney += ns.hacknet.getNodeStats(i).production * moneyFactor;
       // check if the upgrade is possible (infinity is returned if upgrade is maxed out)
       var upgrade_cost = ns.hacknet.getLevelUpgradeCost(i);
       if (isFinite(upgrade_cost)) {
@@ -81,8 +86,13 @@ export async function main(ns) {
           break;
       }
       if (debug) {
-        ns.tprint("manage_hacknet:" + JSON.stringify(option));
+        ns.tprint("manage_hacknet:" + JSON.stringify(result));
       }
+      // reset the maximum money when an upgrade was bought
+      maxMoney = 0;
+    }
+    if (debug) {
+      ns.tprint("maxMoney: " + maxMoney);
     }
     await ns.sleep(period);
   }
