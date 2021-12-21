@@ -1,11 +1,11 @@
 /**
  * Handle the start up of control scripts on the home server at the beginning of a run.
  * @param {import(".").NS } ns
- * @param {number} ram_available - The RAM that is available for use by the scripts.
+ * @param {import(".").Server} host - The server that will run the scripts.
  * @param {import(".").Server} target - The target server.
  * @returns {Object} An object containing the number of threads for each script type.
  */
-export function scriptDistribution(ns, ram_available, target) {
+export function scriptDistribution(ns, host, target) {
   // define the starting counts for all scripts
   var threads = { hack: 0, grow: 0, weaken: 0 };
 
@@ -14,6 +14,7 @@ export function scriptDistribution(ns, ram_available, target) {
   var ram_grow = ns.getScriptRam("grow.js", "home");
   var ram_weaken = ns.getScriptRam("weaken.js", "home");
   var ram_used = 0;
+  var ram_available = host.maxRam - host.ramUsed;
 
   // get the hack amount per thread
   var hack_relative = ns.hackAnalyze(target.hostname);
