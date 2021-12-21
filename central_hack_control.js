@@ -103,7 +103,7 @@ function getAvailableServers(ns) {
     }
   }
   // loop through all the server names and get the associated server objects
-  servers = [];
+  var servers = [];
   for (let name of serverNames) {
     servers.push(ns.getServer(name));
   }
