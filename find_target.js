@@ -30,6 +30,7 @@ export function find_target(ns, unlocked_servers, debug = false) {
     }
     // print the new target if debugging is enabled
     if (debug) {
+        ns.tprint(unlocked_servers);
         ns.tprint("#### Best Target: " + target.hostname + " for hacking lvl " + player_level);
     }
     return target;
