@@ -17,27 +17,12 @@ export async function main(ns) {
   var target = getTarget(ns, debug);
   var available_ram = 0;
   var servers = [];
-  var terminal_string = "";
   var total_threads = 0;
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
     // read the target from file and recalculate the thresholds
     target = getTarget(ns, debug);
-
-    // calculate the thresholds
-    moneyThresh = target.moneyMax * 0.75;
-    securityThresh = target.minDifficulty + 5;
-
-    // update the string that will be displayed in the terminal
-    terminal_string =
-      "|" +
-      target.hostname +
-      "|Money: " +
-      ns.nFormat((target.moneyAvailable / moneyThresh) * 100, "000.0") +
-      " %|";
-    terminal_string += ns.nFormat(securityThresh, "000.0") + " secLvl / ";
-    terminal_string += ns.nFormat(target.hackDifficulty, "000.0") + " secLvl|";
 
     // reset the total thread count
     total_threads = 0;
@@ -69,11 +54,6 @@ export async function main(ns) {
         // update the total thread count
         total_threads += thread_count;
       }
-      terminal_string +=
-        "Weaken - " + ns.tFormat(ns.getWeakenTime(target.hostname)) + "|-";
-      terminal_string +=
-        ns.nFormat(ns.weakenAnalyze(total_threads), "0,0.0") + " secLvl|";
-      ns.tprint(terminal_string);
       await ns.sleep(ns.getWeakenTime(target.hostname));
     } else if (target.moneyAvailable < moneyThresh) {
       for (let server of servers) {
@@ -89,13 +69,6 @@ export async function main(ns) {
         // update the total thread count
         total_threads += thread_count;
       }
-      terminal_string +=
-        "Grow - " + ns.tFormat(ns.getGrowTime(target.hostname));
-      terminal_string +=
-        "|+" +
-        ns.nFormat(ns.growthAnalyzeSecurity(total_threads), "0,0.0") +
-        " secLvl|";
-      ns.tprint(terminal_string);
       await ns.sleep(ns.getGrowTime(target.hostname));
     } else {
       for (let server of servers) {
@@ -111,14 +84,9 @@ export async function main(ns) {
         // update the total thread count
         total_threads += thread_count;
       }
-      terminal_string +=
-        "Hack - " + ns.tFormat(ns.getHackTime(target.hostname)) + "|+";
-      terminal_string +=
-        ns.nFormat(ns.hackAnalyzeSecurity(total_threads), "0,0.0") + " secLvl|";
-      ns.tprint(terminal_string);
       await ns.sleep(ns.getHackTime(target.hostname));
     }
-    // await another 20ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
+    // await another 100ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
     await ns.sleep(100);
   }
 }
