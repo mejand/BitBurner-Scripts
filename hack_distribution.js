@@ -52,7 +52,7 @@ export function scriptDistribution(ns, host, target) {
       threads.weaken * ram_weaken +
       threads.grow * ram_grow;
     // go back to the old counts if the new ones are not valid
-    if (ram_available > ram_used && hack_absolute < 1.0) {
+    if (ram_available < ram_used || hack_absolute > 1.0) {
       threads = threads_old;
       search = false;
     }
