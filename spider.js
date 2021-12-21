@@ -19,19 +19,11 @@ export async function main(ns) {
     for (var i = 0; i < servers_seen.length; i++) {
         // get the name of the server that is currently under investigation
         var host = servers_seen[i];
-        // build the data to print to the file
-        var data = host;
-        data += "," + ns.getServerMaxRam(host);
-        data += "," + ns.getServerNumPortsRequired(host);
-        data += "," + ns.getServerRequiredHackingLevel(host);
-        data += "," + ns.getServerMaxMoney(host);
-        data += "," + ns.getServerMinSecurityLevel(host);
-        data += "," + ns.getServerGrowth(host);
         if (debug) {
-            ns.tprint(data);
+            ns.tprint(host);
         }
         // write the static information of the server to the file
-        await ns.write("network_map.txt", data + "\r\n", "a");
+        await ns.write("network_map.txt", host + "\r\n", "a");
         // get all servers connected to the current server
         var servers_connected = ns.scan(host);
         // Loop through connected servers of the host and add any new servers
