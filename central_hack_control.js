@@ -21,8 +21,8 @@ export async function main(ns) {
     // define the variables for the script
     var target_name = "n00dles";
     var target = ns.getServer(target_name);
-    var moneyThresh = ns.getServerMaxMoney(target) * 0.75;
-    var securityThresh = ns.getServerMinSecurityLevel(target) + 5;
+    var moneyThresh = target.moneyMax * 0.75;
+    var securityThresh = target.minDifficulty + 5;
     var available_ram = 0;
     var servers = [];
     var terminal_string = "";
