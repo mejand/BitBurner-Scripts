@@ -1,4 +1,4 @@
-import { find_target } from "find_target.js";
+import { find_target } from "./find_target";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
