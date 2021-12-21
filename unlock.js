@@ -47,23 +47,23 @@ export async function main(ns) {
                 // use all available programs to open ports
                 var open_ports = 0;
                 if (ns.fileExists("BruteSSH.exe", "home")) {
-                    ns.brutessh(server);
+                    ns.brutessh(server.hostname);
                     open_ports++;
                 }
                 if (ns.fileExists("FTPCrack.exe", "home")) {
-                    ns.ftpcrack(server);
+                    ns.ftpcrack(server.hostname);
                     open_ports++;
                 }
                 if (ns.fileExists("relaySMTP.exe", "home")) {
-                    ns.relaysmtp(server);
+                    ns.relaysmtp(server.hostname);
                     open_ports++;
                 }
                 if (ns.fileExists("HTTPWorm.exe", "home")) {
-                    ns.httpworm(server);
+                    ns.httpworm(server.hostname);
                     open_ports++;
                 }
                 if (ns.fileExists("SQLInject.exe", "home")) {
-                    ns.sqlinject(server);
+                    ns.sqlinject(server.hostname);
                     open_ports++;
                 }
                 // check if enough ports could be opened
