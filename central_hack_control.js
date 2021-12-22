@@ -24,7 +24,19 @@ export async function main(ns) {
   // define a veriable to keep track of how long a script cycle takes
   var cycleTime = 0;
 
-  // define an object to keep track of how many threads are used in total for each script type
+  // get the ram needed to run any script
+  var ramNeeded = Math.max(
+    ns.getScriptRam("hack.js"),
+    ns.getScriptRam("grow.js"),
+    ns.getScriptRam("weaken.js")
+  );
+
+  // define a variable to keep track of how many threads are available
+  var threadsAvailable = getAvailableThreads(ns, servers, ramNeeded);
+
+  // define a variable to keep thrack of how many threads shall be used for which script
+  var threadDistribution = scriptDistribution(ns, threadsAvailable, target);
+  var threadDistributionBase = threadDistribution;
   var threadsUsed = Threads(0, 0, 0);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
@@ -38,24 +50,12 @@ export async function main(ns) {
     // get all servers that are ready for tasking
     servers = getAvailableServers(ns);
 
-    // reset the total thread count
-    threadsUsed.hack.count = 0;
-    threadsUsed.grow.count = 0;
-    threadsUsed.weaken.count = 0;
+    // calculate how many threads are available for tasking
+    threadsAvailable = getAvailableThreads(ns, servers);
 
-    // loop through all servers and start the scripts
-    for (let server of servers) {
-      // get the number of threads per script
-      var threads = scriptDistribution(ns, server, target);
-      // start the scripts
-      ns.exec("hack.js", server.hostname, threads.hack, target.hostname);
-      ns.exec("grow.js", server.hostname, threads.grow, target.hostname);
-      ns.exec("weaken.js", server.hostname, threads.weaken, target.hostname);
-      // add the scripts to the total thread count
-      threadsUsed.hack.count += threads.hack;
-      threadsUsed.grow.count += threads.grow;
-      threadsUsed.weaken.count += threads.weaken;
-    }
+    // update the thread distribution
+    threadDistribution = scriptDistribution(ns, threadsAvailable, target);
+    threadDistributionBase = threadDistribution;
 
     // calculate the wait time of the cycle
     cycleTime = Math.max(
@@ -64,19 +64,73 @@ export async function main(ns) {
       ns.getWeakenTime(target.hostname)
     );
 
+    // loop through all servers and start the scripts
+    for (let server of servers) {
+      // calculate the available threads on the server
+      let ramAvailable = server.mayRam - server.ramUsed;
+      let threadsAvailableLocal = Math.floor(ramAvailable / ramNeeded);
+      // check if there are any threads available for tasking on this server
+      if (threadsAvailableLocal) {
+        // define a variable to hold the information about how many threads shall be used for what on this server
+        let threadsToBeUsed = Threads(0, 0, 0);
+        // calculate howm any threads can be used for weakening
+        threadsToBeUsed.weaken.count = Math.min(
+          threadsAvailableLocal,
+          threadDistribution.weaken.count
+        );
+        // update the remaining available threads and the globally demanded threads
+        threadsAvailableLocal -= threadsToBeUsed.weaken.count;
+        threadDistribution.weaken.count -= threadsToBeUsed.weaken.count;
+        // calculate howm any threads can be used for growing
+        threadsToBeUsed.grow.count = Math.min(
+          threadsAvailableLocal,
+          threadDistribution.grow.count
+        );
+        // update the remaining available threads and the globally demanded threads
+        threadsAvailableLocal -= threadsToBeUsed.grow.count;
+        threadDistribution.grow.count -= threadsToBeUsed.grow.count;
+        // calculate howm any threads can be used for hacking
+        threadsToBeUsed.hack.count = Math.min(
+          threadsAvailableLocal,
+          threadDistribution.hack.count
+        );
+        // update the remaining available threads and the globally demanded threads
+        threadsAvailableLocal -= threadsToBeUsed.hack.count;
+        threadDistribution.hack.count -= threadsToBeUsed.hack.count;
+        // start the scripts
+        for (script in threadsToBeUsed) {
+          if (script.count > 0) {
+            ns.exec(
+              script.script,
+              server.hostname,
+              script.count,
+              target.hostname
+            );
+          }
+        }
+      }
+    }
+
     // print the cycle information to screen
     relativeMoney = (target.moneyAvailable / target.moneyMax) * 100;
     deltaSecurity = target.hackDifficulty - target.minDifficulty;
+    threadsUsed = Threads(
+      threadDistributionBase.hack.count - threadDistribution.hack.count,
+      threadDistributionBase.grow.count - threadDistribution.grow.count,
+      threadDistributionBase.weaken.count - threadDistribution.weaken.count
+    );
+    let threadUsage = (threadsUsed.sum / threadsAvailable) * 100;
     ns.tprint(
       ns.sprintf(
-        "|%s|Money: %3.1f|Security: %3.1f|Hack: %10i|Grow: %10i|Weaken: %10i|Time: %s",
+        "|%s|Money: %3.1f|Security: %3.1f|Hack: %10i|Grow: %10i|Weaken: %10i|Time: %s|Usage: %3.1f",
         target.hostname,
         relativeMoney,
         deltaSecurity,
         threadsUsed.hack.count,
         threadsUsed.grow.count,
         threadsUsed.weaken.count,
-        ns.tFormat(cycleTime)
+        ns.tFormat(cycleTime),
+        threadUsage
       )
     );
 
@@ -123,4 +177,22 @@ function getTarget(ns) {
     target = ns.getServer(targetName);
   }
   return target;
+}
+
+/**
+ * Get the number of threads available for tasking on a set of servers.
+ * @param {import(".").NS} ns
+ * @param {Array} servers - The servers for which the number of threads shall be determined.
+ * @param {number} ramNeeded - The amount of ram needed for any script.
+ * @returns {number} The number of threads available for tasking.
+ */
+function getAvailableThreads(ns, servers, ramNeeded) {
+  // define a variable for the total available threads
+  var threadsAvailable = 0;
+  // loop through all servers and add up their thread count
+  for (let server of servers) {
+    let ramAvailable = server.mayRam - server.ramUsed;
+    threadsAvailable += Math.floor(ramAvailable / ramNeeded);
+  }
+  return threadsAvailable;
 }

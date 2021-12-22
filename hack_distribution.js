@@ -70,4 +70,7 @@ export class Threads {
     this.grow = { count: grow, script: "grow.js" };
     this.weaken = { count: weaken, script: "weaken.js" };
   }
+  get sum() {
+    return this.hack.count + this.grow.count + this.weaken.count;
+  }
 }
