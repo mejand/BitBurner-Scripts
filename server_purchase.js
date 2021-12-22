@@ -67,6 +67,10 @@ export async function main(ns) {
         ) {
           // buy the new server and store its name
           var new_server = ns.purchaseServer("basic-hack-server", ram);
+          // copy the hacking scripts to the new server
+          await ns.scp("weaken.js", "home", new_server);
+          await ns.scp("grow.js", "home", new_server);
+          await ns.scp("hack.js", "home", new_server);
           // print the name for debugging purposes
           if (debug) {
             ns.tprint("bought " + new_server + " - " + ram + "GB");
