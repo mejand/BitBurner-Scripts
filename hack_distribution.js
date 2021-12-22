@@ -1,22 +1,15 @@
 /**
- * Handle the start up of control scripts on the home server at the beginning of a run.
+ * Calculate the number of threads needed per script type to hack a target in the most efficient way.
  * @param {import(".").NS } ns
- * @param {import(".").Server} host - The server that will run the scripts.
+ * @param {number} threadsAvailable - The total number of threads available for tasking.
  * @param {import(".").Server} target - The target server.
  * @returns {Object} An object containing the number of threads for each script type.
  */
-export function scriptDistribution(ns, host, target) {
+export function scriptDistribution(ns, threadsAvailable, target) {
   // define the starting counts for all scripts
   var threads = { hack: 0, grow: 0, weaken: 0 };
   // define a variable to store the old values during each calculation step
-  var threads_old = threads;
-
-  // get the ram amount for each script
-  var ram_hack = ns.getScriptRam("hack.js", "home");
-  var ram_grow = ns.getScriptRam("grow.js", "home");
-  var ram_weaken = ns.getScriptRam("weaken.js", "home");
-  var ram_used = 0;
-  var ram_available = host.maxRam - host.ramUsed;
+  var threadsOld = threads;
 
   // get the hack amount per thread
   var hack_relative = ns.hackAnalyze(target.hostname);
@@ -25,12 +18,15 @@ export function scriptDistribution(ns, host, target) {
   // create a variable to store the security increase of grow and hack
   var security_increase = 0;
 
+  // create a variable to keep thrack of how many threads are being used in total
+  var threadsTotal = 0;
+
   // create a variable to control how long the loop runs for
   var search = true;
 
   while (search) {
     // store the last thread counts before trying out the new values
-    threads_old = threads;
+    threadsOld = threads;
     // increase the number of threads used for hacking
     threads.hack++;
     // calculate the resulting percentage that will be stolen from the host
@@ -47,13 +43,11 @@ export function scriptDistribution(ns, host, target) {
     while (ns.weakenAnalyze(threads.weaken) < security_increase) {
       threads.weaken++;
     }
-    ram_used =
-      threads.hack * ram_hack +
-      threads.weaken * ram_weaken +
-      threads.grow * ram_grow;
+    // calculate the total number of threads used by the scripts
+    threadsTotal = threads.hack + threads.grow + threads.weaken;
     // go back to the old counts if the new ones are not valid
-    if (ram_available < ram_used || hack_absolute > 1.0) {
-      threads = threads_old;
+    if (threadsAvailable < threadsTotal || hack_absolute > 1.0) {
+      threads = threadsOld;
       search = false;
     }
   }
