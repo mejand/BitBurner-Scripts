@@ -121,6 +121,18 @@ export async function main(ns) {
       )
     );
 
+    // print the target thread distribution if debugging is enabled
+    if (debug) {
+      ns.tprint(
+        ns.sprintf(
+          "|Targets|Hack: %(count)10i|Grow: %(count)10i|Weaken: %(count)10i|",
+          threadDistributionTarget.hack,
+          threadDistributionTarget.grow,
+          threadDistributionTarget.weaken
+        )
+      );
+    }
+
     // await another 100ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
     await ns.sleep(cycleTime + 100);
   }
