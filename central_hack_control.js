@@ -1,4 +1,4 @@
-import { scriptDistribution } from "./hack_distribution.js";
+import { scriptDistribution, Threads } from "./hack_distribution.js";
 
 /**
  * Handle the growing, weakening and hacking scripts from one central server.
@@ -25,7 +25,7 @@ export async function main(ns) {
   var cycleTime = 0;
 
   // define an object to keep track of how many threads are used in total for each script type
-  var threads_total = { hack: 0, grow: 0, weaken: 0 };
+  var threadsUsed = Threads(0, 0, 0);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
@@ -39,9 +39,9 @@ export async function main(ns) {
     servers = getAvailableServers(ns);
 
     // reset the total thread count
-    threads_total.hack = 0;
-    threads_total.grow = 0;
-    threads_total.weaken = 0;
+    threadsUsed.hack.count = 0;
+    threadsUsed.grow.count = 0;
+    threadsUsed.weaken.count = 0;
 
     // loop through all servers and start the scripts
     for (let server of servers) {
@@ -52,9 +52,9 @@ export async function main(ns) {
       ns.exec("grow.js", server.hostname, threads.grow, target.hostname);
       ns.exec("weaken.js", server.hostname, threads.weaken, target.hostname);
       // add the scripts to the total thread count
-      threads_total.hack += threads.hack;
-      threads_total.grow += threads.grow;
-      threads_total.weaken += threads.weaken;
+      threadsUsed.hack.count += threads.hack;
+      threadsUsed.grow.count += threads.grow;
+      threadsUsed.weaken.count += threads.weaken;
     }
 
     // calculate the wait time of the cycle
@@ -73,9 +73,9 @@ export async function main(ns) {
         target.hostname,
         relativeMoney,
         deltaSecurity,
-        threads_total.hack,
-        threads_total.grow,
-        threads_total.weaken,
+        threadsUsed.hack.count,
+        threadsUsed.grow.count,
+        threadsUsed.weaken.count,
         ns.tFormat(cycleTime)
       )
     );

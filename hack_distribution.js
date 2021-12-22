@@ -58,7 +58,7 @@ export function scriptDistribution(ns, threadsAvailable, target) {
 /**
  * A class to keep track of the distribution of threads between the hack scripts.
  */
-class Threads {
+export class Threads {
   /**
    * A class to keep track of the distribution of threads between the hack scripts.
    * @param {number} hack - The number of threads dedicated to hacking.
