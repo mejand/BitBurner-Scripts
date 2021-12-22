@@ -47,18 +47,14 @@ export function scriptDistribution(
       ns.hackAnalyzeSecurity(threads.hack.count);
     // calculate how many threads need to be dedicated to weaken to compensate the hack and grow actions
     threads.weaken.count = Math.ceil(securityIncrease / securityDecrease);
-    // print the attempted values for debugging
-    if (debug) {
-      ns.tprint("|Attempt" + threads.description(ns));
-    }
     // go back to the old counts if the new ones are not valid
     if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
       threads = threadsOld.copy;
       search = false;
       // print the abort criteria
       if (debug) {
-        ns.tprint(
-          "Aborted: " +
+        ns.print(
+          "Distribution Calculation Aborted: " +
             threadsAvailable +
             " < " +
             threads.sum +
@@ -67,10 +63,6 @@ export function scriptDistribution(
             " > 1.0"
         );
       }
-    }
-    // print the selected values for debugging
-    if (debug) {
-      ns.tprint("|Result" + threads.description(ns));
     }
   }
   return threads;
