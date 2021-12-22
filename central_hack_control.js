@@ -81,14 +81,6 @@ export async function main(ns) {
       // calculate the available threads on the server
       let ramAvailable = server.maxRam - server.ramUsed;
       let threadsAvailableLocal = Math.floor(ramAvailable / ramNeeded);
-      if (debug) {
-        ns.print(
-          "ramAvailable=" +
-            ramAvailable +
-            " threadsAvailableLocal=" +
-            threadsAvailableLocal
-        );
-      }
       // check if there are any threads available for tasking on this server
       if (threadsAvailableLocal > 0) {
         // start the scripts
@@ -98,10 +90,10 @@ export async function main(ns) {
             threadsAvailableLocal,
             threadDistribution[script].count
           );
-          if (debug) {
-            ns.print(script + ": threads=" + threadsForScript);
-          }
           if (threadsForScript > 0) {
+            if (debug) {
+              ns.print(script + ": threads=" + threadsForScript);
+            }
             // update the remaining available threads and the globally demanded threads
             threadsAvailableLocal -= threadsForScript;
             threadDistribution[script].count -= threadsForScript;
