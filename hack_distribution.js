@@ -49,13 +49,11 @@ export function scriptDistribution(ns, threadsAvailable, target) {
   return threads;
 }
 
-/**
- * A class to keep track of the distribution of threads between the hack scripts.
- * @property {number} sum - The sum of all threads.
- */
 export class Threads {
   /**
-   * A class to keep track of the distribution of threads between the hack scripts.
+   * Create a class object with a given set of threads for each script.
+   * @class
+   * @classdesc A class to keep track of the distribution of threads between the hack scripts
    * @param {number} hack - The number of threads dedicated to hacking.
    * @param {number} grow - The number of threads dedicated to growing.
    * @param {number} weaken - The number of threads dedicated to weaken.
@@ -65,6 +63,11 @@ export class Threads {
     this.grow = { count: grow, script: "grow.js" };
     this.weaken = { count: weaken, script: "weaken.js" };
   }
+
+  /**
+   * Get the sum of all threads.
+   * @readonly
+   */
   get sum() {
     return this.hack.count + this.grow.count + this.weaken.count;
   }
