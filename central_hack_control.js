@@ -62,7 +62,7 @@ export async function main(ns) {
       ns,
       threadsAvailable,
       target,
-      debug
+      false
     );
     threadDistribution = threadDistributionTarget;
 
@@ -101,6 +101,12 @@ export async function main(ns) {
           }
         }
       }
+    }
+
+    // print debug information to the terminal
+    if (debug) {
+      ns.tprint("|Target Threads|" + threadDistributionTarget.description(ns));
+      ns.tprint("|Remaining Threads|" + threadDistribution.description(ns));
     }
 
     // print the cycle information to screen
