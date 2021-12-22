@@ -71,7 +71,7 @@ export async function main(ns) {
     // loop through all servers and start the scripts
     for (let server of servers) {
       // calculate the available threads on the server
-      let ramAvailable = server.mayRam - server.ramUsed;
+      let ramAvailable = server.maxRam - server.ramUsed;
       let threadsAvailableLocal = Math.floor(ramAvailable / ramNeeded);
       // check if there are any threads available for tasking on this server
       if (threadsAvailableLocal > 0) {
@@ -129,7 +129,7 @@ export async function main(ns) {
 /**
  * Get an array of the servers that are ready for tasking.
  * @param {import(".").NS } ns
- * @returns {Array} The server objects that are available for tasking.
+ * @returns {import(".").Server[]} The server objects that are available for tasking.
  */
 function getAvailableServers(ns) {
   // get the names of all purchased servers
@@ -169,7 +169,7 @@ function getTarget(ns) {
 /**
  * Get the number of threads available for tasking on a set of servers.
  * @param {import(".").NS} ns
- * @param {Array} servers - The servers for which the number of threads shall be determined.
+ * @param {import(".").Server[]} servers - The servers for which the number of threads shall be determined.
  * @param {number} ramNeeded - The amount of ram needed for any script.
  * @returns {number} The number of threads available for tasking.
  */
@@ -178,7 +178,7 @@ function getAvailableThreads(ns, servers, ramNeeded) {
   var threadsAvailable = 0;
   // loop through all servers and add up their thread count
   for (let server of servers) {
-    let ramAvailable = server.mayRam - server.ramUsed;
+    let ramAvailable = server.maxRam - server.ramUsed;
     threadsAvailable += Math.floor(ramAvailable / ramNeeded);
   }
   return threadsAvailable;
