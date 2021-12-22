@@ -3,9 +3,15 @@
  * @param {import(".").NS } ns
  * @param {number} threadsAvailable - The total number of threads available for tasking.
  * @param {import(".").Server} target - The target server.
+ * @param {boolean} debug - Flag to enable debug logging to the console.
  * @returns {Threads} An object containing the number of threads for each script type.
  */
-export function scriptDistribution(ns, threadsAvailable, target) {
+export function scriptDistribution(
+  ns,
+  threadsAvailable,
+  target,
+  debug = false
+) {
   // define the starting counts for all scripts
   var threads = new Threads(0, 0, 0);
   // define a variable to store the old values during each calculation step
@@ -40,10 +46,30 @@ export function scriptDistribution(ns, threadsAvailable, target) {
     while (ns.weakenAnalyze(threads.weaken.count) < security_increase) {
       threads.weaken.count++;
     }
+    // print the attempted values for debugging
+    if (debug) {
+      ns.tprint("|Attempt" + threads.description);
+    }
     // go back to the old counts if the new ones are not valid
     if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
       threads = threadsOld;
       search = false;
+      // print the abort criteria
+      if (debug) {
+        ns.tprint(
+          "Aborted: " +
+            threadsAvailable +
+            " < " +
+            threads.sum +
+            " || " +
+            hackAbsolute +
+            " > 1.0"
+        );
+      }
+    }
+    // print the selected values for debugging
+    if (debug) {
+      ns.tprint("|Result" + threads.description);
     }
   }
   return threads;
@@ -70,5 +96,19 @@ export class Threads {
    */
   get sum() {
     return this.hack.count + this.grow.count + this.weaken.count;
+  }
+
+  /**
+   * Get a string that describes the class.
+   * @readonly
+   */
+  get description() {
+    var description = ns.sprintf(
+      "|Hack: %(count)10i|Grow: %(count)10i|Weaken: %(count)10i|",
+      this.hack,
+      this.grow,
+      this.weaken
+    );
+    return description;
   }
 }
