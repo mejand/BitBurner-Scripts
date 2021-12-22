@@ -5,12 +5,15 @@ import { scriptDistribution, Threads } from "./hack_distribution.js";
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
-  // clean up the log
-  ns.disableLog("ALL");
-
   var debug = true;
   if (ns.args.length > 0 && typeof ns.args[0] == "boolean") {
     debug = ns.args[0];
+  }
+
+  // clean up the log
+  ns.disableLog("ALL");
+  if (debug) {
+    ns.enableLog("exec");
   }
 
   // define the servers for the script
@@ -78,6 +81,14 @@ export async function main(ns) {
       // calculate the available threads on the server
       let ramAvailable = server.maxRam - server.ramUsed;
       let threadsAvailableLocal = Math.floor(ramAvailable / ramNeeded);
+      if (debug) {
+        ns.print(
+          "ramAvailable=" +
+            ramAvailable +
+            " threadsAvailableLocal=" +
+            threadsAvailableLocal
+        );
+      }
       // check if there are any threads available for tasking on this server
       if (threadsAvailableLocal > 0) {
         // start the scripts
@@ -87,6 +98,9 @@ export async function main(ns) {
             threadsAvailableLocal,
             threadDistribution[script].count
           );
+          if (debug) {
+            ns.print(script + ": threads=" + threadsForScript);
+          }
           if (threadsForScript > 0) {
             // update the remaining available threads and the globally demanded threads
             threadsAvailableLocal -= threadsForScript;
@@ -105,12 +119,10 @@ export async function main(ns) {
 
     // print debug information to the terminal
     if (debug) {
-      ns.tprint(
-        "|DEBUG|Target Threads   |" + threadDistributionTarget.description(ns)
+      ns.print(
+        "|Target Threads   |" + threadDistributionTarget.description(ns)
       );
-      ns.tprint(
-        "|DEBUG|Remaining Threads|" + threadDistribution.description(ns)
-      );
+      ns.print("|Remaining Threads|" + threadDistribution.description(ns));
     }
 
     // print the cycle information to screen
