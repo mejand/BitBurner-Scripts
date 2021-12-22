@@ -7,7 +7,7 @@
  */
 export function scriptDistribution(ns, threadsAvailable, target) {
   // define the starting counts for all scripts
-  var threads = Threads(0, 0, 0);
+  var threads = new Threads(0, 0, 0);
   // define a variable to store the old values during each calculation step
   var threadsOld = threads;
 
@@ -17,9 +17,6 @@ export function scriptDistribution(ns, threadsAvailable, target) {
 
   // create a variable to store the security increase of grow and hack
   var security_increase = 0;
-
-  // create a variable to keep track of how many threads are being used in total
-  var threadsTotal = 0;
 
   // create a variable to control how long the loop runs for
   var search = true;

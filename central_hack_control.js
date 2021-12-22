@@ -22,7 +22,7 @@ export async function main(ns) {
   var deltaSecurity = target.hackDifficulty - target.minDifficulty;
 
   // define a veriable to keep track of how long a script cycle takes
-  var cycleTime = 0;
+  var cycleTime = 10;
 
   // get the ram needed to run any script
   var ramNeeded = Math.max(
@@ -37,7 +37,7 @@ export async function main(ns) {
   // define a variable to keep thrack of how many threads shall be used for which script
   var threadDistribution = scriptDistribution(ns, threadsAvailable, target);
   var threadDistributionBase = threadDistribution;
-  var threadsUsed = Threads(0, 0, 0);
+  var threadsUsed = new Threads(0, 0, 0);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
@@ -72,7 +72,7 @@ export async function main(ns) {
       // check if there are any threads available for tasking on this server
       if (threadsAvailableLocal) {
         // define a variable to hold the information about how many threads shall be used for what on this server
-        let threadsToBeUsed = Threads(0, 0, 0);
+        let threadsToBeUsed = new Threads(0, 0, 0);
         // calculate howm any threads can be used for weakening
         threadsToBeUsed.weaken.count = Math.min(
           threadsAvailableLocal,
@@ -114,7 +114,7 @@ export async function main(ns) {
     // print the cycle information to screen
     relativeMoney = (target.moneyAvailable / target.moneyMax) * 100;
     deltaSecurity = target.hackDifficulty - target.minDifficulty;
-    threadsUsed = Threads(
+    threadsUsed = new Threads(
       threadDistributionBase.hack.count - threadDistribution.hack.count,
       threadDistributionBase.grow.count - threadDistribution.grow.count,
       threadDistributionBase.weaken.count - threadDistribution.weaken.count
