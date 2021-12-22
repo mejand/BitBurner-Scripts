@@ -91,9 +91,6 @@ export async function main(ns) {
             threadDistribution[script].count
           );
           if (threadsForScript > 0) {
-            if (debug) {
-              ns.print(script + ": threads=" + threadsForScript);
-            }
             // update the remaining available threads and the globally demanded threads
             threadsAvailableLocal -= threadsForScript;
             threadDistribution[script].count -= threadsForScript;
