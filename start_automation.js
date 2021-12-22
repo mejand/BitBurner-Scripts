@@ -135,7 +135,7 @@ export async function main(ns) {
     await ns.sleep(wait_time);
 
     // start the centralized hacking control script
-    ns.run("central_hack_control.js", 1, false);
+    ns.run("central_hack_control.js", 1, true);
     ns.tprint(" #### Central Hack Control Started ####");
     await ns.sleep(wait_time);
   } else {
