@@ -75,39 +75,22 @@ export async function main(ns) {
       let threadsAvailableLocal = Math.floor(ramAvailable / ramNeeded);
       // check if there are any threads available for tasking on this server
       if (threadsAvailableLocal > 0) {
-        // define a variable to hold the information about how many threads shall be used on this server
-        let threadsToBeUsed = new Threads(0, 0, 0);
-        // calculate how many threads can be used for weakening
-        threadsToBeUsed.weaken.count = Math.min(
-          threadsAvailableLocal,
-          threadDistribution.weaken.count
-        );
-        // update the remaining available threads and the globally demanded threads
-        threadsAvailableLocal -= threadsToBeUsed.weaken.count;
-        threadDistribution.weaken.count -= threadsToBeUsed.weaken.count;
-        // calculate howm any threads can be used for growing
-        threadsToBeUsed.grow.count = Math.min(
-          threadsAvailableLocal,
-          threadDistribution.grow.count
-        );
-        // update the remaining available threads and the globally demanded threads
-        threadsAvailableLocal -= threadsToBeUsed.grow.count;
-        threadDistribution.grow.count -= threadsToBeUsed.grow.count;
-        // calculate howm any threads can be used for hacking
-        threadsToBeUsed.hack.count = Math.min(
-          threadsAvailableLocal,
-          threadDistribution.hack.count
-        );
-        // update the remaining available threads and the globally demanded threads
-        threadsAvailableLocal -= threadsToBeUsed.hack.count;
-        threadDistribution.hack.count -= threadsToBeUsed.hack.count;
         // start the scripts
-        for (script in threadsToBeUsed) {
-          if (threadsToBeUsed[script].count > 0) {
+        for (script in threadDistribution) {
+          // calculate how many threads can be used for the script
+          let threadsForScript = Math.min(
+            threadsAvailableLocal,
+            threadDistribution[script].count
+          );
+          if (threadsForScript > 0) {
+            // update the remaining available threads and the globally demanded threads
+            threadsAvailableLocal -= threadsForScript;
+            threadDistribution[script].count -= threadsForScript;
+            // start the script
             ns.exec(
-              threadsToBeUsed[script].script,
+              threadDistribution[script].script,
               server.hostname,
-              threadsToBeUsed[script].count,
+              threadsForScript,
               target.hostname
             );
           }
@@ -126,15 +109,15 @@ export async function main(ns) {
     let threadUsage = (threadDistributionActual.sum / threadsAvailable) * 100;
     ns.tprint(
       ns.sprintf(
-        "|%s|Money: %3.1f|Security: %3.1f|Hack: %10i|Grow: %10i|Weaken: %10i|Time: %s|Usage: %3.1f",
+        "|%s|Money: %3.1f|Security: %3.1f|Hack: %6i|Grow: %6i|Weaken: %6i|Usage: %3.1f|Time: %s|",
         target.hostname,
         relativeMoney,
         deltaSecurity,
         threadDistributionActual.hack.count,
         threadDistributionActual.grow.count,
         threadDistributionActual.weaken.count,
-        ns.tFormat(cycleTime),
-        threadUsage
+        threadUsage,
+        ns.tFormat(cycleTime)
       )
     );
 
