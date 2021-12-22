@@ -18,7 +18,7 @@ export function scriptDistribution(ns, threadsAvailable, target) {
   // create a variable to store the security increase of grow and hack
   var security_increase = 0;
 
-  // create a variable to keep thrack of how many threads are being used in total
+  // create a variable to keep track of how many threads are being used in total
   var threadsTotal = 0;
 
   // create a variable to control how long the loop runs for
@@ -43,11 +43,8 @@ export function scriptDistribution(ns, threadsAvailable, target) {
     while (ns.weakenAnalyze(threads.weaken.count) < security_increase) {
       threads.weaken.count++;
     }
-    // calculate the total number of threads used by the scripts
-    threadsTotal =
-      threads.hack.count + threads.grow.count + threads.weaken.count;
     // go back to the old counts if the new ones are not valid
-    if (threadsAvailable < threadsTotal || hackAbsolute > 1.0) {
+    if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
       threads = threadsOld;
       search = false;
     }
@@ -57,6 +54,7 @@ export function scriptDistribution(ns, threadsAvailable, target) {
 
 /**
  * A class to keep track of the distribution of threads between the hack scripts.
+ * @property {number} sum - The sum of all threads.
  */
 export class Threads {
   /**
