@@ -40,7 +40,7 @@ export async function main(ns) {
     threadsAvailable,
     target
   );
-  var threadDistribution = threadDistributionTarget;
+  var threadDistribution = threadDistributionTarget.copy;
   var threadDistributionActual = new Threads(0, 0, 0);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
@@ -64,7 +64,7 @@ export async function main(ns) {
       target,
       false
     );
-    threadDistribution = threadDistributionTarget;
+    threadDistribution = threadDistributionTarget.copy;
 
     // calculate the wait time of the cycle
     cycleTime = Math.max(

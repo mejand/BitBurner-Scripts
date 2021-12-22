@@ -15,7 +15,7 @@ export function scriptDistribution(
   // define the starting counts for all scripts
   var threads = new Threads(0, 0, 0);
   // define a variable to store the old values during each calculation step
-  var threadsOld = threads;
+  var threadsOld = threads.copy;
 
   // get the hack amount per thread
   var hackRelative = ns.hackAnalyze(target.hostname);
@@ -29,7 +29,7 @@ export function scriptDistribution(
 
   while (search) {
     // store the last thread counts before trying out the new values
-    threadsOld = threads;
+    threadsOld = threads.copy;
     // increase the number of threads used for hacking
     threads.hack.count++;
     // calculate the resulting percentage that will be stolen from the host
@@ -52,7 +52,7 @@ export function scriptDistribution(
     }
     // go back to the old counts if the new ones are not valid
     if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
-      threads = threadsOld;
+      threads = threadsOld.copy;
       search = false;
       // print the abort criteria
       if (debug) {
@@ -112,5 +112,13 @@ export class Threads {
       this.weaken
     );
     return description;
+  }
+
+  /**
+   * Get a clone of the object without referencing the original.
+   * @readonly
+   */
+  get copy() {
+    return new Threads(this.hack.count, this.grow.count, this.weaken.count);
   }
 }
