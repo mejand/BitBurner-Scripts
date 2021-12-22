@@ -76,7 +76,7 @@ export async function main(ns) {
       // check if there are any threads available for tasking on this server
       if (threadsAvailableLocal > 0) {
         // start the scripts
-        for (script in threadDistribution) {
+        for (let script in threadDistribution) {
           // calculate how many threads can be used for the script
           let threadsForScript = Math.min(
             threadsAvailableLocal,
