@@ -128,7 +128,9 @@ export async function main(ns) {
 
     // print the target thread distribution if debugging is enabled
     if (debug) {
-      ns.tprint("|Target Distribution" + threadDistributionTarget.description);
+      ns.tprint(
+        "|Target Distribution" + threadDistributionTarget.description(ns)
+      );
     }
 
     // await another 100ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions

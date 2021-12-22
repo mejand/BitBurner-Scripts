@@ -48,7 +48,7 @@ export function scriptDistribution(
     }
     // print the attempted values for debugging
     if (debug) {
-      ns.tprint("|Attempt" + threads.description);
+      ns.tprint("|Attempt" + threads.description(ns));
     }
     // go back to the old counts if the new ones are not valid
     if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
@@ -69,17 +69,18 @@ export function scriptDistribution(
     }
     // print the selected values for debugging
     if (debug) {
-      ns.tprint("|Result" + threads.description);
+      ns.tprint("|Result" + threads.description(ns));
     }
   }
   return threads;
 }
 
+/**
+ * A class to keep track of the distribution of threads between the hack scripts.
+ */
 export class Threads {
   /**
    * Create a class object with a given set of threads for each script.
-   * @class
-   * @classdesc A class to keep track of the distribution of threads between the hack scripts
    * @param {number} hack - The number of threads dedicated to hacking.
    * @param {number} grow - The number of threads dedicated to growing.
    * @param {number} weaken - The number of threads dedicated to weaken.
@@ -99,10 +100,11 @@ export class Threads {
   }
 
   /**
-   * Get a string that describes the class.
-   * @readonly
+   * Get a string that describes the class instance.
+   * @param {import(".").NS} ns
+   * @returns {string} A description of the class instance.
    */
-  get description() {
+  description(ns) {
     var description = ns.sprintf(
       "|Hack: %(count)10i|Grow: %(count)10i|Weaken: %(count)10i|",
       this.hack,
