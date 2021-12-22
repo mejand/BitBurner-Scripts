@@ -22,10 +22,13 @@ export function scriptDistribution(
   var hackAbsolute = 0;
 
   // create a variable to store the security increase of grow and hack
-  var security_increase = 0;
+  var securityIncrease = 0;
 
   // create a variable to control how long the loop runs for
   var search = true;
+
+  // get the security decrease for weaken with one thread
+  var securityDecrease = ns.weakenAnalyze(1);
 
   while (search) {
     // store the last thread counts before trying out the new values
@@ -39,13 +42,11 @@ export function scriptDistribution(
       ns.growthAnalyze(target.hostname, 1 + hackAbsolute)
     );
     // calculate the resulting increase in security level
-    security_increase =
+    securityIncrease =
       ns.growthAnalyzeSecurity(threads.grow.count) +
       ns.hackAnalyzeSecurity(threads.hack.count);
     // calculate how many threads need to be dedicated to weaken to compensate the hack and grow actions
-    while (ns.weakenAnalyze(threads.weaken.count) < security_increase) {
-      threads.weaken.count++;
-    }
+    threads.weaken.count = Math.ceil(securityIncrease / securityDecrease);
     // print the attempted values for debugging
     if (debug) {
       ns.tprint("|Attempt" + threads.description(ns));
