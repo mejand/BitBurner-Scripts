@@ -137,3 +137,36 @@ export class Threads {
     this.weaken.count = Math.min(this.weaken.count - a.weaken.count, 0);
   }
 }
+
+/**
+ * Calculate the distribution needed for a given number of hacking threads.
+ * @param {import(".").NS} ns
+ * @param {number} hackCount - The number of threads that shall be used for hacking.
+ * @param {import(".").Server} target - The target server.
+ * @returns {Threads} The distribution needed to support the given number of hacking threads.
+ */
+function getDistributionForHackCount(ns, hackCount, target) {
+  // create a new thread distribution based on the given hacking thread count
+  var distribution = new Threads(hackCount, 0, 0);
+  // calculate the security score that needs to be compensated to reach the min level
+  var deltaSecurity = target.hackDifficulty - target.minDifficulty;
+  // calculate the multiplicative factor that is needed to reach max money
+  var growthAmount =
+    (target.moneyMax +
+      target.moneyAvailable *
+        ns.hackAnalyze(target.hackDifficulty) *
+        hackCount) /
+    target.moneyAvailable;
+  // calculate how many threads are needed for the grow function
+  distribution.grow.count = ns.growthAnalyze(target.hostname, growthAmount);
+  // calculate how many threads are needed for the weaken function to compensate
+  distribution.weaken.count =
+    (deltaSecurity +
+      ns.hackAnalyzeSecurity(hackCount) +
+      ns.growthAnalyzeSecurity(distribution.grow.count)) /
+    ns.weakenAnalyze(1);
+  // ensure that the thread counts are integers
+  distribution.grow.count = Math.ceil(distribution.grow.count);
+  distribution.weaken.count = Math.ceil(distribution.weaken.count);
+  return distribution;
+}
