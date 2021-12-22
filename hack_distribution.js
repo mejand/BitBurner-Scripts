@@ -114,4 +114,26 @@ export class Threads {
   get copy() {
     return new Threads(this.hack.count, this.grow.count, this.weaken.count);
   }
+
+  /**
+   * Add another threads object to this one.
+   * @param {Threads} a - The threads object that shall be added to this instance.
+   */
+  add(a) {
+    // limit the values to 0 because a negative thread count makes no sense
+    this.hack.count = Math.min(this.hack.count + a.hack.count, 0);
+    this.grow.count = Math.min(this.grow.count + a.grow.count, 0);
+    this.weaken.count = Math.min(this.weaken.count + a.weaken.count, 0);
+  }
+
+  /**
+   * Subtract another threads object to this one.
+   * @param {Threads} a - The threads object that shall be subtracted from this instance.
+   */
+  subtract(a) {
+    // limit the values to 0 because a negative thread count makes no sense
+    this.hack.count = Math.min(this.hack.count - a.hack.count, 0);
+    this.grow.count = Math.min(this.grow.count - a.grow.count, 0);
+    this.weaken.count = Math.min(this.weaken.count - a.weaken.count, 0);
+  }
 }
