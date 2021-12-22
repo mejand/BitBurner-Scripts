@@ -32,7 +32,7 @@ export async function main(ns) {
   );
 
   // define a variable to keep track of how many threads are available
-  var threadsAvailable = getAvailableThreads(ns, servers, ramNeeded);
+  var threadsAvailable = getAvailableThreads(servers, ramNeeded);
 
   // define a variable to keep thrack of how many threads shall be used for which script
   var threadDistributionTarget = scriptDistribution(
@@ -55,7 +55,7 @@ export async function main(ns) {
     servers = getAvailableServers(ns);
 
     // calculate how many threads are available for tasking
-    threadsAvailable = getAvailableThreads(ns, servers);
+    threadsAvailable = getAvailableThreads(servers, ramNeeded);
 
     // update the thread distribution target and working values
     threadDistributionTarget = scriptDistribution(
@@ -180,12 +180,11 @@ function getTarget(ns) {
 
 /**
  * Get the number of threads available for tasking on a set of servers.
- * @param {import(".").NS} ns
  * @param {import(".").Server[]} servers - The servers for which the number of threads shall be determined.
  * @param {number} ramNeeded - The amount of ram needed for any script.
  * @returns {number} The number of threads available for tasking.
  */
-function getAvailableThreads(ns, servers, ramNeeded) {
+function getAvailableThreads(servers, ramNeeded) {
   // define a variable for the total available threads
   var threadsAvailable = 0;
   // loop through all servers and add up their thread count
