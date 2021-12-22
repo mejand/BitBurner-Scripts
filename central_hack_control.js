@@ -35,13 +35,17 @@ export async function main(ns) {
   var threadsAvailable = getAvailableThreads(ns, servers, ramNeeded);
 
   // define a variable to keep thrack of how many threads shall be used for which script
-  var threadDistribution = scriptDistribution(ns, threadsAvailable, target);
-  var threadDistributionBase = threadDistribution;
-  var threadsUsed = new Threads(0, 0, 0);
+  var threadDistributionTarget = scriptDistribution(
+    ns,
+    threadsAvailable,
+    target
+  );
+  var threadDistribution = threadDistributionTarget;
+  var threadDistributionActual = new Threads(0, 0, 0);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
-    // read the target from file and recalculate the thresholds
+    // update the target if debug mode is off
     if (!debug) {
       // in debug mode n00dles is used because it has the shortest wait times
       target = getTarget(ns);
@@ -53,9 +57,9 @@ export async function main(ns) {
     // calculate how many threads are available for tasking
     threadsAvailable = getAvailableThreads(ns, servers);
 
-    // update the thread distribution
-    threadDistribution = scriptDistribution(ns, threadsAvailable, target);
-    threadDistributionBase = threadDistribution;
+    // update the thread distribution target and working values
+    threadDistributionTarget = scriptDistribution(ns, threadsAvailable, target);
+    threadDistribution = threadDistributionTarget;
 
     // calculate the wait time of the cycle
     cycleTime = Math.max(
@@ -70,10 +74,10 @@ export async function main(ns) {
       let ramAvailable = server.mayRam - server.ramUsed;
       let threadsAvailableLocal = Math.floor(ramAvailable / ramNeeded);
       // check if there are any threads available for tasking on this server
-      if (threadsAvailableLocal) {
-        // define a variable to hold the information about how many threads shall be used for what on this server
+      if (threadsAvailableLocal > 0) {
+        // define a variable to hold the information about how many threads shall be used on this server
         let threadsToBeUsed = new Threads(0, 0, 0);
-        // calculate howm any threads can be used for weakening
+        // calculate how many threads can be used for weakening
         threadsToBeUsed.weaken.count = Math.min(
           threadsAvailableLocal,
           threadDistribution.weaken.count
@@ -99,11 +103,11 @@ export async function main(ns) {
         threadDistribution.hack.count -= threadsToBeUsed.hack.count;
         // start the scripts
         for (script in threadsToBeUsed) {
-          if (script.count > 0) {
+          if (threadsToBeUsed[script].count > 0) {
             ns.exec(
-              script.script,
+              threadsToBeUsed[script].script,
               server.hostname,
-              script.count,
+              threadsToBeUsed[script].count,
               target.hostname
             );
           }
@@ -114,21 +118,21 @@ export async function main(ns) {
     // print the cycle information to screen
     relativeMoney = (target.moneyAvailable / target.moneyMax) * 100;
     deltaSecurity = target.hackDifficulty - target.minDifficulty;
-    threadsUsed = new Threads(
-      threadDistributionBase.hack.count - threadDistribution.hack.count,
-      threadDistributionBase.grow.count - threadDistribution.grow.count,
-      threadDistributionBase.weaken.count - threadDistribution.weaken.count
+    threadDistributionActual = new Threads(
+      threadDistributionTarget.hack.count - threadDistribution.hack.count,
+      threadDistributionTarget.grow.count - threadDistribution.grow.count,
+      threadDistributionTarget.weaken.count - threadDistribution.weaken.count
     );
-    let threadUsage = (threadsUsed.sum / threadsAvailable) * 100;
+    let threadUsage = (threadDistributionActual.sum / threadsAvailable) * 100;
     ns.tprint(
       ns.sprintf(
         "|%s|Money: %3.1f|Security: %3.1f|Hack: %10i|Grow: %10i|Weaken: %10i|Time: %s|Usage: %3.1f",
         target.hostname,
         relativeMoney,
         deltaSecurity,
-        threadsUsed.hack.count,
-        threadsUsed.grow.count,
-        threadsUsed.weaken.count,
+        threadDistributionActual.hack.count,
+        threadDistributionActual.grow.count,
+        threadDistributionActual.weaken.count,
         ns.tFormat(cycleTime),
         threadUsage
       )
