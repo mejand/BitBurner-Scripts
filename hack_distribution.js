@@ -1,97 +1,37 @@
 /**
- * Calculate the number of threads needed per script type to hack a target in the most efficient way.
- * @param {import(".").NS } ns
- * @param {number} threadsAvailable - The total number of threads available for tasking.
- * @param {import(".").Server} target - The target server.
- * @param {boolean} debug - Flag to enable debug logging to the console.
- * @returns {Threads} An object containing the number of threads for each script type.
+ * A class to represent an order for the execution of a script.
  */
-export function scriptDistribution(
-  ns,
-  threadsAvailable,
-  target,
-  debug = false
-) {
-  // define the starting counts for all scripts
-  var threads = new Threads(0, 0, 0);
-  // define a variable to store the old values during each calculation step
-  var threadsOld = threads.copy;
-
-  // get the hack amount per thread
-  var hackRelative = ns.hackAnalyze(target.hostname);
-  var hackAbsolute = 0;
-
-  // create a variable to store the security increase of grow and hack
-  var securityIncrease = 0;
-
-  // create a variable to control how long the loop runs for
-  var search = true;
-
-  // get the security decrease for weaken with one thread
-  var securityDecrease = ns.weakenAnalyze(1);
-
-  while (search) {
-    // store the last thread counts before trying out the new values
-    threadsOld = threads.copy;
-    // increase the number of threads used for hacking
-    threads.hack.count++;
-    // calculate the resulting percentage that will be stolen from the host
-    hackAbsolute = hackRelative * threads.hack.count;
-    // calculate how many threads need to be dedicated to growing to compensate
-    threads.grow.count = Math.ceil(
-      ns.growthAnalyze(target.hostname, 1 + hackAbsolute)
-    );
-    // calculate the resulting increase in security level
-    securityIncrease =
-      ns.growthAnalyzeSecurity(threads.grow.count) +
-      ns.hackAnalyzeSecurity(threads.hack.count);
-    // calculate how many threads need to be dedicated to weaken to compensate the hack and grow actions
-    threads.weaken.count = Math.ceil(securityIncrease / securityDecrease);
-    // go back to the old counts if the new ones are not valid
-    if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
-      threads = threadsOld.copy;
-      search = false;
-      // print the abort criteria
-      if (debug) {
-        ns.print(
-          "Distribution Calculation Aborted: " +
-            threadsAvailable +
-            " < " +
-            threads.sum +
-            " || " +
-            hackAbsolute +
-            " > 1.0"
-        );
-      }
+export class ScriptOrder {
+  /**
+   * Create an object to represent an order for the execution of a script.
+   * @param {number} threads - The number of threads that the script shall be executed with.
+   * @param {string} name - The name of the script that shall be executed.
+   * @param {number} delay - The time in ms that the execution of the script shall be delayed.
+   * @param {import(".").Server} host - The server that the script shall be executed on.
+   * @param {import(".").Server} target - The server that shall be targeted by the script.
+   */
+  constructor(threads, name, delay, host, target) {
+    this.threads = threads;
+    this.name = name;
+    this.delay = delay;
+    this.hostName = host.hostname;
+    this.targetName = target.hostname;
+  }
+  /**
+   * Execute the order.
+   * @param {import(".").NS} ns
+   */
+  execute(ns) {
+    if (this.threads > 0) {
+      ns.exec(
+        this.name,
+        this.hostName,
+        this.threads,
+        this.targetName,
+        this.delay
+      );
     }
   }
-  return threads;
-}
-
-/**
- * A class to keep track of the distribution of threads between the hack scripts.
- */
-export class Threads {
-  /**
-   * Create a class object with a given set of threads for each script.
-   * @param {number} hack - The number of threads dedicated to hacking.
-   * @param {number} grow - The number of threads dedicated to growing.
-   * @param {number} weaken - The number of threads dedicated to weaken.
-   */
-  constructor(hack, grow, weaken) {
-    this.hack = { count: hack, script: "hack.js" };
-    this.grow = { count: grow, script: "grow.js" };
-    this.weaken = { count: weaken, script: "weaken.js" };
-  }
-
-  /**
-   * Get the sum of all threads.
-   * @readonly
-   */
-  get sum() {
-    return this.hack.count + this.grow.count + this.weaken.count;
-  }
-
   /**
    * Get a string that describes the class instance.
    * @param {import(".").NS} ns
@@ -99,74 +39,355 @@ export class Threads {
    */
   description(ns) {
     var description = ns.sprintf(
-      "|Hack: %(count)10i|Grow: %(count)10i|Weaken: %(count)10i|",
-      this.hack,
-      this.grow,
-      this.weaken
+      "|%(name)s|%(threads)6i|%(delay).0f ms|",
+      this
     );
     return description;
-  }
-
-  /**
-   * Get a clone of the object without referencing the original.
-   * @readonly
-   */
-  get copy() {
-    return new Threads(this.hack.count, this.grow.count, this.weaken.count);
-  }
-
-  /**
-   * Add another threads object to this one.
-   * @param {Threads} a - The threads object that shall be added to this instance.
-   */
-  add(a) {
-    // limit the values to 0 because a negative thread count makes no sense
-    this.hack.count = Math.min(this.hack.count + a.hack.count, 0);
-    this.grow.count = Math.min(this.grow.count + a.grow.count, 0);
-    this.weaken.count = Math.min(this.weaken.count + a.weaken.count, 0);
-  }
-
-  /**
-   * Subtract another threads object to this one.
-   * @param {Threads} a - The threads object that shall be subtracted from this instance.
-   */
-  subtract(a) {
-    // limit the values to 0 because a negative thread count makes no sense
-    this.hack.count = Math.min(this.hack.count - a.hack.count, 0);
-    this.grow.count = Math.min(this.grow.count - a.grow.count, 0);
-    this.weaken.count = Math.min(this.weaken.count - a.weaken.count, 0);
   }
 }
 
 /**
- * Calculate the distribution needed for a given number of hacking threads.
- * @param {import(".").NS} ns
- * @param {number} hackCount - The number of threads that shall be used for hacking.
- * @param {import(".").Server} target - The target server.
- * @returns {Threads} The distribution needed to support the given number of hacking threads.
+ * A class to keep track of the distribution of threads between the hack scripts.
  */
-function getDistributionForHackCount(ns, hackCount, target) {
-  // create a new thread distribution based on the given hacking thread count
-  var distribution = new Threads(hackCount, 0, 0);
-  // calculate the security score that needs to be compensated to reach the min level
-  var deltaSecurity = target.hackDifficulty - target.minDifficulty;
-  // calculate the multiplicative factor that is needed to reach max money
-  var growthAmount =
-    (target.moneyMax +
-      target.moneyAvailable *
-        ns.hackAnalyze(target.hackDifficulty) *
-        hackCount) /
-    target.moneyAvailable;
-  // calculate how many threads are needed for the grow function
-  distribution.grow.count = ns.growthAnalyze(target.hostname, growthAmount);
-  // calculate how many threads are needed for the weaken function to compensate
-  distribution.weaken.count =
-    (deltaSecurity +
-      ns.hackAnalyzeSecurity(hackCount) +
-      ns.growthAnalyzeSecurity(distribution.grow.count)) /
-    ns.weakenAnalyze(1);
-  // ensure that the thread counts are integers
-  distribution.grow.count = Math.ceil(distribution.grow.count);
-  distribution.weaken.count = Math.ceil(distribution.weaken.count);
-  return distribution;
+export class OrderDistribution {
+  /**
+   * Create a class object with a given set of threads for each script.
+   * @param {import(".").Server} host - The server that the script shall be executed on.
+   * @param {import(".").Server} target - The server that shall be targeted by the script.
+   * @param {number} hack - The number of threads dedicated to hacking.
+   * @param {number} grow - The number of threads dedicated to growing.
+   * @param {number} weaken - The number of threads dedicated to weaken.
+   */
+  constructor(host, target, hack, grow, weaken) {
+    this.hack = new ScriptOrder(hack, "hack.js", 0, host, target);
+    this.grow = new ScriptOrder(grow, "grow.js", 0, host, target);
+    this.weaken = new ScriptOrder(weaken, "weaken.js", 0, host, target);
+  }
+  /**
+   * Get the sum of all threads.
+   * @readonly
+   */
+  get sum() {
+    return this.hack.threads + this.grow.threads + this.weaken.threads;
+  }
+  /**
+   * Set a new target server.
+   * @param {import(".").Server} target - The new target.
+   */
+  setTarget(target) {
+    this.hack.targetName = target.hostname;
+    this.grow.targetName = target.hostname;
+    this.weaken.targetName = target.hostname;
+  }
+  /**
+   * Set the delay times for the scripts.
+   * @param {number} hack - The delay time that shall be set for the hack script.
+   * @param {number} grow - The delay time that shall be set for the grow script.
+   * @param {number} weaken - The delay time that shall be set for the weaken script.
+   */
+  setDelay(hack, grow, weaken) {
+    this.hack.delay = hack;
+    this.grow.delay = grow;
+    this.weaken.delay = weaken;
+  }
+  /**
+   * Get a string that describes the class instance.
+   * @param {import(".").NS} ns
+   * @returns {string} A description of the class instance.
+   */
+  description(ns) {
+    var description = "|";
+    for (let script in this) {
+      description += this[script].description(ns);
+    }
+    description += "|";
+    return description;
+  }
+  /**
+   * Execute the saved orders to start the scripts.
+   * @param {import(".").NS} ns
+   */
+  execute(ns) {
+    this.hack.execute(ns);
+    this.grow.execute(ns);
+    this.weaken.execute(ns);
+  }
+  /**
+   * Reset the threads and delays of all scripts.
+   */
+  reset() {
+    this.hack.threads = 0;
+    this.hack.delay = 0;
+    this.grow.threads = 0;
+    this.grow.delay = 0;
+    this.weaken.threads = 0;
+    this.weaken.delay = 0;
+  }
+}
+/**
+ * A class to handle the distribution and targeting of the hack scripts on a single host server.
+ */
+export class ScriptHandler {
+  /**
+   * Create a class object with the given host and target.
+   * @param {import(".").NS} ns
+   * @param {import(".").Server} host - The server that the script shall be executed on.
+   * @param {import(".").Server} target - The server that shall be targeted by the script.
+   */
+  constructor(ns, host, target) {
+    /**
+     * @property The server that hosts the hack, grow and weaken scripts.
+     */
+    this.host = host;
+    /**
+     * @property The server that hosts the hack, grow and weaken scripts.
+     */
+    this.targetServer = target;
+    /**
+     * @property The set of orders that will be executed by the scripts on the host server.
+     */
+    this.order = new OrderDistribution(host, target, 0, 0, 0);
+    /**
+     * @property The RAM that is needed to run any of the scripts on the host.
+     */
+    this.ramScripts = Math.max(
+      ns.getScriptRam(this.order.hack.name),
+      ns.getScriptRam(this.order.grow.name),
+      ns.getScriptRam(this.order.weaken.name)
+    );
+    /**
+     * @property The amount of money that will be stolen per hack.
+     */
+    this.moneyPerHack =
+      ns.hackAnalyze(this.host.hostname) * this.targetServer.moneyAvailable;
+    /**
+     * @property The multiplicative factor the grow function has to achive to compensate one hack.
+     */
+    this.growthPerHack = this.moneyPerHack / this.targetServer.moneyAvailable;
+    /**
+     * @property The multiplicative factor the grow function has to achive to get to maxMoney.
+     */
+    this.growthToMax =
+      this.targetServer.moneyMax / this.targetServer.moneyAvailable;
+    /**
+     * @property The amount of security the weaken function has to remove to get to minDifficulty.
+     */
+    this.securityToMin =
+      this.targetServer.hackDifficulty - this.targetServer.minDifficulty;
+    /**
+     * @property The amount of security the weaken function removes per call.
+     */
+    this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
+    /**
+     * @property The amount of security the weaken function has to remove to compensate one hack.
+     */
+    this.securityPerHack = ns.hackAnalyzeSecurity(1);
+    /**
+     * @property The amount of security the weaken function has to remove to compensate one grow.
+     */
+    this.securityPerGrow = ns.growthAnalyzeSecurity(1);
+    /**
+     * @property The time it takes to complete one hack, grow, weaken cycle.
+     */
+    this.cycleTime = 0;
+    /**
+     * @property The time it takes to complete one hack, grow, weaken cycle formatted as a string.
+     */
+    this.cycleTimeString = ns.tFormat(0);
+    /**
+     * @property The current load of the hoast server in %.
+     */
+    this.load = 0;
+    /**
+     * @property The number of threads currently available on the host.
+     */
+    this.threadsAvailable = 0;
+  }
+  /**
+   * Set the target.
+   * @param {import(".").Server} newTarget - The new target server.
+   */
+  set target(newTarget) {
+    this.targetServer = newTarget;
+    this.order.setTarget(newTarget);
+  }
+  /**
+   * Update the class internal orders in preparation of execution.
+   * @param {import(".").NS} ns
+   */
+  update(ns) {
+    // reset the order to start with a clean slate
+    this.order.reset();
+    // update the host and target data
+    this.host = ns.getServer(this.host.hostname);
+    this.targetServer = ns.getServer(this.targetServer.hostname);
+    // calculate how much ram is available on the host
+    let ramAvailable = this.host.maxRam - this.host.ramUsed;
+    // calculate how many threads are available on the host
+    this.threadsAvailable = Math.floor(ramAvailable / this.ramScripts);
+    // update the host and target dependant values
+    this.moneyPerHack =
+      ns.hackAnalyze(this.host.hostname) * this.targetServer.moneyAvailable;
+    this.growthPerHack = this.moneyPerHack / this.targetServer.moneyAvailable;
+    this.growthToMax =
+      this.targetServer.moneyMax / this.targetServer.moneyAvailable;
+    this.securityToMin =
+      this.targetServer.hackDifficulty - this.targetServer.minDifficulty;
+    this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
+    this.securityPerHack = ns.hackAnalyzeSecurity(1);
+    this.securityPerGrow = ns.growthAnalyzeSecurity(1);
+    // only continue if there are any threads available
+    if (this.threadsAvailable > 0) {
+      // if it is impossible to reach min security and max mone in one cycle than try to grow as much as possible
+      let orderNoHack = this.getOrderByHackCount(ns, 0);
+      if (orderNoHack.sum >= this.threadsAvailable) {
+        let orderOneGrowth = this.getOrderByGrowthCount(1);
+        if (orderOneGrowth.sum >= this.threadsAvailable) {
+          this.order.weaken.threads = this.threadsAvailable;
+        } else {
+          // try to find the growth count that will work best
+          let search = true;
+          let growthCount = 2;
+          while (search) {
+            let proposedOrder = this.getOrderByGrowthCount(growthCount);
+            if (proposedOrder.sum < this.threadsAvailable) {
+              this.order = proposedOrder;
+              growthCount++;
+            } else {
+              search = false;
+            }
+          }
+        }
+      } else {
+        // search for the best order set that steals all money or uses all available threads
+        let search = true;
+        let hackThreads = 1;
+        while (search) {
+          // calculate the proposed order set with the current hack count
+          let proposedOrder = this.getOrderByHackCount(ns, hackThreads);
+          let threadsToContinue = proposedOrder.sum < this.threadsAvailable;
+          let moneyToContinue =
+            this.moneyPerHack * hackThreads < this.targetServer.moneyAvailable;
+          if (threadsToContinue && moneyToContinue) {
+            // continue the search if the proposed order set does not use all available threads and more money can be stolen
+            this.order = proposedOrder;
+            hackThreads++;
+          } else {
+            // stop the search if the proposed order set uses more than the available threads and discard the proposed order set
+            search = false;
+          }
+        }
+      }
+      // calculate the delay times for each script type
+      let hackTime = ns.getHackTime(this.targetServer.hostname);
+      let growTime = ns.getGrowTime(this.targetServer.hostname);
+      let weakenTime = ns.getWeakenTime(this.targetServer.hostname);
+      this.cycleTime = Math.max(hackTime, growTime, weakenTime);
+      this.order.weaken.delay = this.cycleTime - weakenTime;
+      if (this.order.weaken.delay > 0) {
+        this.order.weaken.delay = Math.ceil(this.order.weaken.delay + 5);
+        weakenTime += this.order.weaken.delay;
+        this.cycleTime += this.order.weaken.delay;
+      }
+      this.order.grow.delay = Math.max(
+        0,
+        hackTime + (weakenTime - hackTime) * 0.5 - growTime
+      );
+      if (this.order.grow.delay > 0) {
+        this.order.grow.delay = Math.ceil(this.order.grow.delay);
+      }
+      // add a small buffer to the cycle timer to ensure that all scripts are really finished
+      this.cycleTime += 50;
+      this.cycleTimeString = ns.tFormat(this.cycleTime);
+    }
+    // update the loading
+    this.load = this.getLoad();
+  }
+  /**
+   * Execute the queued orders.
+   * @param {import(".").NS} ns
+   */
+  execute(ns) {
+    this.order.execute(ns);
+  }
+  /**
+   * Get an order set that is needed to sustain the given number of hacking threads.
+   * @param {import(".").NS} ns
+   * @param {number} hackThreads - The number of threads that shall be dedicated to hacking.
+   * @returns {OrderDistribution} The set of orders needed to sustain the given hacking thread count.
+   */
+  getOrderByHackCount(ns, hackThreads) {
+    let result = new OrderDistribution(
+      this.host,
+      this.targetServer,
+      hackThreads,
+      0,
+      0
+    );
+    // calculate how many growing threads are needed to support the hacking and reach max money
+    result.grow.threads = Math.ceil(
+      ns.growthAnalyze(
+        this.host.hostname,
+        this.growthToMax + this.growthPerHack * hackThreads,
+        this.host.cpuCores
+      )
+    );
+    // calculate how many weakening cycles are needed to support the hacking, growing and reach min security
+    result.weaken.threads = Math.ceil(
+      (this.securityToMin +
+        this.securityPerHack * hackThreads +
+        this.securityPerGrow * result.grow.threads) /
+        this.securityPerWeaken
+    );
+    // return the resulting order set
+    return result;
+  }
+  /**
+   * Get an order set that is needed to sustain the given number of growing threads with 0 hacking.
+   * @param {import(".").NS} ns
+   * @param {number} growthThreads - The number of threads that shall be dedicated to growing.
+   * @returns {OrderDistribution} The set of orders needed to sustain the given growing thread count.
+   */
+  getOrderByGrowthCount(growthThreads) {
+    let result = new OrderDistribution(
+      this.host,
+      this.targetServer,
+      0,
+      growthThreads,
+      0
+    );
+    // calculate how many weakening cycles are needed to support the hacking, growing and reach min security
+    result.weaken.threads = Math.ceil(
+      (this.securityToMin + this.securityPerGrow * result.grow.threads) /
+        this.securityPerWeaken
+    );
+    // return the resulting order set
+    return result;
+  }
+  /**
+   * Get a string that describes the class instance.
+   * @param {import(".").NS} ns
+   * @returns {string} A description of the class instance.
+   */
+  description(ns) {
+    var description = ns.sprintf(
+      "|%(host.hostname)s vs. %(targetServer.hostname)s|",
+      this
+    );
+    description += this.order.description(ns);
+    description += ns.sprintf("|Load: %(load)3.1f|%(cycleTimeString)s|", this);
+    return description;
+  }
+  /**
+   * Get the current load of the host server.
+   * @returns {number} The current load in %.
+   */
+  getLoad() {
+    // set the default value to 100% so there is no wrong impact from servers that have no threads available
+    let load = 100;
+    if (this.threadsAvailable > 0) {
+      load = (this.order.sum / this.threadsAvailable) * 100;
+    }
+    return load;
+  }
 }
