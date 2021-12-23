@@ -134,7 +134,7 @@ export class ScriptHandler {
     /**
      * @property The server that hosts the hack, grow and weaken scripts.
      */
-    this.target = target;
+    this.targetServer = target;
     /**
      * @property The set of orders that will be executed by the scripts on the host server.
      */
@@ -151,19 +151,21 @@ export class ScriptHandler {
      * @property The amount of money that will be stolen per hack.
      */
     this.moneyPerHack =
-      ns.hackAnalyze(this.host.hostname) * this.target.moneyAvailable;
+      ns.hackAnalyze(this.host.hostname) * this.targetServer.moneyAvailable;
     /**
      * @property The multiplicative factor the grow function has to achive to compensate one hack.
      */
-    this.growthPerHack = this.moneyPerHack / this.target.moneyAvailable;
+    this.growthPerHack = this.moneyPerHack / this.targetServer.moneyAvailable;
     /**
      * @property The multiplicative factor the grow function has to achive to get to maxMoney.
      */
-    this.growthToMax = this.target.moneyMax / this.target.moneyAvailable;
+    this.growthToMax =
+      this.targetServer.moneyMax / this.targetServer.moneyAvailable;
     /**
      * @property The amount of security the weaken function has to remove to get to minDifficulty.
      */
-    this.securityToMin = this.target.hackDifficulty - this.target.minDifficulty;
+    this.securityToMin =
+      this.targetServer.hackDifficulty - this.targetServer.minDifficulty;
     /**
      * @property The amount of security the weaken function removes per call.
      */
@@ -186,7 +188,7 @@ export class ScriptHandler {
    * @param {import(".").Server} newTarget - The new target server.
    */
   set target(newTarget) {
-    this.target = newTarget;
+    this.targetServer = newTarget;
     this.order.setTarget(newTarget);
   }
   /**
@@ -198,17 +200,19 @@ export class ScriptHandler {
     this.order.reset();
     // update the host and target data
     this.host = ns.getServer(this.host.hostname);
-    this.target = ns.getServer(this.target.hostname);
+    this.targetServer = ns.getServer(this.targetServer.hostname);
     // calculate how much ram is available on the host
     let ramAvailable = this.host.ramAvailable - this.host.ramUsed;
     // calculate how many threads are available on the host
     let threadsAvailable = Math.floor(ramAvailable / this.ramScripts);
     // update the host and target dependant values
     this.moneyPerHack =
-      ns.hackAnalyze(this.host.hostname) * this.target.moneyAvailable;
-    this.growthPerHack = this.moneyPerHack / this.target.moneyAvailable;
-    this.growthToMax = this.target.moneyMax / this.target.moneyAvailable;
-    this.securityToMin = this.target.hackDifficulty - this.target.minDifficulty;
+      ns.hackAnalyze(this.host.hostname) * this.targetServer.moneyAvailable;
+    this.growthPerHack = this.moneyPerHack / this.targetServer.moneyAvailable;
+    this.growthToMax =
+      this.targetServer.moneyMax / this.targetServer.moneyAvailable;
+    this.securityToMin =
+      this.targetServer.hackDifficulty - this.targetServer.minDifficulty;
     this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
     this.securityPerHack = ns.hackAnalyzeSecurity(1);
     this.securityPerGrow = ns.growthAnalyzeSecurity(1);
@@ -227,7 +231,7 @@ export class ScriptHandler {
           let proposedOrder = this.getOrderByHackCount(hackThreads);
           let threadsToContinue = proposedOrder.sum < threadsAvailable;
           let moneyToContinue =
-            this.moneyPerHack * hackThreads < this.target.moneyAvailable;
+            this.moneyPerHack * hackThreads < this.targetServer.moneyAvailable;
           if (threadsToContinue && moneyToContinue) {
             // continue the search if the proposed order set does not use all available threads and more money can be stolen
             this.order = proposedOrder;
@@ -274,7 +278,7 @@ export class ScriptHandler {
   getOrderByHackCount(ns, hackThreads) {
     let result = new OrderDistribution(
       this.host,
-      this.target,
+      this.targetServer,
       hackThreads,
       0,
       0
