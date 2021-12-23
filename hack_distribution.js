@@ -248,7 +248,7 @@ export class ScriptHandler {
         weakenTime += this.order.weaken.delay;
         this.cycleTime += this.order.weaken.delay;
       }
-      this.order.grow.delay = Math.min(
+      this.order.grow.delay = Math.max(
         0,
         hackTime + (weakenTime - hackTime) * 0.5 - growTime
       );
