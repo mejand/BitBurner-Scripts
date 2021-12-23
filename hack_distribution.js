@@ -1,71 +1,31 @@
 /**
- * Calculate the number of threads needed per script type to hack a target in the most efficient way.
- * @param {import(".").NS } ns
- * @param {number} threadsAvailable - The total number of threads available for tasking.
- * @param {import(".").Server} target - The target server.
- * @param {boolean} debug - Flag to enable debug logging to the console.
- * @returns {Threads} An object containing the number of threads for each script type.
+ * A class to represent an order for the execution of a script.
  */
-export function scriptDistribution(
-  ns,
-  threadsAvailable,
-  target,
-  debug = false
-) {
-  // define the starting counts for all scripts
-  var threads = new Threads(0, 0, 0);
-  // define a variable to store the old values during each calculation step
-  var threadsOld = threads.copy;
-
-  // get the hack amount per thread
-  var hackRelative = ns.hackAnalyze(target.hostname);
-  var hackAbsolute = 0;
-
-  // create a variable to store the security increase of grow and hack
-  var securityIncrease = 0;
-
-  // create a variable to control how long the loop runs for
-  var search = true;
-
-  // get the security decrease for weaken with one thread
-  var securityDecrease = ns.weakenAnalyze(1);
-
-  while (search) {
-    // store the last thread counts before trying out the new values
-    threadsOld = threads.copy;
-    // increase the number of threads used for hacking
-    threads.hack.count++;
-    // calculate the resulting percentage that will be stolen from the host
-    hackAbsolute = hackRelative * threads.hack.count;
-    // calculate how many threads need to be dedicated to growing to compensate
-    threads.grow.count = Math.ceil(
-      ns.growthAnalyze(target.hostname, 1 + hackAbsolute)
-    );
-    // calculate the resulting increase in security level
-    securityIncrease =
-      ns.growthAnalyzeSecurity(threads.grow.count) +
-      ns.hackAnalyzeSecurity(threads.hack.count);
-    // calculate how many threads need to be dedicated to weaken to compensate the hack and grow actions
-    threads.weaken.count = Math.ceil(securityIncrease / securityDecrease);
-    // go back to the old counts if the new ones are not valid
-    if (threadsAvailable < threads.sum || hackAbsolute > 1.0) {
-      threads = threadsOld.copy;
-      search = false;
-      // print the abort criteria
-      if (debug) {
-        ns.print(
-          "Distribution Calculation Aborted: " +
-            threadsAvailable +
-            " < " +
-            threads.sum +
-            " || " +
-            hackAbsolute +
-            " > 1.0"
-        );
-      }
+class ScriptOrder {
+  /**
+   * Create an object to represent an order for the execution of a script.
+   * @param {number} threads - The number of threads that the script shall be executed with.
+   * @param {string} name - The name of the cript that shall be executed.
+   * @param {number} delay - The time in ms that the execution of the script shall be delayed.
+   * @param {import(".").Server} host - The server that the script shall be executed on.
+   * @param {import(".").Server} target - The server that shall be targeted by the script.
+   */
+  constructor(threads, name, delay, host, target) {
+    this.threads = threads;
+    this.name = name;
+    this.delay = delay;
+    this.host = host.hostname;
+    this.target = target.hostname;
+  }
+  /**
+   * Execute the order.
+   * @param {import(".").NS} ns
+   */
+  execute(ns, host, target) {
+    if (this.threads > 0) {
+      ns.exec(this.name, this.host, this.threads, this.target, this.delay);
     }
   }
-  return threads;
 }
 
 /**
