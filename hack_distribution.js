@@ -213,10 +213,26 @@ export class ScriptHandler {
     this.securityPerGrow = ns.growthAnalyzeSecurity(1);
     // only continue if there are any threads available
     if (threadsAvailable > 0) {
-      // if it is impossible to reach min security and max mone in one cycle than dedicate the complete cycle to weakening
+      // if it is impossible to reach min security and max mone in one cycle than try to grow as much as possible
       let orderNoHack = this.getOrderByHackCount(ns, 0);
       if (orderNoHack.sum >= threadsAvailable) {
-        this.order.weaken.threads = threadsAvailable;
+        let orderOneGrowth = this.getOrderByGrowthCount(ns, 1);
+        if (orderOneGrowth.sum >= threadsAvailable) {
+          this.order.weaken.threads = threadsAvailable;
+        } else {
+          // try to find the growth count that will work best
+          let search = true;
+          let growthCount = 1;
+          while (search) {
+            let proposedOrder = this.getOrderByGrowthCount(growthCount);
+            if (proposedOrder.sum < threadsAvailable) {
+              this.order = proposedOrder;
+              growthCount++;
+            } else {
+              search = false;
+            }
+          }
+        }
       } else {
         // search for the best order set that steals all money or uses all available threads
         let search = true;
@@ -291,6 +307,28 @@ export class ScriptHandler {
       (this.securityToMin +
         this.securityPerHack * hackThreads +
         this.securityPerGrow * result.grow.threads) /
+        this.securityPerWeaken
+    );
+    // return the resulting order set
+    return result;
+  }
+  /**
+   * Get an order set that is needed to sustain the given number of growing threads with 0 hacking.
+   * @param {import(".").NS} ns
+   * @param {number} growthThreads - The number of threads that shall be dedicated to growing.
+   * @returns {OrderDistribution} The set of orders needed to sustain the given growing thread count.
+   */
+  getOrderByGrowthCount(ns, growthThreads) {
+    let result = new OrderDistribution(
+      this.host,
+      this.targetServer,
+      0,
+      growthThreads,
+      0
+    );
+    // calculate how many weakening cycles are needed to support the hacking, growing and reach min security
+    result.weaken.threads = Math.ceil(
+      (this.securityToMin + this.securityPerGrow * result.grow.threads) /
         this.securityPerWeaken
     );
     // return the resulting order set
