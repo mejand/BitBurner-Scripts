@@ -3,34 +3,49 @@
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
-  // define default values for the arguments and try to get the arguments
+  /**
+   * Use debug logging.
+   * @type {boolean}
+   */
   var debug = true;
   if (ns.args.length > 0 && typeof (ns.args[0] == "boolean")) {
     debug = ns.args[0];
   }
 
-  // define the wait time between starting the individual scripts
+  /**
+   * The wait time between each step in the start up sequence.
+   * @type {number}
+   */
   var wait_time = 500;
 
-  // find all script files on the home server and delete them to remove old files
+  /**
+   * All files present on the host server.
+   * @type {string[]}
+   */
   var files = ns.ls("home", ".ns").concat(ns.ls("home", ".js"));
-  if (debug) {
-    ns.tprint(files);
-  }
+
   // loop through the files and delete everything except the start up scripts
   for (let file of files) {
     if (file != "start.js" && file != "start_automation.js") {
       ns.rm(file, "home");
+
+      // print information about the deleted files to the terminal if debugging is enabled
       if (debug) {
         ns.tprint("Deleted " + file);
       }
     }
   }
+
   ns.tprint(" #### Files Deleted ####");
   await ns.sleep(wait_time);
 
-  // download the necessary scripts from the git repository to get newest versions.
+  /**
+   * Downloading of files was successful.
+   * @type {boolean}
+   */
   var success = true;
+
+  // download the necessary scripts from the git repository to get newest versions.
   var url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/spider.js";
   if (await ns.wget(url, "spider.js")) {
@@ -61,7 +76,7 @@ export async function main(ns) {
     ns.tprint(" ###  Server-Purchase Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Server-Purchase Failed  ###");
+    ns.tprint(" ###  Server-Purchase Download Failed  ###");
   }
   url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/central_hack_control.js";
@@ -69,7 +84,7 @@ export async function main(ns) {
     ns.tprint(" ###  Central-Hack-Control Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Central-Hack-Control Failed  ###");
+    ns.tprint(" ###  Central-Hack-Control Download Failed  ###");
   }
   url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hack.js";
@@ -77,7 +92,7 @@ export async function main(ns) {
     ns.tprint(" ###  Hack Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Hack Failed  ###");
+    ns.tprint(" ###  Hack Download Failed  ###");
   }
   url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/grow.js";
@@ -85,7 +100,7 @@ export async function main(ns) {
     ns.tprint(" ###  Grow Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Grow Failed  ###");
+    ns.tprint(" ###  Grow Download Failed  ###");
   }
   url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/weaken.js";
@@ -93,7 +108,7 @@ export async function main(ns) {
     ns.tprint(" ###  Weaken Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Weaken Failed  ###");
+    ns.tprint(" ###  Weaken Download Failed  ###");
   }
   url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/find_target.js";
@@ -101,7 +116,7 @@ export async function main(ns) {
     ns.tprint(" ###  Find-Target Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Find-Target Failed  ###");
+    ns.tprint(" ###  Find-Target Download Failed  ###");
   }
   url =
     "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hack_distribution.js";
@@ -109,10 +124,11 @@ export async function main(ns) {
     ns.tprint(" ###  Hack-Distribution Download Successful  ###");
   } else {
     success = false;
-    ns.tprint(" ###  Hack-Distribution Failed  ###");
+    ns.tprint(" ###  Hack-Distribution Download Failed  ###");
   }
   await ns.sleep(wait_time);
 
+  // start running the scripts if all were downloaded successfully.
   if (success) {
     // call the spider script to populate the network map
     ns.run("spider.js", 1, false);
