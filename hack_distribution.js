@@ -32,6 +32,15 @@ export class ScriptOrder {
       );
     }
   }
+  /**
+   * Get a string that describes the class instance.
+   * @param {import(".").NS} ns
+   * @returns {string} A description of the class instance.
+   */
+  description(ns) {
+    var description = ns.sprintf("|%(name)s|%(threads)6i|%(delay)d ms|", this);
+    return description;
+  }
 }
 
 /**
@@ -84,10 +93,11 @@ export class OrderDistribution {
    * @returns {string} A description of the class instance.
    */
   description(ns) {
-    var description = ns.sprintf(
-      "||Hack|%(hack.threads)10i|%(hack.delay)f||Grow|%(grow.threads)10i|%(grow.delay)f||Weaken: %(weaken.threads)10i|%(weaken.delay)f||",
-      this
-    );
+    var description = "|";
+    for (let script in this) {
+      description += this[script].description(ns);
+    }
+    description += "|";
     return description;
   }
   /**
