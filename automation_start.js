@@ -26,7 +26,7 @@ export async function main(ns) {
 
   // loop through the files and delete everything except the start up scripts
   for (let file of files) {
-    if (file != "start.js" && file != "start_automation.js") {
+    if (file != "start.js" && file != "automation_start.js") {
       ns.rm(file, "home");
 
       // print information about the deleted files to the terminal if debugging is enabled
