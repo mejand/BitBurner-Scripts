@@ -14,8 +14,8 @@ class ScriptOrder {
     this.threads = threads;
     this.name = name;
     this.delay = delay;
-    this.host = host.hostname;
-    this.target = target.hostname;
+    this.hostName = host.hostname;
+    this.targetName = target.hostname;
   }
   /**
    * Execute the order.
@@ -23,7 +23,13 @@ class ScriptOrder {
    */
   execute(ns) {
     if (this.threads > 0) {
-      ns.exec(this.name, this.host, this.threads, this.target, this.delay);
+      ns.exec(
+        this.nameName,
+        this.hostName,
+        this.threads,
+        this.target,
+        this.delay
+      );
     }
   }
 }
@@ -51,6 +57,26 @@ export class OrderDistribution {
    */
   get sum() {
     return this.hack.threads + this.grow.threads + this.weaken.threads;
+  }
+  /**
+   * Set a new target server.
+   * @param {import(".").Server} target - The new target.
+   */
+  setTarget(target) {
+    this.hack.targetName = target.hostname;
+    this.grow.targetName = target.hostname;
+    this.weaken.targetName = target.hostname;
+  }
+  /**
+   * Set the delay times for the scripts.
+   * @param {number} hack - The delay time that shall be set for the hack script.
+   * @param {number} grow - The delay time that shall be set for the grow script.
+   * @param {number} weaken - The delay time that shall be set for the weaken script.
+   */
+  setDelay(hack, grow, weaken) {
+    this.hack.delay = hack;
+    this.grow.delay = grow;
+    this.weaken.delay = weaken;
   }
   /**
    * Get a string that describes the class instance.
