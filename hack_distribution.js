@@ -127,25 +127,54 @@ export class ScriptHandler {
    * @param {import(".").Server} target - The server that shall be targeted by the script.
    */
   constructor(ns, host, target) {
-    // store the host and target servers
+    /**
+     * @property The server that hosts the hack, grow and weaken scripts.
+     */
     this.host = host;
+    /**
+     * @property The server that hosts the hack, grow and weaken scripts.
+     */
     this.target = target;
-    // create an object to hold the orders for each script
+    /**
+     * @property The set of orders that will be executed by the scripts on the host server.
+     */
     this.order = new OrderDistribution(host, target, 0, 0, 0);
-    // calculate the ram needed to run each of the scripts
+    /**
+     * @property The RAM that is needed to run any of the scripts on the host.
+     */
     this.ramScripts = Math.max(
       ns.getScriptRam(this.order.hack.name),
       ns.getScriptRam(this.order.grow.name),
       ns.getScriptRam(this.order.weaken.name)
     );
-    // calculate the host and target dependant values
+    /**
+     * @property The amount of money that will be stolen per hack.
+     */
     this.moneyPerHack =
       ns.hackAnalyze(this.host.hostname) * this.target.moneyAvailable;
+    /**
+     * @property The multiplicative factor the grow function has to achive to compensate one hack.
+     */
     this.growthPerHack = this.moneyPerHack / this.target.moneyAvailable;
+    /**
+     * @property The multiplicative factor the grow function has to achive to get to maxMoney.
+     */
     this.growthToMax = this.target.moneyMax / this.target.moneyAvailable;
+    /**
+     * @property The amount of security the weaken function has to remove to get to minDifficulty.
+     */
     this.securityToMin = this.target.hackDifficulty - this.target.minDifficulty;
+    /**
+     * @property The amount of security the weaken function removes per call.
+     */
     this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
+    /**
+     * @property The amount of security the weaken function has to remove to compensate one hack.
+     */
     this.securityPerHack = ns.hackAnalyzeSecurity(1);
+    /**
+     * @property The amount of security the weaken function has to remove to compensate one grow.
+     */
     this.securityPerGrow = ns.growthAnalyzeSecurity(1);
   }
   /**
