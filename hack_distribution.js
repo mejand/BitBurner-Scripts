@@ -104,6 +104,17 @@ export class OrderDistribution {
     this.grow.execute(ns);
     this.weaken.execute(ns);
   }
+  /**
+   * Reset the threads and delays of all scripts.
+   */
+  reset() {
+    this.hack.threads = 0;
+    this.hack.delay = 0;
+    this.grow.threads = 0;
+    this.grow.delay = 0;
+    this.weaken.threads = 0;
+    this.weaken.delay = 0;
+  }
 }
 /**
  * A class to handle the distribution and targeting of the hack scripts on a single host server.
@@ -111,13 +122,31 @@ export class OrderDistribution {
 export class ScriptHandler {
   /**
    * Create a class object with the given host and target.
+   * @param {import(".").NS} ns
    * @param {import(".").Server} host - The server that the script shall be executed on.
    * @param {import(".").Server} target - The server that shall be targeted by the script.
    */
-  constructor(host, target) {
+  constructor(ns, host, target) {
+    // store the host and target servers
     this.host = host;
     this.target = target;
-    this.Order = new OrderDistribution(host, target, 0, 0, 0);
+    // create an object to hold the orders for each script
+    this.order = new OrderDistribution(host, target, 0, 0, 0);
+    // calculate the ram needed to run each of the scripts
+    this.ramScripts = Math.max(
+      ns.getScriptRam(this.order.hack.name),
+      ns.getScriptRam(this.order.grow.name),
+      ns.getScriptRam(this.order.weaken.name)
+    );
+    // calculate the host and target dependant values
+    this.moneyPerHack =
+      ns.hackAnalyze(this.host.hostname) * this.target.moneyAvailable;
+    this.growthPerHack = this.moneyPerHack / this.target.moneyAvailable;
+    this.growthToMax = this.target.moneyMax / this.target.moneyAvailable;
+    this.securityToMin = this.target.hackDifficulty - this.target.minDifficulty;
+    this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
+    this.securityPerHack = ns.hackAnalyzeSecurity(1);
+    this.securityPerGrow = ns.growthAnalyzeSecurity(1);
   }
   /**
    * Set the target.
@@ -125,18 +154,93 @@ export class ScriptHandler {
    */
   set target(newTarget) {
     this.target = newTarget;
-    this.Order.setTarget(newTarget);
+    this.order.setTarget(newTarget);
   }
   /**
    * Update the class internal orders in preparation of execution.
    * @param {import(".").NS} ns
    */
-  update(ns) {}
+  update(ns) {
+    // reset the order to start with a clean slate
+    this.order.reset();
+    // update the host and target data
+    this.host = ns.getServer(this.host.hostname);
+    this.target = ns.getServer(this.target.hostname);
+    // calculate how much ram is available on the host
+    let ramAvailable = this.host.ramAvailable - this.host.ramUsed;
+    // calculate how many threads are available on the host
+    let threadsAvailable = Math.floor(ramAvailable / this.ramScripts);
+    // update the host and target dependant values
+    this.moneyPerHack =
+      ns.hackAnalyze(this.host.hostname) * this.target.moneyAvailable;
+    this.growthPerHack = this.moneyPerHack / this.target.moneyAvailable;
+    this.growthToMax = this.target.moneyMax / this.target.moneyAvailable;
+    this.securityToMin = this.target.hackDifficulty - this.target.minDifficulty;
+    this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
+    this.securityPerHack = ns.hackAnalyzeSecurity(1);
+    this.securityPerGrow = ns.growthAnalyzeSecurity(1);
+    // only continue if there are any threads available
+    if (threadsAvailable > 0) {
+      // if it is impossible to reach min security and max mone in one cycle than dedicate the complete cycle to weakening
+      let orderNoHack = this.getOrderByHackCount(ns, 0);
+      if (orderNoHack.sum >= threadsAvailable) {
+        this.order.weaken.threads = threadsAvailable;
+      } else {
+        // search for the best order set that steals all money or uses all available threads
+        let search = true;
+        let hackThreads = 1;
+        while (search) {
+          // calculate the proposed order set with the current hack count
+          let proposedOrder = this.getOrderByHackCount(hackThreads);
+          if (proposedOrder.sum < threadsAvailable) {
+            // continue the search if the proposed order set does not use all available threads and take over the proposed order set
+            this.order = proposedOrder;
+            hackThreads++;
+          } else {
+            // stop the search if the proposed order set uses more than the available threads and discard the proposed order set
+            search = false;
+          }
+        }
+      }
+    }
+  }
   /**
    * Execute the queued orders.
    * @param {import(".").NS} ns
    */
   execute(ns) {
-    this.Order.execute(ns);
+    this.order.execute(ns);
+  }
+  /**
+   * Get an order set that is needed to sustain the given number of hacking threads.
+   * @param {import(".").NS} ns
+   * @param {number} hackThreads - The number of threads that shall be dedicated to hacking.
+   * @returns {OrderDistribution} The set of orders needed to sustain the given hacking thread count.
+   */
+  getOrderByHackCount(ns, hackThreads) {
+    let result = new OrderDistribution(
+      this.host,
+      this.target,
+      hackThreads,
+      0,
+      0
+    );
+    // calculate how many growing threads are needed to support the hacking and reach max money
+    result.grow.threads = Math.ceil(
+      ns.growthAnalyze(
+        this.host.hostname,
+        this.growthToMax + this.growthPerHack * hackThreads,
+        this.host.cpuCores
+      )
+    );
+    // calculate how many weakening cycles are needed to support the hacking, growing and reach min security
+    result.weaken.threads = Math.ceil(
+      (this.securityToMin +
+        this.securityPerHack * hackThreads +
+        this.securityPerGrow * result.grow.threads) /
+        this.securityPerWeaken
+    );
+    // return the resulting order set
+    return result;
   }
 }
