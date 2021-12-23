@@ -38,7 +38,10 @@ export class ScriptOrder {
    * @returns {string} A description of the class instance.
    */
   description(ns) {
-    var description = ns.sprintf("|%(name)s|%(threads)6i|%(delay)d ms|", this);
+    var description = ns.sprintf(
+      "|%(name)s|%(threads)6i|%(delay).0f ms|",
+      this
+    );
     return description;
   }
 }
@@ -351,5 +354,19 @@ export class ScriptHandler {
     );
     // return the resulting order set
     return result;
+  }
+  /**
+   * Get a string that describes the class instance.
+   * @param {import(".").NS} ns
+   * @returns {string} A description of the class instance.
+   */
+  description(ns) {
+    var description = ns.sprintf(
+      "|%(host.hostname)s vs. %(targetServer.hostname)s|",
+      this
+    );
+    description += this.order.description(ns);
+    description += ns.sprintf("|Load: %(load)3.1f|", this);
+    return description;
   }
 }
