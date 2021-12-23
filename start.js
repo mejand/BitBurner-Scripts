@@ -5,7 +5,7 @@
 export async function main(ns) {
   // download the file from github
   var url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/start_automation.js";
+    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/automation_start.js";
   var success = await ns.wget(url, "start_automation.js");
 
   // inform the user about the success or failure and start the startup script
