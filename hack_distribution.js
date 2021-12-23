@@ -202,7 +202,7 @@ export class ScriptHandler {
     this.host = ns.getServer(this.host.hostname);
     this.targetServer = ns.getServer(this.targetServer.hostname);
     // calculate how much ram is available on the host
-    let ramAvailable = this.host.ramAvailable - this.host.ramUsed;
+    let ramAvailable = this.host.maxRam - this.host.ramUsed;
     // calculate how many threads are available on the host
     let threadsAvailable = Math.floor(ramAvailable / this.ramScripts);
     // update the host and target dependant values
