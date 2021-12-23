@@ -111,7 +111,6 @@ export class OrderDistribution {
 export class ScriptHandler {
   /**
    * Create a class object with the given host and target.
-   * @param {import(".").NS} ns
    * @param {import(".").Server} host - The server that the script shall be executed on.
    * @param {import(".").Server} target - The server that shall be targeted by the script.
    */
@@ -127,5 +126,17 @@ export class ScriptHandler {
   set target(newTarget) {
     this.target = newTarget;
     this.Order.setTarget(newTarget);
+  }
+  /**
+   * Update the class internal orders in preparation of execution.
+   * @param {import(".").NS} ns
+   */
+  update(ns) {}
+  /**
+   * Execute the queued orders.
+   * @param {import(".").NS} ns
+   */
+  execute(ns) {
+    this.Order.execute(ns);
   }
 }
