@@ -272,7 +272,7 @@ export class ScriptHandler {
         this.order.grow.delay = Math.ceil(this.order.grow.delay);
       }
       // add a small buffer to the cycle timer to ensure that all scripts are really finished
-      this.cycleTime += 5;
+      this.cycleTime += 50;
     }
   }
   /**
