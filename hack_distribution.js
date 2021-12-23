@@ -194,6 +194,10 @@ export class ScriptHandler {
      * @property The current load of the hoast server in %.
      */
     this.load = 0;
+    /**
+     * @property The number of threads currently available on the host.
+     */
+    this.threadsAvailable = 0;
   }
   /**
    * Set the target.
@@ -216,7 +220,7 @@ export class ScriptHandler {
     // calculate how much ram is available on the host
     let ramAvailable = this.host.maxRam - this.host.ramUsed;
     // calculate how many threads are available on the host
-    let threadsAvailable = Math.floor(ramAvailable / this.ramScripts);
+    this.threadsAvailable = Math.floor(ramAvailable / this.ramScripts);
     // update the host and target dependant values
     this.moneyPerHack =
       ns.hackAnalyze(this.host.hostname) * this.targetServer.moneyAvailable;
@@ -229,20 +233,20 @@ export class ScriptHandler {
     this.securityPerHack = ns.hackAnalyzeSecurity(1);
     this.securityPerGrow = ns.growthAnalyzeSecurity(1);
     // only continue if there are any threads available
-    if (threadsAvailable > 0) {
+    if (this.threadsAvailable > 0) {
       // if it is impossible to reach min security and max mone in one cycle than try to grow as much as possible
       let orderNoHack = this.getOrderByHackCount(ns, 0);
-      if (orderNoHack.sum >= threadsAvailable) {
+      if (orderNoHack.sum >= this.threadsAvailable) {
         let orderOneGrowth = this.getOrderByGrowthCount(1);
-        if (orderOneGrowth.sum >= threadsAvailable) {
-          this.order.weaken.threads = threadsAvailable;
+        if (orderOneGrowth.sum >= this.threadsAvailable) {
+          this.order.weaken.threads = this.threadsAvailable;
         } else {
           // try to find the growth count that will work best
           let search = true;
           let growthCount = 2;
           while (search) {
             let proposedOrder = this.getOrderByGrowthCount(growthCount);
-            if (proposedOrder.sum < threadsAvailable) {
+            if (proposedOrder.sum < this.threadsAvailable) {
               this.order = proposedOrder;
               growthCount++;
             } else {
@@ -257,7 +261,7 @@ export class ScriptHandler {
         while (search) {
           // calculate the proposed order set with the current hack count
           let proposedOrder = this.getOrderByHackCount(ns, hackThreads);
-          let threadsToContinue = proposedOrder.sum < threadsAvailable;
+          let threadsToContinue = proposedOrder.sum < this.threadsAvailable;
           let moneyToContinue =
             this.moneyPerHack * hackThreads < this.targetServer.moneyAvailable;
           if (threadsToContinue && moneyToContinue) {
@@ -290,9 +294,9 @@ export class ScriptHandler {
       }
       // add a small buffer to the cycle timer to ensure that all scripts are really finished
       this.cycleTime += 50;
-      // update the current loading
-      this.load = (this.order.sum / threadsAvailable) * 100;
     }
+    // update the loading
+    this.load = this.getLoad();
   }
   /**
    * Execute the queued orders.
@@ -368,5 +372,17 @@ export class ScriptHandler {
     description += this.order.description(ns);
     description += ns.sprintf("|Load: %(load)3.1f|", this);
     return description;
+  }
+  /**
+   * Get the current load of the host server.
+   * @returns {number} The current load in %.
+   */
+  getLoad() {
+    // set the default value to 100% so there is no wrong impact from servers that have no threads available
+    let load = 100;
+    if (this.threadsAvailable > 0) {
+      load = (this.order.sum / this.threadsAvailable) * 100;
+    }
+    return load;
   }
 }
