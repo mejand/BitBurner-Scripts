@@ -221,8 +221,11 @@ export class ScriptHandler {
         while (search) {
           // calculate the proposed order set with the current hack count
           let proposedOrder = this.getOrderByHackCount(hackThreads);
-          if (proposedOrder.sum < threadsAvailable) {
-            // continue the search if the proposed order set does not use all available threads and take over the proposed order set
+          let threadsToContinue = proposedOrder.sum < threadsAvailable;
+          let moneyToContinue =
+            this.moneyPerHack * hackThreads < this.target.moneyAvailable;
+          if (threadsToContinue && moneyToContinue) {
+            // continue the search if the proposed order set does not use all available threads and more money can be stolen
             this.order = proposedOrder;
             hackThreads++;
           } else {
