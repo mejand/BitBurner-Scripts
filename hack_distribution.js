@@ -191,6 +191,10 @@ export class ScriptHandler {
      */
     this.cycleTime = 0;
     /**
+     * @property The time it takes to complete one hack, grow, weaken cycle formatted as a string.
+     */
+    this.cycleTimeString = ns.tFormat(0);
+    /**
      * @property The current load of the hoast server in %.
      */
     this.load = 0;
@@ -294,6 +298,7 @@ export class ScriptHandler {
       }
       // add a small buffer to the cycle timer to ensure that all scripts are really finished
       this.cycleTime += 50;
+      this.cycleTimeString = ns.tFormat(this.cycleTime);
     }
     // update the loading
     this.load = this.getLoad();
@@ -370,7 +375,7 @@ export class ScriptHandler {
       this
     );
     description += this.order.description(ns);
-    description += ns.sprintf("|Load: %(load)3.1f|", this);
+    description += ns.sprintf("|Load: %(load)3.1f|%(cycleTimeString)s|", this);
     return description;
   }
   /**
