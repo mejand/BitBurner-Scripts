@@ -21,7 +21,7 @@ class ScriptOrder {
    * Execute the order.
    * @param {import(".").NS} ns
    */
-  execute(ns, host, target) {
+  execute(ns) {
     if (this.threads > 0) {
       ns.exec(this.name, this.host, this.threads, this.target, this.delay);
     }
@@ -31,17 +31,19 @@ class ScriptOrder {
 /**
  * A class to keep track of the distribution of threads between the hack scripts.
  */
-export class Threads {
+export class OrderDistribution {
   /**
    * Create a class object with a given set of threads for each script.
+   * @param {import(".").Server} host - The server that the script shall be executed on.
+   * @param {import(".").Server} target - The server that shall be targeted by the script.
    * @param {number} hack - The number of threads dedicated to hacking.
    * @param {number} grow - The number of threads dedicated to growing.
    * @param {number} weaken - The number of threads dedicated to weaken.
    */
-  constructor(hack, grow, weaken) {
-    this.hack = { count: hack, script: "hack.js" };
-    this.grow = { count: grow, script: "grow.js" };
-    this.weaken = { count: weaken, script: "weaken.js" };
+  constructor(host, target, hack, grow, weaken) {
+    this.hack = new ScriptOrder(hack, "hack.js", 0, host, target);
+    this.grow = new ScriptOrder(grow, "grow.js", 0, host, target);
+    this.weaken = new ScriptOrder(weaken, "weaken.js", 0, host, target);
   }
 
   /**
@@ -49,7 +51,7 @@ export class Threads {
    * @readonly
    */
   get sum() {
-    return this.hack.count + this.grow.count + this.weaken.count;
+    return this.hack.threads + this.grow.threads + this.weaken.threads;
   }
 
   /**
@@ -59,9 +61,12 @@ export class Threads {
    */
   description(ns) {
     var description = ns.sprintf(
-      "|Hack: %(count)10i|Grow: %(count)10i|Weaken: %(count)10i|",
+      "||Hack|%(threads)10i|%(delay)f||Grow|%(threads)10i|%(delay)f||Weaken: %(threads)10i|%(delay)f||",
+      this.hack,
       this.hack,
       this.grow,
+      this.grow,
+      this.weaken,
       this.weaken
     );
     return description;
