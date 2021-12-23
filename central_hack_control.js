@@ -94,6 +94,9 @@ export async function main(ns) {
       handler.execute(ns);
       cycleTime = Math.max(cycleTime, handler.cycleTime);
       load += handler.load;
+      if (debug) {
+        ns.print(handler.description(ns));
+      }
     }
 
     // rescale the laod based on the number of available servers
