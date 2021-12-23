@@ -177,6 +177,10 @@ export class ScriptHandler {
      * @property The time it takes to complete one hack, grow, weaken cycle.
      */
     this.cycleTime = 0;
+    /**
+     * @property The current load of the hoast server in %.
+     */
+    this.load = 0;
   }
   /**
    * Set the target.
@@ -273,6 +277,8 @@ export class ScriptHandler {
       }
       // add a small buffer to the cycle timer to ensure that all scripts are really finished
       this.cycleTime += 50;
+      // update the current loading
+      this.load = (this.order.sum / threadsAvailable) * 100;
     }
   }
   /**
