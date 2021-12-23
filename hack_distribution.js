@@ -1,7 +1,7 @@
 /**
  * A class to represent an order for the execution of a script.
  */
-class ScriptOrder {
+export class ScriptOrder {
   /**
    * Create an object to represent an order for the execution of a script.
    * @param {number} threads - The number of threads that the script shall be executed with.
@@ -103,5 +103,29 @@ export class OrderDistribution {
     this.hack.execute(ns);
     this.grow.execute(ns);
     this.weaken.execute(ns);
+  }
+}
+/**
+ * A class to handle the distribution and targeting of the hack scripts on a single host server.
+ */
+export class ScriptHandler {
+  /**
+   * Create a class object with the given host and target.
+   * @param {import(".").NS} ns
+   * @param {import(".").Server} host - The server that the script shall be executed on.
+   * @param {import(".").Server} target - The server that shall be targeted by the script.
+   */
+  constructor(host, target) {
+    this.host = host;
+    this.target = target;
+    this.Order = new OrderDistribution(host, target, 0, 0, 0);
+  }
+  /**
+   * Set the target.
+   * @param {import(".").Server} newTarget - The new target server.
+   */
+  set target(newTarget) {
+    this.target = newTarget;
+    this.Order.setTarget(newTarget);
   }
 }
