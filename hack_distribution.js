@@ -45,7 +45,6 @@ export class OrderDistribution {
     this.grow = new ScriptOrder(grow, "grow.js", 0, host, target);
     this.weaken = new ScriptOrder(weaken, "weaken.js", 0, host, target);
   }
-
   /**
    * Get the sum of all threads.
    * @readonly
@@ -53,7 +52,6 @@ export class OrderDistribution {
   get sum() {
     return this.hack.threads + this.grow.threads + this.weaken.threads;
   }
-
   /**
    * Get a string that describes the class instance.
    * @param {import(".").NS} ns
@@ -70,5 +68,14 @@ export class OrderDistribution {
       this.weaken
     );
     return description;
+  }
+  /**
+   * Execute the saved orders to start the scripts.
+   * @param {import(".").NS} ns
+   */
+  execute(ns) {
+    this.hack.execute(ns);
+    this.grow.execute(ns);
+    this.weaken.execute(ns);
   }
 }
