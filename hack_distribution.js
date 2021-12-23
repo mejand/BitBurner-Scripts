@@ -216,13 +216,13 @@ export class ScriptHandler {
       // if it is impossible to reach min security and max mone in one cycle than try to grow as much as possible
       let orderNoHack = this.getOrderByHackCount(ns, 0);
       if (orderNoHack.sum >= threadsAvailable) {
-        let orderOneGrowth = this.getOrderByGrowthCount(ns, 1);
+        let orderOneGrowth = this.getOrderByGrowthCount(1);
         if (orderOneGrowth.sum >= threadsAvailable) {
           this.order.weaken.threads = threadsAvailable;
         } else {
           // try to find the growth count that will work best
           let search = true;
-          let growthCount = 1;
+          let growthCount = 2;
           while (search) {
             let proposedOrder = this.getOrderByGrowthCount(growthCount);
             if (proposedOrder.sum < threadsAvailable) {
@@ -239,7 +239,7 @@ export class ScriptHandler {
         let hackThreads = 1;
         while (search) {
           // calculate the proposed order set with the current hack count
-          let proposedOrder = this.getOrderByHackCount(hackThreads);
+          let proposedOrder = this.getOrderByHackCount(ns, hackThreads);
           let threadsToContinue = proposedOrder.sum < threadsAvailable;
           let moneyToContinue =
             this.moneyPerHack * hackThreads < this.targetServer.moneyAvailable;
@@ -271,6 +271,8 @@ export class ScriptHandler {
       if (this.order.grow.delay > 0) {
         this.order.grow.delay = Math.ceil(this.order.grow.delay);
       }
+      // add a small buffer to the cycle timer to ensure that all scripts are really finished
+      this.cycleTime += 5;
     }
   }
   /**
@@ -318,7 +320,7 @@ export class ScriptHandler {
    * @param {number} growthThreads - The number of threads that shall be dedicated to growing.
    * @returns {OrderDistribution} The set of orders needed to sustain the given growing thread count.
    */
-  getOrderByGrowthCount(ns, growthThreads) {
+  getOrderByGrowthCount(growthThreads) {
     let result = new OrderDistribution(
       this.host,
       this.targetServer,
