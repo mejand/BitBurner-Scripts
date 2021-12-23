@@ -176,6 +176,10 @@ export class ScriptHandler {
      * @property The amount of security the weaken function has to remove to compensate one grow.
      */
     this.securityPerGrow = ns.growthAnalyzeSecurity(1);
+    /**
+     * @property The time it takes to complete one hack, grow, weaken cycle.
+     */
+    this.cycleTime = 0;
   }
   /**
    * Set the target.
@@ -233,6 +237,24 @@ export class ScriptHandler {
             search = false;
           }
         }
+      }
+      // calculate the delay times for each script type
+      let hackTime = ns.getHackTime(this.host.hostname);
+      let growTime = ns.getGrowTime(this.host.hostname);
+      let weakenTime = ns.getWeakenTime(this.host.hostname);
+      this.cycleTime = Math.max(hackTime, growTime, weakenTime);
+      this.order.weaken.delay = this.cycleTime - weakenTime;
+      if (this.order.weaken.delay > 0) {
+        this.order.weaken.delay = Math.ceil(this.order.weaken.delay + 5);
+        weakenTime += this.order.weaken.delay;
+        this.cycleTime += this.order.weaken.delay;
+      }
+      this.order.grow.delay = Math.min(
+        0,
+        hackTime + (weakenTime - hackTime) * 0.5 - growTime
+      );
+      if (this.order.grow.delay > 0) {
+        this.order.grow.delay = Math.ceil(this.order.grow.delay);
       }
     }
   }
