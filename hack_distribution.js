@@ -5,7 +5,7 @@ export class ScriptOrder {
   /**
    * Create an object to represent an order for the execution of a script.
    * @param {number} threads - The number of threads that the script shall be executed with.
-   * @param {string} name - The name of the cript that shall be executed.
+   * @param {string} name - The name of the script that shall be executed.
    * @param {number} delay - The time in ms that the execution of the script shall be delayed.
    * @param {import(".").Server} host - The server that the script shall be executed on.
    * @param {import(".").Server} target - The server that shall be targeted by the script.
@@ -24,10 +24,10 @@ export class ScriptOrder {
   execute(ns) {
     if (this.threads > 0) {
       ns.exec(
-        this.nameName,
+        this.name,
         this.hostName,
         this.threads,
-        this.target,
+        this.targetName,
         this.delay
       );
     }
@@ -85,13 +85,8 @@ export class OrderDistribution {
    */
   description(ns) {
     var description = ns.sprintf(
-      "||Hack|%(threads)10i|%(delay)f||Grow|%(threads)10i|%(delay)f||Weaken: %(threads)10i|%(delay)f||",
-      this.hack,
-      this.hack,
-      this.grow,
-      this.grow,
-      this.weaken,
-      this.weaken
+      "||Hack|%(hack.threads)10i|%(hack.delay)f||Grow|%(grow.threads)10i|%(grow.delay)f||Weaken: %(weaken.threads)10i|%(weaken.delay)f||",
+      this
     );
     return description;
   }
