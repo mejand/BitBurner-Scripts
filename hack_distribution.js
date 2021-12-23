@@ -254,9 +254,9 @@ export class ScriptHandler {
         }
       }
       // calculate the delay times for each script type
-      let hackTime = ns.getHackTime(this.host.hostname);
-      let growTime = ns.getGrowTime(this.host.hostname);
-      let weakenTime = ns.getWeakenTime(this.host.hostname);
+      let hackTime = ns.getHackTime(this.target.hostname);
+      let growTime = ns.getGrowTime(this.target.hostname);
+      let weakenTime = ns.getWeakenTime(this.target.hostname);
       this.cycleTime = Math.max(hackTime, growTime, weakenTime);
       this.order.weaken.delay = this.cycleTime - weakenTime;
       if (this.order.weaken.delay > 0) {
