@@ -12,31 +12,31 @@ export class ScriptOrder {
    */
   constructor(threads, name, delay, host, target) {
     /**
-     * The number of threads that the script shall be executed with.
+     * @property The number of threads that the script shall be executed with.
      * @type {number}
      */
     this.threads = threads;
 
     /**
-     * The name of the script.
+     * @property The name of the script.
      * @type {string}
      */
     this.name = name;
 
     /**
-     * The delay time in ms for starting the script.
+     * @property The delay time in ms for starting the script.
      * @type {number}
      */
     this.delay = delay;
 
     /**
-     * The name of the host server.
+     * @property The name of the host server.
      * @type {string}
      */
     this.hostName = host.hostname;
 
     /**
-     * The name of the target server.
+     * @property The name of the target server.
      * @type {string}
      */
     this.targetName = target.hostname;
@@ -91,19 +91,19 @@ export class OrderDistribution {
    */
   constructor(host, target, hack, grow, weaken) {
     /**
-     * The order object that handles hacking.
+     * @property The order object that handles hacking.
      * @type {ScriptOrder}
      */
     this.hack = new ScriptOrder(hack, "hack.js", 0, host, target);
 
     /**
-     * The order object that handles growing.
+     * @property The order object that handles growing.
      * @type {ScriptOrder}
      */
     this.grow = new ScriptOrder(grow, "grow.js", 0, host, target);
 
     /**
-     * The order object that handles weakening.
+     * @property The order object that handles weakening.
      * @type {ScriptOrder}
      */
     this.weaken = new ScriptOrder(weaken, "weaken.js", 0, host, target);
@@ -199,14 +199,17 @@ export class ScriptHandler {
      * @property The server that hosts the hack, grow and weaken scripts.
      */
     this.host = host;
+
     /**
      * @property The server that hosts the hack, grow and weaken scripts.
      */
     this.targetServer = target;
+
     /**
      * @property The set of orders that will be executed by the scripts on the host server.
      */
     this.order = new OrderDistribution(host, target, 0, 0, 0);
+
     /**
      * @property The RAM that is needed to run any of the scripts on the host.
      */
@@ -215,54 +218,66 @@ export class ScriptHandler {
       ns.getScriptRam(this.order.grow.name),
       ns.getScriptRam(this.order.weaken.name)
     );
+
     /**
      * @property The amount of money that will be stolen per hack.
      */
     this.moneyPerHack =
       ns.hackAnalyze(this.host.hostname) * this.targetServer.moneyAvailable;
+
     /**
      * @property The multiplicative factor the grow function has to achive to compensate one hack.
      */
     this.growthPerHack = this.moneyPerHack / this.targetServer.moneyAvailable;
+
     /**
      * @property The multiplicative factor the grow function has to achive to get to maxMoney.
      */
     this.growthToMax =
       this.targetServer.moneyMax / this.targetServer.moneyAvailable;
+
     /**
      * @property The amount of security the weaken function has to remove to get to minDifficulty.
      */
     this.securityToMin =
       this.targetServer.hackDifficulty - this.targetServer.minDifficulty;
+
     /**
      * @property The amount of security the weaken function removes per call.
      */
     this.securityPerWeaken = ns.weakenAnalyze(1, this.host.cpuCores);
+
     /**
      * @property The amount of security the weaken function has to remove to compensate one hack.
      */
     this.securityPerHack = ns.hackAnalyzeSecurity(1);
+
     /**
      * @property The amount of security the weaken function has to remove to compensate one grow.
      */
     this.securityPerGrow = ns.growthAnalyzeSecurity(1);
+
     /**
      * @property The time it takes to complete one hack, grow, weaken cycle.
      */
     this.cycleTime = 0;
+
     /**
      * @property The time it takes to complete one hack, grow, weaken cycle formatted as a string.
      */
     this.cycleTimeString = ns.tFormat(0);
+
     /**
      * @property The current load of the hoast server in %.
      */
     this.load = 0;
+
     /**
      * @property The number of threads currently available on the host.
      */
     this.threadsAvailable = 0;
   }
+
   /**
    * Set the target.
    * @param {import(".").Server} newTarget - The new target server.
@@ -271,6 +286,7 @@ export class ScriptHandler {
     this.targetServer = newTarget;
     this.order.setTarget(newTarget);
   }
+
   /**
    * Update the class internal orders in preparation of execution.
    * @param {import(".").NS} ns
@@ -363,6 +379,7 @@ export class ScriptHandler {
     // update the loading
     this.load = this.getLoad();
   }
+
   /**
    * Execute the queued orders.
    * @param {import(".").NS} ns
@@ -370,6 +387,7 @@ export class ScriptHandler {
   execute(ns) {
     this.order.execute(ns);
   }
+
   /**
    * Get an order set that is needed to sustain the given number of hacking threads.
    * @param {import(".").NS} ns
@@ -402,6 +420,7 @@ export class ScriptHandler {
     // return the resulting order set
     return result;
   }
+
   /**
    * Get an order set that is needed to sustain the given number of growing threads with 0 hacking.
    * @param {import(".").NS} ns
@@ -424,6 +443,7 @@ export class ScriptHandler {
     // return the resulting order set
     return result;
   }
+
   /**
    * Get a string that describes the class instance.
    * @param {import(".").NS} ns
@@ -438,6 +458,7 @@ export class ScriptHandler {
     description += ns.sprintf("|Load: %(load)3.1f|%(cycleTimeString)s|", this);
     return description;
   }
+
   /**
    * Get the current load of the host server.
    * @returns {number} The current load in %.
