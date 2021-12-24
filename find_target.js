@@ -58,9 +58,34 @@ export function find_target(ns, unlockedServers, debug = false) {
 /**
  * Get the score for a given server (higher score is more desirable).
  * @param {import(".").NS} ns
- * @param {Server} server - The server for which the score shall be calculated.
+ * @param {import(".").Server} server - The server for which the score shall be calculated.
  * @returns {number} The score of the server.
  */
 function getServerScore(ns, server) {
-  return server.moneyMax / server.minDifficulty;
+  /**
+   * The amount of money stolen by a single hack.
+   * @type {number}
+   */
+  var moneyPerHack = ns.hackAnalyze(server.hostname) * server.moneyMax;
+
+  /**
+   * The time it takes to complete a hack, grow, weaken cycle.
+   * @type {number}
+   */
+  var cycleTime =
+    Math.max(
+      ns.getHackTime(server.hostname),
+      ns.getGrowTime(server.hostname),
+      ns.getWeakenTime(server.hostname)
+    ) + 50;
+
+  /**
+   * The money per second of a hack, grow, weaken batch with 1 hack thread.
+   * @type {number}
+   */
+  // cycle time can not be 0 because of 50ms offset
+  var moneyPerSecondBatch = moneyPerHack / cycleTime;
+
+  // cycle time can not be 0 because of 50ms offset
+  return moneyPerSecondBatch;
 }
