@@ -1,42 +1,56 @@
 /**
  * Find the most suitable target.
  * @param {import(".").NS } ns
- * @param {Array} unlocked_servers - An array of all currently unlocked servers.
+ * @param {import(".").Server[]} unlockedServers - An array of all currently unlocked servers.
  * @param {Boolean} debug - A flag that governs if debug messages shall be printed to the terminal.
  * @returns {import(".").Server} The server object of the most suitable target.
  */
-export function find_target(ns, unlocked_servers, debug = false) {
-  // define the default target
+export function find_target(ns, unlockedServers, debug = false) {
+  /**
+   * The target server.
+   * @type {import(".").Server}
+   */
   var target = ns.getServer("n00dles");
 
-  // define the values needed for the search
-  var max_score = target.moneyMax / target.minDifficulty;
+  /**
+   * The currently highest score of any server.
+   * @type {number}
+   */
+  var maxScore = target.moneyMax / target.minDifficulty;
+
+  /**
+   * The score of the currently inevestigated server.
+   * @type {number}
+   */
   var score = 0;
-  var player_level = ns.getHackingLevel();
+
+  /**
+   * The hack lavel of the player.
+   * @type {number}
+   */
+  var playerLevel = ns.getHackingLevel();
 
   // loop through all unlocked servers and find the one with the highest score
-  for (let server of unlocked_servers) {
+  for (let server of unlockedServers) {
     // check if ther server can be hacked at all
-    if (server.requiredHackingSkill <= player_level) {
+    if (server.requiredHackingSkill <= playerLevel) {
       // calculate the score of the server
       score = server.moneyMax / server.minDifficulty;
       // check if the score is better than the current target
-      if (score > max_score) {
+      if (score > maxScore) {
         // update the target if necessary
-        max_score = score;
+        maxScore = score;
         target = server;
       }
     }
   }
+
   // print the new target if debugging is enabled
   if (debug) {
-    ns.tprint(unlocked_servers);
     ns.tprint(
-      "#### Best Target: " +
-        target.hostname +
-        " for hacking lvl " +
-        player_level
+      "#### Best Target: " + target.hostname + " for hacking lvl " + playerLevel
     );
   }
+
   return target;
 }
