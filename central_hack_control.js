@@ -42,16 +42,10 @@ export async function main(ns) {
   var cycleTime = 1000;
 
   /**
-   * The combined load of all available servers.
+   * The index in the server array that is currently beeing processed.
    * @type {number}
    */
-  var load = 0;
-
-  /**
-   * The percentage of money currently on the target server.
-   * @type {number}
-   */
-  var moneyPercent = 0;
+  var index = 0;
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
@@ -82,39 +76,15 @@ export async function main(ns) {
     // take over the new server list
     servers = newServers;
 
-    // reset the cycle time
-    cycleTime = 0;
+    // try to start a new batch on the current server
+    handlers[index].update(ns);
+    handlers[index].execute(ns);
+    ns.print(handlers[index].description(ns));
+    index++;
 
-    // reset the load
-    load = 0;
-
-    // loop through all handlers, update them and start their scripts
-    for (let handler of handlers) {
-      handler.update(ns);
-      handler.execute(ns);
-      cycleTime = Math.max(cycleTime, handler.cycleTime);
-      load += handler.load;
-      if (debug) {
-        ns.print(handler.description(ns));
-      }
+    if (index >= servers.length) {
+      index = 0;
     }
-
-    // rescale the laod based on the number of available servers
-    load = load / handlers.length;
-
-    // update the money percent
-    moneyPercent = (target.moneyAvailable / target.moneyMax) * 100;
-
-    // print a status update to the terminal
-    ns.tprint(
-      ns.sprintf(
-        "|%s|Load: %3.1f|Money: %3.1f|%s|",
-        target.hostname,
-        load,
-        moneyPercent,
-        ns.tFormat(cycleTime)
-      )
-    );
 
     // sleep while the scripts are active
     await ns.sleep(cycleTime);
