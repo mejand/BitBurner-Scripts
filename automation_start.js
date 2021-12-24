@@ -94,7 +94,7 @@ export async function main(ns) {
     await ns.sleep(wait_time);
 
     // start the server purchase script with a 10 second period and debugging off
-    ns.run("server_purchase.js", 1, 10000, 0.75, false);
+    ns.run("server_purchase.js", 1, 10000, 0.75, true);
     ns.tprint("#### Server Purchasing Started ####");
     await ns.sleep(wait_time);
 

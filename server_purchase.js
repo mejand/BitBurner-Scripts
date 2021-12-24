@@ -79,7 +79,12 @@ export async function main(ns) {
         ns.killall(minRamServer.hostname);
         ns.deleteServer(minRamServer.hostname);
         if (debug) {
-          ns.tprint(minRamServer.hostname + " - deleted");
+          ns.tprint(
+            minRamServer.hostname +
+              " at " +
+              minRamServer.maxRam +
+              "GB - deleted"
+          );
         }
       }
     }
