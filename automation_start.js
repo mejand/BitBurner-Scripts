@@ -1,6 +1,6 @@
 /**
  * Handle the start up of control scripts on the home server at the beginning of a run.
- * @param {import(".").NS } ns
+ * @param {import(".").NS} ns
  */
 export async function main(ns) {
   /**
@@ -49,87 +49,30 @@ export async function main(ns) {
    */
   var success = true;
 
+  /**
+   * The names of all scripts that shall be downloaded.
+   * @type {string[]}
+   */
+  var scripts = [
+    "spider.js",
+    "unlock.js",
+    "hacknet.js",
+    "server_purchase.js",
+    "central_hack_control.js",
+    "hack.js",
+    "grow.js",
+    "weaken.js",
+    "find_target.js",
+    "hack_distribution.js",
+  ];
+
   // download the necessary scripts from the git repository to get newest versions.
-  var url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/spider.js";
-  if (await ns.wget(url, "spider.js")) {
-    ns.tprint(" ###  Spider Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Spider Download Failed  ###");
+  for (let script of scripts) {
+    if (!download(ns, script)) {
+      success = false;
+    }
   }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/unlock.js";
-  if (await ns.wget(url, "unlock.js")) {
-    ns.tprint(" ###  Unlock Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Unlock Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hacknet.js";
-  if (await ns.wget(url, "hacknet.js")) {
-    ns.tprint(" ###  Hacknet Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Hacknet Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/server_purchase.js";
-  if (await ns.wget(url, "server_purchase.js")) {
-    ns.tprint(" ###  Server-Purchase Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Server-Purchase Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/central_hack_control.js";
-  if (await ns.wget(url, "central_hack_control.js")) {
-    ns.tprint(" ###  Central-Hack-Control Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Central-Hack-Control Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hack.js";
-  if (await ns.wget(url, "hack.js")) {
-    ns.tprint(" ###  Hack Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Hack Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/grow.js";
-  if (await ns.wget(url, "grow.js")) {
-    ns.tprint(" ###  Grow Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Grow Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/weaken.js";
-  if (await ns.wget(url, "weaken.js")) {
-    ns.tprint(" ###  Weaken Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Weaken Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/find_target.js";
-  if (await ns.wget(url, "find_target.js")) {
-    ns.tprint(" ###  Find-Target Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Find-Target Download Failed  ###");
-  }
-  url =
-    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/hack_distribution.js";
-  if (await ns.wget(url, "hack_distribution.js")) {
-    ns.tprint(" ###  Hack-Distribution Download Successful  ###");
-  } else {
-    success = false;
-    ns.tprint(" ###  Hack-Distribution Download Failed  ###");
-  }
+
   await ns.sleep(wait_time);
 
   // start running the scripts if all were downloaded successfully.
@@ -161,4 +104,34 @@ export async function main(ns) {
   } else {
     ns.alert("Download of advanced scripts failed");
   }
+}
+
+/**
+ * Download a script and print the result to the terminal.
+ * @param {import(".").NS} ns
+ * @param {string} name - The name of the script that shall be downloaded.
+ * @returns {boolean} True if the script was successfully downloaded.
+ */
+async function download(ns, name) {
+  /**
+   * The base url of the github repository.
+   * @type {string}
+   */
+  var baseUrl =
+    "https://raw.githubusercontent.com/mejand/BitBurner-Scripts/main/";
+
+  /**
+   * The download was successful.
+   * @type {boolean}
+   */
+  var success = await ns.wget(baseUrl + name, name);
+
+  if (success) {
+    ns.tprint(ns.sprintf("----  %s Download Successful  ----", name));
+  } else {
+    success = false;
+    ns.tprint(ns.sprintf("----  %s Download Failed  ----", name));
+  }
+
+  return success;
 }
