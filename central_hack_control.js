@@ -39,7 +39,7 @@ export async function main(ns) {
    * The time between each calculation cycle.
    * @type {number}
    */
-  var cycleTime = 1000;
+  var cycleTime = 500;
 
   /**
    * The index in the server array that is currently beeing processed.
