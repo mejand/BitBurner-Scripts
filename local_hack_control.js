@@ -44,7 +44,10 @@ export async function main(ns) {
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
+    // update the available ram on the host
     availableRam = ns.getServerMaxRam(hostName) - ns.getServerUsedRam(hostName);
+
+    // check which type of cycle needs to be started
     if (ns.getServerSecurityLevel(targetName) > securityThresh) {
       // If the server's security level is above our threshold, weaken it
       let threadCount = Math.floor(availableRam / ns.getScriptRam("weaken.js"));
@@ -67,6 +70,7 @@ export async function main(ns) {
       }
       await ns.sleep(ns.getHackTime(targetName));
     }
+
     // await another 10ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
     await ns.sleep(10);
   }
