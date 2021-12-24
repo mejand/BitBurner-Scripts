@@ -395,6 +395,10 @@ export class ScriptHandler {
    * @returns {OrderDistribution} The set of orders needed to sustain the given hacking thread count.
    */
   getOrderByHackCount(ns, hackThreads) {
+    /**
+     * The distribution of orders that is needed to compensate for the number of hack threads.
+     * @type {OrderDistribution}
+     */
     let result = new OrderDistribution(
       this.host,
       this.targetServer,
@@ -402,6 +406,7 @@ export class ScriptHandler {
       0,
       0
     );
+
     // calculate how many growing threads are needed to support the hacking and reach max money
     result.grow.threads = Math.ceil(
       ns.growthAnalyze(
@@ -410,6 +415,7 @@ export class ScriptHandler {
         this.host.cpuCores
       )
     );
+
     // calculate how many weakening cycles are needed to support the hacking, growing and reach min security
     result.weaken.threads = Math.ceil(
       (this.securityToMin +
@@ -417,6 +423,7 @@ export class ScriptHandler {
         this.securityPerGrow * result.grow.threads) /
         this.securityPerWeaken
     );
+
     // return the resulting order set
     return result;
   }
@@ -428,6 +435,10 @@ export class ScriptHandler {
    * @returns {OrderDistribution} The set of orders needed to sustain the given growing thread count.
    */
   getOrderByGrowthCount(growthThreads) {
+    /**
+     * The distribution of orders that is needed to compensate for the number of grow threads.
+     * @type {OrderDistribution}
+     */
     let result = new OrderDistribution(
       this.host,
       this.targetServer,
@@ -435,11 +446,13 @@ export class ScriptHandler {
       growthThreads,
       0
     );
+
     // calculate how many weakening cycles are needed to support the hacking, growing and reach min security
     result.weaken.threads = Math.ceil(
       (this.securityToMin + this.securityPerGrow * result.grow.threads) /
         this.securityPerWeaken
     );
+
     // return the resulting order set
     return result;
   }
@@ -450,12 +463,19 @@ export class ScriptHandler {
    * @returns {string} A description of the class instance.
    */
   description(ns) {
+    /**
+     * A string that describes the class instance.
+     * @type {string}
+     */
     var description = ns.sprintf(
       "|%(host.hostname)s vs. %(targetServer.hostname)s|",
       this
     );
+
     description += this.order.description(ns);
+
     description += ns.sprintf("|Load: %(load)3.1f|%(cycleTimeString)s|", this);
+
     return description;
   }
 
@@ -465,10 +485,16 @@ export class ScriptHandler {
    */
   getLoad() {
     // set the default value to 100% so there is no wrong impact from servers that have no threads available
+    /**
+     * The current loading ot the host server in %.
+     * @type {number}
+     */
     let load = 100;
+
     if (this.threadsAvailable > 0) {
       load = (this.order.sum / this.threadsAvailable) * 100;
     }
+
     return load;
   }
 }
