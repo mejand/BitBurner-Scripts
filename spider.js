@@ -3,34 +3,50 @@
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
-  // get the arguments the script was called with
+  /**
+   * Enable debug logging.
+   * @type {boolean}
+   */
   var debug = true;
   if (ns.args.length > 0) {
     debug = ns.args[0];
   }
 
-  // Create a servers_seen array, containing the host server to start with
-  var servers_seen = [ns.getHostname()];
+  /**
+   * The names of all servers that have already been analyzed.
+   * @type {string[]}
+   */
+  var serversSeen = [ns.getHostname()];
 
   // delete the network map from file so the newly discovered servers can be added
   ns.clear("network_map.txt");
 
   // For every server we've seen so far, do a scan
-  for (var i = 0; i < servers_seen.length; i++) {
-    // get the name of the server that is currently under investigation
-    var host = servers_seen[i];
+  for (var i = 0; i < serversSeen.length; i++) {
+    /**
+     * The name of the server that is currently being analyzed.
+     * @type {string}
+     */
+    let serverName = serversSeen[i];
+
     if (debug) {
-      ns.tprint(host);
+      ns.tprint(serverName);
     }
-    // write the static information of the server to the file
-    await ns.write("network_map.txt", host + "\r\n", "a");
-    // get all servers connected to the current server
-    var servers_connected = ns.scan(host);
-    // Loop through connected servers of the host and add any new servers
-    for (var j = 0; j < servers_connected.length; j++) {
-      // If this server isn't in servers_seen, add it
-      if (servers_seen.indexOf(servers_connected[j]) === -1) {
-        servers_seen.push(servers_connected[j]);
+
+    // append the name of the server to the file
+    await ns.write("network_map.txt", serverName + "\r\n", "a");
+
+    /**
+     * The names of all servers connected to the server currently being analyzed.
+     * @type {string[]}
+     */
+    let serversConnected = ns.scan(serverName);
+
+    // Loop through the connected servers and add any new servers
+    for (var j = 0; j < serversConnected.length; j++) {
+      // If this server isn't in serversSeen, add it
+      if (serversSeen.indexOf(serversConnected[j]) === -1) {
+        serversSeen.push(serversConnected[j]);
       }
     }
   }
