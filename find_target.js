@@ -35,7 +35,7 @@ export function find_target(ns, unlockedServers, debug = false) {
     // check if ther server can be hacked at all
     if (server.requiredHackingSkill <= playerLevel) {
       // calculate the score of the server
-      score = server.moneyMax / server.minDifficulty;
+      score = getServerScore(ns, server);
       // check if the score is better than the current target
       if (score > maxScore) {
         // update the target if necessary
@@ -53,4 +53,14 @@ export function find_target(ns, unlockedServers, debug = false) {
   }
 
   return target;
+}
+
+/**
+ * Get the score for a given server (higher score is more desirable).
+ * @param {import(".").NS} ns
+ * @param {Server} server - The server for which the score shall be calculated.
+ * @returns {number} The score of the server.
+ */
+function getServerScore(ns, server) {
+  return server.moneyMax / server.minDifficulty;
 }
