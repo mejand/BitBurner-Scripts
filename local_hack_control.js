@@ -3,49 +3,69 @@
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
-  // get the arguments the script was started with.
-  var target = "n00dles";
+  /**
+   * The name of the target server.
+   * @type {string}
+   */
+  var targetName = "n00dles";
   if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
-    target = ns.args[0];
+    targetName = ns.args[0];
   }
 
-  // define the variables for the script
-  var moneyThresh = ns.getServerMaxMoney(target) * 0.75;
-  var securityThresh = ns.getServerMinSecurityLevel(target) + 5;
-  var host = ns.getHostname();
-  var available_ram = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
+  /**
+   * The amount of money under which a grow cycle will be started.
+   * @type {number}
+   */
+  var moneyThresh = ns.getServerMaxMoney(targetName) * 0.75;
+
+  /**
+   * The security level under which a weaken cycle will be started.
+   * @type {number}
+   */
+  var securityThresh = ns.getServerMinSecurityLevel(targetName) + 5;
+
+  /**
+   * The name of the host server the script runs on.
+   * @type {string}
+   */
+  var hostName = ns.getHostname();
+
+  /**
+   * The amount of ram available on the host server.
+   * @type {number}
+   */
+  var availableRam =
+    ns.getServerMaxRam(hostName) - ns.getServerUsedRam(hostName);
 
   // copy the needed scripts to the host
-  await ns.scp("weaken.js", "home", host);
-  await ns.scp("grow.js", "home", host);
-  await ns.scp("hack.js", "home", host);
+  await ns.scp("weaken.js", "home", hostName);
+  await ns.scp("grow.js", "home", hostName);
+  await ns.scp("hack.js", "home", hostName);
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
-    available_ram = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
-    if (ns.getServerSecurityLevel(target) > securityThresh) {
+    availableRam = ns.getServerMaxRam(hostName) - ns.getServerUsedRam(hostName);
+    if (ns.getServerSecurityLevel(targetName) > securityThresh) {
       // If the server's security level is above our threshold, weaken it
-      let thread_count = Math.floor(
-        available_ram / ns.getScriptRam("weaken.js")
-      );
-      if (thread_count > 0) {
-        ns.run("weaken.js", thread_count, target);
+      let threadCount = Math.floor(availableRam / ns.getScriptRam("weaken.js"));
+      if (threadCount > 0) {
+        ns.run("weaken.js", threadCount, targetName);
       }
-      await ns.sleep(ns.getWeakenTime(target));
-    } else if (ns.getServerMoneyAvailable(target) < moneyThresh) {
+      await ns.sleep(ns.getWeakenTime(targetName));
+    } else if (ns.getServerMoneyAvailable(targetName) < moneyThresh) {
       // If the server's money is less than our threshold, grow it
-      let thread_count = Math.floor(available_ram / ns.getScriptRam("grow.js"));
-      if (thread_count > 0) {
-        ns.run("grow.js", thread_count, target);
+      let threadCount = Math.floor(availableRam / ns.getScriptRam("grow.js"));
+      if (threadCount > 0) {
+        ns.run("grow.js", threadCount, targetName);
       }
-      await ns.sleep(ns.getGrowTime(target));
+      await ns.sleep(ns.getGrowTime(targetName));
     } else {
       // Otherwise, hack it
-      let thread_count = Math.floor(available_ram / ns.getScriptRam("hack.js"));
-      if (thread_count > 0) {
-        ns.run("hack.js", thread_count, target);
+      let threadCount = Math.floor(availableRam / ns.getScriptRam("hack.js"));
+      if (threadCount > 0) {
+        ns.run("hack.js", threadCount, targetName);
       }
-      await ns.sleep(ns.getHackTime(target));
+      await ns.sleep(ns.getHackTime(targetName));
     }
     // await another 10ms to get some buffer time if there is a mismatch in the getXXXTime and sleep functions
     await ns.sleep(10);
