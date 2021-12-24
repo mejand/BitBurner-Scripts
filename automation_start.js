@@ -68,7 +68,8 @@ export async function main(ns) {
 
   // download the necessary scripts from the git repository to get newest versions.
   for (let script of scripts) {
-    if (!download(ns, script)) {
+    let downloadSuccess = await download(ns, script);
+    if (!downloadSuccess) {
       success = false;
     }
   }
