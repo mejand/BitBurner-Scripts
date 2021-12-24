@@ -40,7 +40,7 @@ export async function main(ns) {
     }
   }
 
-  ns.tprint(" #### Files Deleted ####");
+  ns.tprint("#### Files Deleted ####");
   await ns.sleep(wait_time);
 
   /**
@@ -80,27 +80,27 @@ export async function main(ns) {
   if (success) {
     // call the spider script to populate the network map
     ns.run("spider.js", 1, false);
-    ns.tprint(" #### Network Mapped ####");
+    ns.tprint("#### Network Mapped ####");
     await ns.sleep(wait_time);
 
     // start the unlock script with a 10 second period and debugging off
     ns.run("unlock.js", 1, 10000, false);
-    ns.tprint(" #### Server Unlocking Started ####");
+    ns.tprint("#### Server Unlocking Started ####");
     await ns.sleep(wait_time);
 
     // start the hacknet control script with a 5 second period, a 50% budget and debugging off
     ns.run("hacknet.js", 1, 5000, 0.5, false);
-    ns.tprint(" #### Hacknet Upgrading Started ####");
+    ns.tprint("#### Hacknet Upgrading Started ####");
     await ns.sleep(wait_time);
 
     // start the server purchase script with a 10 second period and debugging off
     ns.run("server_purchase.js", 1, 10000, 0.75, false);
-    ns.tprint(" #### Hacknet Upgrading Started ####");
+    ns.tprint("#### Server Purchasing Started ####");
     await ns.sleep(wait_time);
 
     // start the centralized hacking control script
     ns.run("central_hack_control.js", 1, false);
-    ns.tprint(" #### Central Hack Control Started ####");
+    ns.tprint("#### Central Hack Control Started ####");
     await ns.sleep(wait_time);
   } else {
     ns.alert("Download of advanced scripts failed");
@@ -128,10 +128,10 @@ async function download(ns, name) {
   var success = await ns.wget(baseUrl + name, name);
 
   if (success) {
-    ns.tprint(ns.sprintf("----  %s Download Successful  ----", name));
+    ns.tprint(ns.sprintf("---- %s Download Successful", name));
   } else {
     success = false;
-    ns.tprint(ns.sprintf("----  %s Download Failed  ----", name));
+    ns.tprint(ns.sprintf("---- %s Download Failed", name));
   }
 
   return success;
