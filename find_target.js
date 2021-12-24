@@ -86,6 +86,5 @@ function getServerScore(ns, server) {
   // cycle time can not be 0 because of 50ms offset
   var moneyPerSecondBatch = moneyPerHack / cycleTime;
 
-  // cycle time can not be 0 because of 50ms offset
   return moneyPerSecondBatch;
 }
