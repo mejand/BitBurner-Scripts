@@ -108,6 +108,18 @@ export async function main(ns) {
           // update the root access flag
           server.hasAdminRights = true;
 
+          /**
+           * The names of all files on the server.
+           * @type {string[]}
+           */
+          let filesToCopy = ns.ls(server.hostname);
+
+          if (filesToCopy) {
+            for (let file of filesToCopy) {
+              await ns.scp(file, server.hostname, "home");
+            }
+          }
+
           // copy the hack scripts to the server if it has ram available
           if (server.maxRam > 0) {
             // copy the scripts to the server
