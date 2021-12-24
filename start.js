@@ -14,7 +14,7 @@ export async function main(ns) {
    * Download was successful.
    * @type {boolean}
    */
-  var success = await ns.wget(url, "start_automation.js", "home");
+  var success = await ns.wget(url, "automation_start.js", "home");
 
   // inform the user about the success or failure and start the startup script
   if (success) {
