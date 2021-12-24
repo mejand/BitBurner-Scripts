@@ -88,7 +88,7 @@ export async function main(ns) {
     serversNames = ns.getPurchasedServers();
 
     // check if another server can be purchased
-    if (serversNames.length < maxServerCount) {
+    if (serversNames.length < maxServerCount && maxAffordableRam > 0) {
       /**
        * The name of the new server that was purchased this cycle.
        * @type {string}
@@ -131,7 +131,7 @@ function getMaxAffordableRam(ns, money) {
    * The exponent for RAM calculation (2 ** i).
    * @type {number}
    */
-  var i = 0;
+  var i = 1;
 
   /**
    * Maximum RAM not reached -> continue the search.
@@ -168,6 +168,8 @@ function getMaxAffordableRam(ns, money) {
       search = false;
     }
   }
+
+  return ram;
 }
 
 /**
