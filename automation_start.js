@@ -93,7 +93,7 @@ export async function main(ns) {
     await ns.sleep(wait_time);
 
     // start the server purchase script with a 10 second period and debugging off
-    ns.run("server_purchase.js", 1, 10000, 10, 0.75, false);
+    ns.run("server_purchase.js", 1, 10000, 0.75, false);
     ns.tprint(" #### Hacknet Upgrading Started ####");
     await ns.sleep(wait_time);
 
