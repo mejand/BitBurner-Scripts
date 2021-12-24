@@ -1,83 +1,201 @@
 /**
- * Handle the automatic buying of servers.
- * @param {import(".").NS } ns
+ * Handle the automatic buying of serversNames.
+ * @param {import(".").NS} ns
  */
 export async function main(ns) {
-  // get the arguments or use the default values
+  /**
+   * The time between executions of the automatic buying.
+   * @type {number}
+   */
   var period = 10000;
   if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
     period = ns.args[0];
   }
-  var min_ram_level = 1;
+
+  /**
+   * The fraction of the player's money that can be spent on buying serversNames.
+   * @type {number}
+   */
+  var maxMoneyFactor = 0.25;
   if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
-    min_ram_level = ns.args[1];
-    // limit the ram level to the maximum possible
-    min_ram_level = Math.min(
-      min_ram_level,
-      Math.sqrt(ns.getPurchasedServerMaxRam())
-    );
-  }
-  var max_money_factor = 0.25;
-  if (ns.args.length > 2 && typeof (ns.args[2] == "number")) {
-    max_money = ns.args[2];
-  }
-  var debug = true;
-  if (ns.args.length > 3 && typeof (ns.args[3] == "boolean")) {
-    debug = ns.args[3];
+    maxMoney = ns.args[1];
   }
 
-  // define the variables for the script
-  var max_money = ns.getServerMoneyAvailable("home") * max_money_factor;
-  var ram = 2;
-  var min_ram = 2 ** min_ram_level;
-  var i = 1;
-  var servers = ns.getPurchasedServers();
+  /**
+   * Enable debug logging.
+   * @type {boolean}
+   */
+  var debug = true;
+  if (ns.args.length > 2 && typeof (ns.args[2] == "boolean")) {
+    debug = ns.args[2];
+  }
+
+  /**
+   * The maximum money that can be spent on buying a new server.
+   * @type {number}
+   */
+  var maxMoney = ns.getServerMoneyAvailable("home") * maxMoneyFactor;
+
+  /**
+   * The names of all currently purchased servers.
+   * @type {string[]}
+   */
+  var serversNames = ns.getPurchasedServers();
+
+  /**
+   * The maximum amount of RAM that can be purchased.
+   * @type {number}
+   */
+  var maxAffordableRam = 0;
+
+  /**
+   * The purchased server with the lowest RAM.
+   * @type {import(".").Server}
+   */
+  var minRamServer = null;
+
+  /**
+   * The maximum number of servers that can be purchased.
+   * @type {number}
+   */
+  var maxServerCount = ns.getPurchasedServerLimit();
 
   // start the loop to periodically try to purchase a server
   while (true) {
     // get the current player money
-    max_money = ns.getServerMoneyAvailable("home") * max_money_factor;
-    // find the maximum affordable ram based on the available money
-    while (
-      ns.getPurchasedServerCost(ram) < max_money &&
-      ram < ns.getPurchasedServerMaxRam()
-    ) {
-      i++;
-      ram = 2 ** i;
-    }
-    // iterate through all currently purchased servers and delet any that are below the minimum ram
-    for (let server of servers) {
-      if (ns.getServerMaxRam(server) < min_ram) {
-        ns.killall(server);
-        ns.deleteServer(server);
-        ns.tprint(server + " - deleted");
-      }
-    }
-    // update the array of purchased servers
-    servers = ns.getPurchasedServers();
-    // check if the resulting ram is above the minimum desired threshold
-    if (i > min_ram_level) {
-      // go back one ram step since that was the last one below the money threshold
-      ram = 2 ** (i - 1);
-      // check if another server can be purchased
-      if (servers.length < ns.getPurchasedServerLimit()) {
-        // double check if a new server can be afforded
-        if (
-          ns.getPurchasedServerCost(ram) <= ns.getServerMoneyAvailable("home")
-        ) {
-          // buy the new server and store its name
-          var new_server = ns.purchaseServer("basic-hack-server", ram);
-          // copy the hacking scripts to the new server
-          await ns.scp("weaken.js", "home", new_server);
-          await ns.scp("grow.js", "home", new_server);
-          await ns.scp("hack.js", "home", new_server);
-          // print the name for debugging purposes
-          if (debug) {
-            ns.tprint("bought " + new_server + " - " + ram + "GB");
-          }
+    maxMoney = ns.getServerMoneyAvailable("home") * maxMoneyFactor;
+
+    // get the maximum amount of RAM that could be purchased.
+    maxAffordableRam = getMaxAffordableRam(ns, maxMoney);
+
+    // check if an existing server can be replaced by a new one
+    if (serversNames.length == maxServerCount) {
+      // get the server with the maximum amount of RAM
+      minRamServer = getMinRamServer(ns, serversNames);
+
+      // check if a better server can be afforded
+      if (minRamServer.maxRam < maxAffordableRam) {
+        // delete the old server
+        ns.killall(minRamServer.hostname);
+        ns.deleteServer(minRamServer.hostname);
+        if (debug) {
+          ns.tprint(minRamServer.hostname + " - deleted");
         }
       }
     }
+
+    // update the array of purchased servers
+    serversNames = ns.getPurchasedServers();
+
+    // check if another server can be purchased
+    if (serversNames.length < maxServerCount) {
+      /**
+       * The name of the new server that was purchased this cycle.
+       * @type {string}
+       */
+      var newServerName = ns.purchaseServer(
+        "basic-hack-server",
+        maxAffordableRam
+      );
+
+      // copy the hacking scripts to the new server
+      await ns.scp("weaken.js", "home", newServerName);
+      await ns.scp("grow.js", "home", newServerName);
+      await ns.scp("hack.js", "home", newServerName);
+
+      // print the name for debugging purposes
+      if (debug) {
+        ns.tprint("bought " + newServerName + " - " + maxAffordableRam + "GB");
+      }
+    }
+
+    // wait for the next execution cycle
     await ns.sleep(period);
   }
+}
+
+/**
+ * Get the maximum amount of RAM that can be purchased for a given price.
+ * @param {import(".").NS} ns
+ * @param {number} money - The maximum money available for purchase of RAM.
+ * @returns {number} The maximum amount RAM that can be purchased.
+ */
+function getMaxAffordableRam(ns, money) {
+  /**
+   * The amount of RAM that can be purchased.
+   * @type {number}
+   */
+  var ram = 0;
+
+  /**
+   * The exponent for RAM calculation (2 ** i).
+   * @type {number}
+   */
+  var i = 0;
+
+  /**
+   * Maximum RAM not reached -> continue the search.
+   * @type {boolean}
+   */
+  var search = true;
+
+  /**
+   * The upper threshold for how much RAM can be purchased.
+   * @type {number}
+   */
+  var maxRam = ns.getPurchasedServerMaxRam();
+
+  // iteratively increase the RAM amount until the price reaches the threshold.
+  while (search) {
+    /**
+     * The proposed RAM for examination of validity.
+     * @type {number}
+     */
+    let proposedRam = 2 ** i;
+
+    /**
+     * The price for buying the proposed RAM.
+     * @type {number}
+     */
+    let price = ns.getPurchasedServerCost(proposedRam);
+
+    if (proposedRam <= maxRam && price <= money) {
+      // take over the proposal and continue the search
+      ram = proposedRam;
+      i++;
+    } else {
+      // stop the search if the maximum RAM has been reached
+      search = false;
+    }
+  }
+}
+
+/**
+ * Get the server with the lowest RAM.
+ * @param {import(".").NS} ns
+ * @param {string[]} serversNames - The names of the servers from which to select.
+ * @returns {import(".").Server}
+ */
+function getMinRamServer(ns, serversNames) {
+  /**
+   * The current minimum RAM.
+   * @type {number}
+   */
+  var minRam = Infinity;
+
+  /**
+   * The name of the server with the lowest RAM.
+   * @type {string}
+   */
+  var minRamServerName = "";
+
+  for (let serverName of serversNames) {
+    let ram = ns.getServerMaxRam(serverName);
+    if (ram < minRam) {
+      minRam = ram;
+      minRamServerName = serverName;
+    }
+  }
+
+  return ns.getServer(minRamServerName);
 }
