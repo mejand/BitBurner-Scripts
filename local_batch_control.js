@@ -37,9 +37,9 @@ export async function main(ns) {
   var weakenRam = ns.getScriptRam("weaken.js", hostName);
 
   // copy the scripts to the host
-  await ns.scp("hack.js", "home", hostServer.hostName);
-  await ns.scp("grow.js", "home", hostServer.hostName);
-  await ns.scp("weaken.js", "home", hostServer.hostName);
+  await ns.scp("hack.js", "home", hostName);
+  await ns.scp("grow.js", "home", hostName);
+  await ns.scp("weaken.js", "home", hostName);
 
   while (true) {
     /**
@@ -64,7 +64,7 @@ export async function main(ns) {
      * The number of threads needed to grow the target to max money.
      * @type {number}
      */
-    let growThreads = getGrowThreads(ns, targetServer, hostServer);
+    let growThreads = getGrowThreads(ns, targetServer, hostServer, hackThreads);
 
     /**
      * The number of threads needed to reduce the target security to minimum.
