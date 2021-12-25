@@ -47,6 +47,12 @@ export async function main(ns) {
     let hostServer = ns.getServer(hostName);
 
     /**
+     * The number threads dedicated to hacking the target.
+     * @type {number}
+     */
+    let hackThreads = 1;
+
+    /**
      * The number of threads needed to grow the target to max money.
      * @type {number}
      */
@@ -60,6 +66,7 @@ export async function main(ns) {
       ns,
       targetServer,
       hostServer,
+      hackThreads,
       growThreads
     );
 
@@ -72,9 +79,10 @@ export async function main(ns) {
  * @param {import(".").NS} ns
  * @param {import(".").Server} targetServer - The target server.
  * @param {import(".").Server} hostServer - The host server.
+ * @param {number} hackThreads - The number of threads dedicated to hacking the target.
  * @returns {number} The number of threads needed to grow the target to max money.
  */
-function getGrowThreads(ns, targetServer, hostServer) {
+function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
   /**
    * The number of threads needed to grow the target to max money.
    * @type {number}
@@ -86,6 +94,11 @@ function getGrowThreads(ns, targetServer, hostServer) {
    * @type {number}
    */
   var deltaMoney = targetServer.moneyMax - targetServer.moneyAvailable;
+
+  deltaMoney +=
+    ns.hackAnalyze(hostServer.hostname) *
+    hackThreads *
+    targetServer.moneyAvailable;
 
   /**
    * The factor that the available money needs to be multiplied with to get the deltaMoney.
@@ -105,10 +118,17 @@ function getGrowThreads(ns, targetServer, hostServer) {
  * @param {import(".").NS} ns
  * @param {import(".").Server} targetServer - The target server.
  * @param {import(".").Server} hostServer - The host server.
- * @param {number} growThreads - The number of threads dedicated growing to max money.
+ * @param {number} hackThreads - The number of threads dedicated to hacking the target.
+ * @param {number} growThreads - The number of threads dedicated to growing to max money.
  * @returns {number} The number of threads needed to grow the target to max money.
  */
-function getWeakenThreads(ns, targetServer, hostServer, growThreads) {
+function getWeakenThreads(
+  ns,
+  targetServer,
+  hostServer,
+  hackThreads,
+  growThreads
+) {
   /**
    * The number of threads needed to grow the target to max money.
    * @type {number}
@@ -121,6 +141,7 @@ function getWeakenThreads(ns, targetServer, hostServer, growThreads) {
    */
   var deltaSecurity = targetServer.hackDifficulty - targetServer.minDifficulty;
 
+  deltaSecurity += ns.hackAnalyzeSecurity(hackThreads);
   deltaSecurity += ns.growthAnalyzeSecurity(growThreads);
 
   /**
