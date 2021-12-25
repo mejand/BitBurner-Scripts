@@ -3,6 +3,9 @@
  * @param {import(".").NS} ns
  */
 export async function main(ns) {
+  // clean up the log file
+  ns.disableLog("ALL");
+
   /**
    * The name of the target server.
    * @type {string}
@@ -32,6 +35,11 @@ export async function main(ns) {
    * @type {number}
    */
   var weakenRam = ns.getScriptRam("weaken.js", hostName);
+
+  // copy the scripts to the host
+  await ns.scp("hack.js", "home", hostServer.hostName);
+  await ns.scp("grow.js", "home", hostServer.hostName);
+  await ns.scp("weaken.js", "home", hostServer.hostName);
 
   while (true) {
     /**
@@ -97,6 +105,92 @@ export async function main(ns) {
 
     // update the available ram to account for the hacking
     availableRam -= hackThreads * hackRam;
+
+    /**
+     * The time it takes to run the hack command.
+     * @type {number}
+     */
+    let hackTime = ns.getHackTime(hostServer.hostname);
+
+    /**
+     * The time it takes to run the grow command.
+     * @type {number}
+     */
+    let growTime = ns.getGrowTime(hostServer.hostname);
+
+    /**
+     * The time it takes to run the weaken command.
+     * @type {number}
+     */
+    let weakenTime = ns.getWeakenTime(hostServer.hostname);
+
+    /**
+     * The time that the complete hack, grow, weaken cycle takes to complete.
+     * @type {number}
+     */
+    let cycleTime = Math.max(hackTime, growTime, weakenTime);
+
+    /**
+     * The time that the weaken command has to be delayed to ensure it
+     * finishes last in the cycle.
+     * @type {number}
+     */
+    let weakenDelay = Math.max(
+      0,
+      growTime - weakenTime + 1,
+      hackTime - weakenTime + 1
+    );
+
+    /**
+     * The time that the grow command has to be delayed to ensure it
+     * finishes second in the cycle.
+     * @type {number}
+     */
+    let growDelay = Math.max(
+      0,
+      hackTime - growTime + 1,
+      cycleTime - growTime - 1
+    );
+
+    /**
+     * The time that the hack command has to be delayed to ensure it
+     * finishes third in the cycle.
+     * @type {number}
+     */
+    let hackDelay = Math.max(0, cycleTime - hackTime - 2);
+
+    // start the scripts with their corresponding delays
+    if (hackThreads > 0) {
+      ns.run("hack.js", hackThreads, targetServer.hostname, hackDelay);
+    }
+    if (growThreads > 0) {
+      ns.run("grow.js", growThreads, targetServer.hostname, growDelay);
+    }
+    if (weakenThreads > 0) {
+      ns.run("weaken.js", weakenThreads, targetServer.hostname, weakenDelay);
+    }
+
+    ns.print(
+      ns.sprintf(
+        "|hack|%i|%s||grow|%i|%s||weaken|%i|%s||",
+        hackThreads,
+        ns.tFormat(hackDelay),
+        growThreads,
+        ns.tFormat(growDelay),
+        weakenThreads,
+        ns.tFormat(weakenDelay)
+      )
+    );
+
+    ns.tprint(
+      ns.sprintf(
+        "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f||",
+        targetServer.hostname,
+        availableRam / hostServer.maxRam,
+        targetServer.moneyAvailable / targetServer.moneyMax,
+        targetServer.securityAvailable / targetServer.securityMax
+      )
+    );
 
     await ns.sleep(10);
   }
