@@ -212,21 +212,12 @@ function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
   var count = 0;
 
   /**
-   * The amount of money that needs to be added to reach the max money.
-   * @type {number}
-   */
-  var deltaMoney = targetServer.moneyMax - targetServer.moneyAvailable;
-
-  deltaMoney +=
-    ns.hackAnalyze(hostServer.hostname) *
-    hackThreads *
-    targetServer.moneyAvailable;
-
-  /**
    * The factor that the available money needs to be multiplied with to get the deltaMoney.
    * @type {number}
    */
-  var growFactor = deltaMoney / targetServer.moneyAvailable;
+  var growFactor =
+    targetServer.moneyMax / targetServer.moneyAvailable +
+    hackThreads * ns.hackAnalyze(targetServer.hostname);
 
   count = Math.ceil(
     ns.growthAnalyze(hostServer.hostname, growFactor, hostServer.cpuCores)
