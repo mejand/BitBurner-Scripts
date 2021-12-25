@@ -70,6 +70,34 @@ export async function main(ns) {
       growThreads
     );
 
+    /**
+     * The amount of ram on the host server available for tasking.
+     * @type {number}
+     */
+    let availableRam = hostServer.maxRam - hostServer.ramUsed;
+
+    // limit the thread counts to the available ram
+    // start with weakening to ensure the minimum security is reached as quickly as possible
+    weakenThreads = Math.min(
+      weakenThreads,
+      Math.floor(availableRam / weakenRam)
+    );
+
+    // update the available ram to account for the weakening
+    availableRam -= weakenThreads * weakenRam;
+
+    // continue with growing to ensure the maximum money is reached as quickly as possible
+    growThreads = Math.min(growThreads, Math.floor(availableRam / growRam));
+
+    // update the available ram to account for the growing
+    availableRam -= growThreads * growRam;
+
+    // continue with hacking
+    hackThreads = Math.min(hackThreads, Math.floor(availableRam / hackRam));
+
+    // update the available ram to account for the hacking
+    availableRam -= hackThreads * hackRam;
+
     await ns.sleep(10);
   }
 }
