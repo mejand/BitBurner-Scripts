@@ -5,6 +5,7 @@
 export async function main(ns) {
   // clean up the log file
   ns.disableLog("ALL");
+  ns.enableLog("exec");
 
   /**
    * The name of the target server.
@@ -186,9 +187,9 @@ export async function main(ns) {
       ns.sprintf(
         "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f||",
         targetServer.hostname,
-        availableRam / hostServer.maxRam,
+        1 - availableRam / hostServer.maxRam,
         targetServer.moneyAvailable / targetServer.moneyMax,
-        targetServer.securityAvailable / targetServer.securityMax
+        targetServer.hackDifficulty / targetServer.minDifficulty
       )
     );
 
