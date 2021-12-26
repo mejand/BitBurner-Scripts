@@ -160,31 +160,58 @@ export async function main(ns) {
      */
     let hackDelay = Math.max(0, cycleTime - hackTime - 2);
 
-    // create all batches that can be created on the host
-    for (let i = 0; i < batchCount; i++) {
-      // start the scripts with their corresponding delays (10ms between batches)
-      if (hackThreads > 0) {
-        ns.run(
-          "hack.js",
-          hackThreads,
-          targetServer.hostname,
-          hackDelay + i * 10
-        );
+    if (batchCount > 0) {
+      // create all batches that can be created on the host
+      for (let i = 0; i < batchCount; i++) {
+        // start the scripts with their corresponding delays (10ms between batches)
+        if (hackThreads > 0) {
+          ns.run(
+            "hack.js",
+            hackThreads,
+            targetServer.hostname,
+            hackDelay + i * 10
+          );
+        }
+        if (growThreads > 0) {
+          ns.run(
+            "grow.js",
+            growThreads,
+            targetServer.hostname,
+            growDelay + i * 10
+          );
+        }
+        if (weakenThreads > 0) {
+          ns.run(
+            "weaken.js",
+            weakenThreads,
+            targetServer.hostname,
+            weakenDelay + i * 10
+          );
+        }
       }
-      if (growThreads > 0) {
-        ns.run(
-          "grow.js",
-          growThreads,
-          targetServer.hostname,
-          growDelay + i * 10
-        );
-      }
+    } else {
+      // if it is not possible to start the batches try to reduce the target security.
+      weakenThreads = Math.min(
+        weakenThreads,
+        Math.floor(ramAvailable / weakenRam)
+      );
+      ramAvailable -= weakenThreads * weakenRam;
       if (weakenThreads > 0) {
         ns.run(
           "weaken.js",
           weakenThreads,
           targetServer.hostname,
           weakenDelay + i * 10
+        );
+      }
+      growThreads = Math.min(growThreads, Math.floor(ramAvailable / growRam));
+      ramAvailable -= growThreads * growRam;
+      if (growThreads > 0) {
+        ns.run(
+          "grow.js",
+          growThreads,
+          targetServer.hostname,
+          growDelay + i * 10
         );
       }
     }
