@@ -59,7 +59,7 @@ export async function main(ns) {
      * The number threads dedicated to hacking the target.
      * @type {number}
      */
-    let hackThreads = 1;
+    let hackThreads = getHackThreads(ns, targetServer);
 
     /**
      * The number of threads needed to grow the target to max money.
@@ -85,27 +85,18 @@ export async function main(ns) {
      */
     let availableRam = hostServer.maxRam - hostServer.ramUsed;
 
-    // limit the thread counts to the available ram
-    // start with weakening to ensure the minimum security is reached as quickly as possible
-    weakenThreads = Math.min(
-      weakenThreads,
-      Math.floor(availableRam / weakenRam)
-    );
+    /**
+     * The amount of ram needed to run one batch.
+     * @type {number}
+     */
+    let ramPerBatch =
+      hackThreads * hackRam + growThreads * growRam + weakenThreads * weakenRam;
 
-    // update the available ram to account for the weakening
-    availableRam -= weakenThreads * weakenRam;
-
-    // continue with growing to ensure the maximum money is reached as quickly as possible
-    growThreads = Math.min(growThreads, Math.floor(availableRam / growRam));
-
-    // update the available ram to account for the growing
-    availableRam -= growThreads * growRam;
-
-    // continue with hacking
-    hackThreads = Math.min(hackThreads, Math.floor(availableRam / hackRam));
-
-    // update the available ram to account for the hacking
-    availableRam -= hackThreads * hackRam;
+    /**
+     * The amount of batched that can be run at once.
+     * @type {number}
+     */
+    let batchCount = Math.floor(availableRam / ramPerBatch);
 
     /**
      * The time it takes to run the hack command.
@@ -160,41 +151,70 @@ export async function main(ns) {
      */
     let hackDelay = Math.max(0, cycleTime - hackTime - 2);
 
-    // start the scripts with their corresponding delays
-    if (hackThreads > 0) {
-      ns.run("hack.js", hackThreads, targetServer.hostname, hackDelay);
-    }
-    if (growThreads > 0) {
-      ns.run("grow.js", growThreads, targetServer.hostname, growDelay);
-    }
-    if (weakenThreads > 0) {
-      ns.run("weaken.js", weakenThreads, targetServer.hostname, weakenDelay);
+    // create all batches that can be created on the host
+    for (let i = 0; i < batchCount; i++) {
+      // start the scripts with their corresponding delays (10ms between batches)
+      if (hackThreads > 0) {
+        ns.run(
+          "hack.js",
+          hackThreads,
+          targetServer.hostname,
+          hackDelay + i * 10
+        );
+      }
+      if (growThreads > 0) {
+        ns.run(
+          "grow.js",
+          growThreads,
+          targetServer.hostname,
+          growDelay + i * 10
+        );
+      }
+      if (weakenThreads > 0) {
+        ns.run(
+          "weaken.js",
+          weakenThreads,
+          targetServer.hostname,
+          weakenDelay + i * 10
+        );
+      }
     }
 
-    ns.print(
-      ns.sprintf(
-        "|hack|%i|%s||grow|%i|%s||weaken|%i|%s||",
-        hackThreads,
-        ns.tFormat(hackDelay),
-        growThreads,
-        ns.tFormat(growDelay),
-        weakenThreads,
-        ns.tFormat(weakenDelay)
-      )
-    );
+    /**
+     * The time it takes for all batches to complete.
+     * @type {number}
+     */
+    let batchTime = cycleTime + batchCount * 10 + 10;
 
     ns.tprint(
       ns.sprintf(
-        "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f||",
+        "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f|Batches: %i|%s||",
         targetServer.hostname,
-        1 - availableRam / hostServer.maxRam,
+        ns.getServerUsedRam(hostName) / hostServer.maxRam,
         targetServer.moneyAvailable / targetServer.moneyMax,
-        targetServer.hackDifficulty / targetServer.minDifficulty
+        targetServer.hackDifficulty / targetServer.minDifficulty,
+        batchCount,
+        ns.tFormat(batchTime)
       )
     );
 
-    await ns.sleep(10);
+    await ns.sleep(batchTime);
   }
+}
+
+/**
+ * Get the number of threads needed to steal all money from the target.
+ * @param {import(".").NS} ns
+ * @param {import(".").Server} targetServer - The target server.
+ * @returns {number} The number of threads needed to hack the target.
+ */
+function getHackThreads(ns, targetServer) {
+  /**
+   * The number of threads needed to steal all money from the target.
+   * @type {number}
+   */
+  var count = Math.floor(1 / ns.hackAnalyze(targetServer.hostname));
+  return count;
 }
 
 /**
