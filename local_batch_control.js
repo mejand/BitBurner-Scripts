@@ -5,7 +5,6 @@
 export async function main(ns) {
   // clean up the log file
   ns.disableLog("ALL");
-  ns.enableLog("run");
 
   /**
    * The name of the target server.
@@ -59,7 +58,7 @@ export async function main(ns) {
      * The number threads dedicated to hacking the target.
      * @type {number}
      */
-    let hackThreads = getHackThreads(ns, targetServer);
+    let hackThreads = 1;
 
     /**
      * The number of threads needed to grow the target to max money.
@@ -191,28 +190,25 @@ export async function main(ns) {
       }
     } else {
       // if it is not possible to start the batches try to reduce the target security.
+      /**
+       * The ram currently available on the host server.
+       * @type {number}
+       */
+      let ramAvailable = hostServer.maxRam - hostServer.ramUsed;
+
       weakenThreads = Math.min(
         weakenThreads,
         Math.floor(ramAvailable / weakenRam)
       );
       ramAvailable -= weakenThreads * weakenRam;
       if (weakenThreads > 0) {
-        ns.run(
-          "weaken.js",
-          weakenThreads,
-          targetServer.hostname,
-          weakenDelay + i * 10
-        );
+        ns.run("weaken.js", weakenThreads, targetServer.hostname, weakenDelay);
       }
+
       growThreads = Math.min(growThreads, Math.floor(ramAvailable / growRam));
       ramAvailable -= growThreads * growRam;
       if (growThreads > 0) {
-        ns.run(
-          "grow.js",
-          growThreads,
-          targetServer.hostname,
-          growDelay + i * 10
-        );
+        ns.run("grow.js", growThreads, targetServer.hostname, growDelay);
       }
     }
 
