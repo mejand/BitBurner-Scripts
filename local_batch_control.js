@@ -5,7 +5,7 @@
 export async function main(ns) {
   // clean up the log file
   ns.disableLog("ALL");
-  ns.enableLog("exec");
+  ns.enableLog("run");
 
   /**
    * The name of the target server.
@@ -79,6 +79,10 @@ export async function main(ns) {
       growThreads
     );
 
+    ns.print("hackThreads = " + hackThreads);
+    ns.print("growThreads = " + growThreads);
+    ns.print("weakenThreads = " + weakenThreads);
+
     /**
      * The amount of ram on the host server available for tasking.
      * @type {number}
@@ -97,6 +101,11 @@ export async function main(ns) {
      * @type {number}
      */
     let batchCount = Math.floor(availableRam / ramPerBatch);
+
+    ns.print("hackPercent = " + ns.hackAnalyze(targetName));
+    ns.print("availableRam = " + availableRam);
+    ns.print("ramPerBatch = " + ramPerBatch);
+    ns.print("batchCount = " + batchCount);
 
     /**
      * The time it takes to run the hack command.
@@ -186,6 +195,8 @@ export async function main(ns) {
      */
     let batchTime = cycleTime + batchCount * 10 + 10;
 
+    ns.print("batchTime = " + batchTime);
+
     ns.tprint(
       ns.sprintf(
         "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f|Batches: %i|%s||",
@@ -239,6 +250,8 @@ function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
   var growFactor =
     targetServer.moneyMax / targetServer.moneyAvailable +
     hackThreads * ns.hackAnalyze(targetServer.hostname);
+
+  ns.print("growFactor = " + growFactor);
 
   count = Math.ceil(
     ns.growthAnalyze(hostServer.hostname, growFactor, hostServer.cpuCores)
