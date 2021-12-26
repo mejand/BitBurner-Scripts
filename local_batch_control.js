@@ -216,7 +216,7 @@ export async function main(ns) {
      * The time it takes for all batches to complete.
      * @type {number}
      */
-    let batchTime = cycleTime + batchCount * 10 + 10;
+    let batchTime = cycleTime + batchCount * 10 + 50;
 
     ns.print("batchTime = " + batchTime);
 
