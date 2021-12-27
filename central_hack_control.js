@@ -115,32 +115,28 @@ export async function main(ns) {
       batchCount += handler.batchCount;
       load += handler.load;
       cycleTime = Math.max(cycleTime, handler.batchTime);
-      if (debug) {
-        ns.print(
-          handler.hostServer.hostname +
-            ": " +
-            ns.tFormat(handler.batchTime, true) +
-            " + " +
-            handler.hostServer.maxRam +
-            "GB " +
-            handler.batchCount +
-            " batches"
-        );
-      }
-    }
-
-    if (debug) {
-      ns.print("batchTime = " + ns.tFormat(cycleTime));
-      ns.print("Time for batchCount = " + ns.tFormat(batchCount * 10 + 150));
       ns.print(
-        "load / handlers.length = " +
-          load +
-          " / " +
-          handlers.length +
-          " = " +
-          load / handlers.length
+        handler.hostServer.hostname +
+          ": " +
+          ns.tFormat(handler.batchTime, true) +
+          " + " +
+          handler.hostServer.maxRam +
+          "GB " +
+          handler.batchCount +
+          " batches"
       );
     }
+
+    ns.print("batchTime = " + ns.tFormat(cycleTime));
+    ns.print("Time for batchCount = " + ns.tFormat(batchCount * 10 + 150));
+    ns.print(
+      "load / handlers.length = " +
+        load +
+        " / " +
+        handlers.length +
+        " = " +
+        load / handlers.length
+    );
 
     // add the number of batches and padding to the cycle time
     cycleTime += batchCount * 10 + 50;
