@@ -175,20 +175,7 @@ function getAvailableServers(ns) {
    */
   var serverNames = ns.getPurchasedServers();
 
-  /**
-   * The rows of the network_unlocked.txt file.
-   * @type {string[]}
-   */
-  var rows = ns.read("network_unlocked.txt").split("\r\n");
-
-  // loop through all rows and add the names to the available servers
-  for (let row of rows) {
-    // Ignore last blank row
-    if (row) {
-      // get the server name and append it to the array
-      serverNames.push(row);
-    }
-  }
+  serverNames.push("home");
 
   /**
    * All available servers.
