@@ -117,6 +117,18 @@ export async function main(ns) {
       cycleTime = Math.max(cycleTime, handler.batchTime);
     }
 
+    if (debug) {
+      ns.print("batchTime = " + cycleTime);
+      ns.print(
+        "load / handlers.length = " +
+          load +
+          " / " +
+          handlers.length +
+          " = " +
+          load / handlers.length
+      );
+    }
+
     // add the number of batches and padding to the cycle time
     cycleTime += batchCount * 10 + 50;
 
