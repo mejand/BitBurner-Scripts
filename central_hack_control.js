@@ -119,10 +119,12 @@ export async function main(ns) {
         ns.print(
           handler.hostServer.hostname +
             ": " +
-            ns.tFormat(handler.batchTime) +
+            ns.tFormat(handler.batchTime, true) +
             " + " +
             handler.hostServer.maxRam +
-            "GB"
+            "GB " +
+            handler.batchCount +
+            " batches"
         );
       }
     }
