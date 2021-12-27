@@ -137,6 +137,12 @@ export class BatchHandler {
      * @type {number}
      */
     this.batchCount = 0;
+
+    /**
+     * The load of the host server after the scripts have been started in percent.
+     * @type {number}
+     */
+    this.load = 0;
   }
 
   /**
@@ -184,6 +190,8 @@ export class BatchHandler {
         );
       }
     }
+
+    this.updateLoad(ns);
   }
 
   /**
@@ -266,5 +274,20 @@ export class BatchHandler {
 
     // the hack script must finish shortly before the grow and weaken scripts
     this.hackDelay = Math.max(0, this.cycleTime - this.hackTime - 2);
+  }
+
+  /**
+   * Update the load value after starting the scripts.
+   * @param {import(".").NS} ns
+   */
+  updateLoad(ns) {
+    if (this.hostServer.maxRam > 0) {
+      this.load =
+        (ns.getServerUsedRam(this.hostServer.hostname) /
+          this.hostServer.maxRam) *
+        100;
+    } else {
+      this.load = 100;
+    }
   }
 }
