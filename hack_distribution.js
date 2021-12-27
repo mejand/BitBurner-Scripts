@@ -237,7 +237,7 @@ export class BatchHandler {
    * Update the number of batches that can be run on the host.
    */
   updateBatchCount() {
-    this.batchCount = Math.floor(this.availableRam / this.ramPerBatch);
+    this.batchCount = Math.floor(this.availableTotalRam / this.ramPerBatch);
   }
 
   /**
