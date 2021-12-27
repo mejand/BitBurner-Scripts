@@ -152,24 +152,27 @@ export class BatchHandler {
       // start the scripts with their corresponding delays (10ms between batches)
       // the offset caused by other ost servers must also be considered
       if (this.hackThreads > 0) {
-        ns.run(
+        ns.exec(
           "hack.js",
+          this.hostServer.hostname,
           this.hackThreads,
           this.targetServer.hostname,
           this.hackDelay + (i + batchNumberOffset) * 10
         );
       }
       if (this.growThreads > 0) {
-        ns.run(
+        ns.exec(
           "grow.js",
+          this.hostServer.hostname,
           this.growThreads,
           this.targetServer.hostname,
           this.growDelay + (i + batchNumberOffset) * 10
         );
       }
       if (this.weakenThreads > 0) {
-        ns.run(
+        ns.exec(
           "weaken.js",
+          this.hostServer.hostname,
           this.weakenThreads,
           this.targetServer.hostname,
           this.weakenDelay + (i + batchNumberOffset) * 10
@@ -255,11 +258,11 @@ export class BatchHandler {
     this.growDelay = Math.max(
       0,
       this.hackTime - this.growTime + 1,
-      this.cycleTime - this.growTime - 1 // the grow script must be delayed so it finishes shortly before weaken
+      this.batchTime - this.growTime - 1 // the grow script must be delayed so it finishes shortly before weaken
     );
 
     // the hack script must finish shortly before the grow and weaken scripts
-    this.hackDelay = Math.max(0, this.cycleTime - this.hackTime - 2);
+    this.hackDelay = Math.max(0, this.batchTime - this.hackTime - 2);
   }
 
   /**
