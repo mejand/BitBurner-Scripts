@@ -131,7 +131,7 @@ export async function main(ns) {
 
     if (debug) {
       ns.print("batchTime = " + ns.tFormat(cycleTime));
-      ns.print("Time for batchCount = " + ns.tFormat(batchCount * 10 + 100));
+      ns.print("Time for batchCount = " + ns.tFormat(batchCount * 10 + 150));
       ns.print(
         "load / handlers.length = " +
           load +
