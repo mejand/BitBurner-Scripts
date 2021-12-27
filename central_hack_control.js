@@ -21,19 +21,19 @@ export async function main(ns) {
    * The RAM needed to run the hack script.
    * @type {number}
    */
-  var hackRam = ns.getScriptRam("hack.js", hostName);
+  var hackRam = ns.getScriptRam("hack.js", "home");
 
   /**
    * The RAM needed to run the grow script.
    * @type {number}
    */
-  var growRam = ns.getScriptRam("grow.js", hostName);
+  var growRam = ns.getScriptRam("grow.js", "home");
 
   /**
    * The RAM needed to run the weaken script.
    * @type {number}
    */
-  var weakenRam = ns.getScriptRam("weaken.js", hostName);
+  var weakenRam = ns.getScriptRam("weaken.js", "home");
 
   /**
    * The target server.
