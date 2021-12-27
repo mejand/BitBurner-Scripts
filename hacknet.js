@@ -39,7 +39,7 @@ export async function main(ns) {
   /**adjust the money factor for the period of the script production is given in $/s
    * -> if the period is longer than 1 second then more than one second of production
    * has to be considered */
-  moneyFactor = moneyFactor * (1000 / period);
+  moneyFactor = moneyFactor * (period / 1000);
 
   // start the loop to periodically upgrade the hacknet servers
   while (true) {
