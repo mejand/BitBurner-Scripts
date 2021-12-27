@@ -92,7 +92,7 @@ export class BatchHandler {
      * @type {number}
      */
     if (this.useable) {
-      this.hackTime = ns.getHackTime(hostName);
+      this.hackTime = ns.getHackTime(targetName);
     } else {
       this.hackTime = 0;
     }
@@ -102,7 +102,7 @@ export class BatchHandler {
      * @type {number}
      */
     if (this.useable) {
-      this.growTime = ns.getGrowTime(hostName);
+      this.growTime = ns.getGrowTime(targetName);
     } else {
       this.growTime = 0;
     }
@@ -112,7 +112,7 @@ export class BatchHandler {
      * @type {number}
      */
     if (this.useable) {
-      this.weakenTime = ns.getWeakenTime(hostName);
+      this.weakenTime = ns.getWeakenTime(targetName);
     } else {
       this.weakenTime = 0;
     }
