@@ -267,7 +267,12 @@ export class BatchHandler {
    * Update the number of batches that can be run on the host.
    */
   updateBatchCount() {
-    this.batchCount = Math.floor(this.availableTotalRam / this.ramPerBatch);
+    // guard against division by zero
+    if (this.ramPerBatch > 0) {
+      this.batchCount = Math.floor(this.availableTotalRam / this.ramPerBatch);
+    } else {
+      this.batchCount = 0;
+    }
   }
 
   /**
@@ -310,7 +315,7 @@ export class BatchHandler {
      * @type {number}
      */
     let ramPerBatchConsolidated =
-      hackThreadsConsolidated * this.hackRam +
+      this.hackThreads * hackThreadsConsolidated * this.hackRam +
       this.growThreads * hackThreadsConsolidated * this.growRam +
       this.weakenThreads * hackThreadsConsolidated * this.weakenRam;
 
