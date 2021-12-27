@@ -146,6 +146,44 @@ export class BatchHandler {
   update(ns) {
     this.updateGrowThreads(ns);
     this.updateHackThreads(ns);
+    this.updateRamPerBatch();
+    this.updateBatchCount();
+    this.updateDelays();
+  }
+
+  /**
+   * Start the scripts for as many batches as possible.
+   * @param {import(".").NS} ns
+   */
+  execute(ns) {
+    for (let i = 0; i < this.batchCount; i++) {
+      // start the scripts with their corresponding delays (10ms between batches)
+      // the offset caused by other ost servers must also be considered
+      if (this.hackThreads > 0) {
+        ns.run(
+          "hack.js",
+          this.hackThreads,
+          this.targetServer.hostname,
+          this.hackDelay + (i + this.batchNumberOffset) * 10
+        );
+      }
+      if (this.growThreads > 0) {
+        ns.run(
+          "grow.js",
+          this.growThreads,
+          this.targetServer.hostname,
+          this.growDelay + (i + this.batchNumberOffset) * 10
+        );
+      }
+      if (this.weakenThreads > 0) {
+        ns.run(
+          "weaken.js",
+          this.weakenThreads,
+          this.targetServer.hostname,
+          this.weakenDelay + (i + this.batchNumberOffset) * 10
+        );
+      }
+    }
   }
 
   /**
@@ -189,5 +227,44 @@ export class BatchHandler {
     var weakenReduction = ns.weakenAnalyze(1, this.hostServer.cpuCores);
 
     this.weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
+  }
+
+  /**
+   * Update the ram needed to run a single thread.
+   */
+  updateRamPerBatch() {
+    this.ramPerBatch =
+      this.hackThreads * this.hackRam +
+      this.growThreads * this.growRam +
+      this.weakenThreads * this.weakenRam;
+  }
+
+  /**
+   * Update the number of batches that can be run on the host.
+   */
+  updateBatchCount() {
+    this.batchCount = Math.floor(this.availableRam / this.ramPerBatch);
+  }
+
+  /**
+   * Update the delay times for the scripts in a single batch.
+   */
+  updateDelays() {
+    // The weaken script must finish last to compensate the security impact of hack and weaken.
+    this.weakenDelay = Math.max(
+      0, // ensure the dealy can not be negative
+      this.growTime - this.weakenTime + 1, // if weaken finishes before grow it must be delayed
+      this.hackTime - this.weakenTime + 1 // if weaken finishes before hack it must be delayed
+    );
+
+    // the grow script must finish between the hack and weaken scripts
+    this.growDelay = Math.max(
+      0,
+      this.hackTime - this.growTime + 1,
+      this.cycleTime - this.growTime - 1 // the grow script must be delayed so it finishes shortly before weaken
+    );
+
+    // the hack script must finish shortly before the grow and weaken scripts
+    this.hackDelay = Math.max(0, this.cycleTime - this.hackTime - 2);
   }
 }
