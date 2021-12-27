@@ -34,7 +34,7 @@ export async function main(ns) {
    * The budget available for upgrades.
    * @type {number}
    */
-  var maxMoney = 0;
+  var maxMoney = ns.getServerMoneyAvailable("home");
 
   /**adjust the money factor for the period of the script production is given in $/s
    * -> if the period is longer than 1 second then more than one second of production
