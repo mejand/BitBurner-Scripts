@@ -52,7 +52,11 @@ export class BatchHandler {
      * The number of threads dedicated to hacking.
      * @type {number}
      */
-    this.hackThreads = 1;
+    if (this.useable) {
+      this.hackThreads = 1;
+    } else {
+      this.hackThreads = 0;
+    }
 
     /**
      * The number of threads needed to compensate the effect of hacking.
@@ -337,7 +341,7 @@ export class BatchHandler {
    * @param {import(".").NS} ns
    */
   updateLoad(ns) {
-    if (this.hostServer.maxRam > 0) {
+    if (this.useable) {
       this.load =
         (ns.getServerUsedRam(this.hostServer.hostname) /
           this.hostServer.maxRam) *
