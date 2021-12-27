@@ -115,6 +115,16 @@ export async function main(ns) {
       batchCount += handler.batchCount;
       load += handler.load;
       cycleTime = Math.max(cycleTime, handler.batchTime);
+      if (debug) {
+        ns.print(
+          handler.hostServer.hostname +
+            ": " +
+            ns.tFormat(handler.batchTime) +
+            " + " +
+            handler.hostServer.maxRam +
+            "GB"
+        );
+      }
     }
 
     if (debug) {

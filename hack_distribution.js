@@ -25,6 +25,12 @@ export class BatchHandler {
     this.hostServer = ns.getServer(hostName);
 
     /**
+     * Indcates if the host server has free ram.
+     * @type {boolean}
+     */
+    this.useable = this.hostServer.maxRam > 0;
+
+    /**
      * The amount of ram needed by the hack script.
      * @type {number}
      */
@@ -85,19 +91,31 @@ export class BatchHandler {
      * The amount of time it takes to run the hack script.
      * @type {number}
      */
-    this.hackTime = ns.getHackTime(hostName);
+    if (this.useable) {
+      this.hackTime = ns.getHackTime(hostName);
+    } else {
+      this.hackTime = 0;
+    }
 
     /**
      * The amount of time it takes to run the grow script.
      * @type {number}
      */
-    this.growTime = ns.getGrowTime(hostName);
+    if (this.useable) {
+      this.growTime = ns.getGrowTime(hostName);
+    } else {
+      this.growTime = 0;
+    }
 
     /**
      * The amount of time it takes to run the grow script.
      * @type {number}
      */
-    this.weakenTime = ns.getWeakenTime(hostName);
+    if (this.useable) {
+      this.weakenTime = ns.getWeakenTime(hostName);
+    } else {
+      this.weakenTime = 0;
+    }
 
     /**
      * The amount of time it takes to run a single hack, grow, weaken batch.
@@ -135,11 +153,13 @@ export class BatchHandler {
    * @param {import(".").NS} ns
    */
   update(ns) {
-    this.updateGrowThreads(ns);
-    this.updateHackThreads(ns);
-    this.updateRamPerBatch();
-    this.updateBatchCount();
-    this.updateDelays();
+    if (this.useable) {
+      this.updateGrowThreads(ns);
+      this.updateHackThreads(ns);
+      this.updateRamPerBatch();
+      this.updateBatchCount();
+      this.updateDelays();
+    }
   }
 
   /**
@@ -148,39 +168,41 @@ export class BatchHandler {
    * @param {number} batchNumberOffset - The number of batches that have already been created on others hosts.
    */
   execute(ns, batchNumberOffset) {
-    for (let i = 0; i < this.batchCount; i++) {
-      // start the scripts with their corresponding delays (10ms between batches)
-      // the offset caused by other ost servers must also be considered
-      if (this.hackThreads > 0) {
-        ns.exec(
-          "hack.js",
-          this.hostServer.hostname,
-          this.hackThreads,
-          this.targetServer.hostname,
-          this.hackDelay + (i + batchNumberOffset) * 10
-        );
+    if (this.useable) {
+      for (let i = 0; i < this.batchCount; i++) {
+        // start the scripts with their corresponding delays (10ms between batches)
+        // the offset caused by other ost servers must also be considered
+        if (this.hackThreads > 0) {
+          ns.exec(
+            "hack.js",
+            this.hostServer.hostname,
+            this.hackThreads,
+            this.targetServer.hostname,
+            this.hackDelay + (i + batchNumberOffset) * 10
+          );
+        }
+        if (this.growThreads > 0) {
+          ns.exec(
+            "grow.js",
+            this.hostServer.hostname,
+            this.growThreads,
+            this.targetServer.hostname,
+            this.growDelay + (i + batchNumberOffset) * 10
+          );
+        }
+        if (this.weakenThreads > 0) {
+          ns.exec(
+            "weaken.js",
+            this.hostServer.hostname,
+            this.weakenThreads,
+            this.targetServer.hostname,
+            this.weakenDelay + (i + batchNumberOffset) * 10
+          );
+        }
       }
-      if (this.growThreads > 0) {
-        ns.exec(
-          "grow.js",
-          this.hostServer.hostname,
-          this.growThreads,
-          this.targetServer.hostname,
-          this.growDelay + (i + batchNumberOffset) * 10
-        );
-      }
-      if (this.weakenThreads > 0) {
-        ns.exec(
-          "weaken.js",
-          this.hostServer.hostname,
-          this.weakenThreads,
-          this.targetServer.hostname,
-          this.weakenDelay + (i + batchNumberOffset) * 10
-        );
-      }
-    }
 
-    this.updateLoad(ns);
+      this.updateLoad(ns);
+    }
   }
 
   /**
