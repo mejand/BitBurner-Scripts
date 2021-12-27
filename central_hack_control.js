@@ -110,21 +110,23 @@ export async function main(ns) {
 
     // loop through all handlers to update and execute their batches
     for (let handler of handlers) {
-      handler.update(ns);
-      handler.execute(ns, batchCount);
-      batchCount += handler.batchCount;
-      load += handler.load;
-      cycleTime = Math.max(cycleTime, handler.batchTime);
-      ns.print(
-        handler.hostServer.hostname +
-          ": " +
-          ns.tFormat(handler.batchTime, true) +
-          " + " +
-          handler.hostServer.maxRam +
-          "GB " +
-          handler.batchCount +
-          " batches"
-      );
+      if (handler.useable) {
+        handler.update(ns);
+        handler.execute(ns, batchCount);
+        batchCount += handler.batchCount;
+        load += handler.load;
+        cycleTime = Math.max(cycleTime, handler.batchTime);
+        ns.print(
+          handler.hostServer.hostname +
+            ": " +
+            ns.tFormat(handler.batchTime, true) +
+            " + " +
+            handler.hostServer.maxRam +
+            "GB " +
+            handler.batchCount +
+            " batches"
+        );
+      }
     }
 
     ns.print("batchTime = " + ns.tFormat(cycleTime));
