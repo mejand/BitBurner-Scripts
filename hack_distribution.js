@@ -156,7 +156,7 @@ export class BatchHandler {
     if (this.useable) {
       this.updateGrowThreads(ns);
       this.updateHackThreads(ns);
-      this.updateRamPerBatch();
+      this.consolidateBatches(ns);
       this.updateBatchCount();
       this.updateDelays();
     }
@@ -259,13 +259,6 @@ export class BatchHandler {
   }
 
   /**
-   * Update the number of batches that can be run on the host.
-   */
-  updateBatchCount() {
-    this.batchCount = Math.floor(this.availableTotalRam / this.ramPerBatch);
-  }
-
-  /**
    * Update the delay times for the scripts in a single batch.
    */
   updateDelays() {
@@ -285,6 +278,62 @@ export class BatchHandler {
 
     // the hack script must finish shortly before the grow and weaken scripts
     this.hackDelay = Math.max(0, this.batchTime - this.hackTime - 2);
+  }
+
+  /**
+   * Try to consolidate the 1 hack batches into larger operations to reduce calculations.
+   * @param {import(".").NS} ns
+   */
+  consolidateBatches(ns) {
+    /**
+     * The number of hack threads needed to steal all money from the target Server.
+     * @type {number}
+     */
+    let hackThreadsConsolidated = Math.floor(
+      1.0 / ns.hackAnalyze(this.targetServer.hostname)
+    );
+
+    /**
+     * The amount of ram needed to run a consolidated batch (steel all money from the target server).
+     * @type {number}
+     */
+    let ramPerBatchConsolidated =
+      hackThreadsConsolidated * this.hackRam +
+      this.growThreads * hackThreadsConsolidated * this.growRam +
+      this.weakenThreads * hackThreadsConsolidated * this.weakenRam;
+
+    /**
+     * The amount of consolidated batches that can be run on the current host server.
+     * @type {number}
+     */
+    let batchCountConsolidated = Math.floor(
+      this.availableTotalRam / ramPerBatchConsolidated
+    );
+
+    /**
+     * The factor that the consolidated hack thread count has to be multiplied with to get the maximum
+     * possible hack threads per consolidated batch given the available RAM.
+     * @type {number}
+     */
+    let batchConsolidatedScaling = Math.min(
+      1.0,
+      this.availableTotalRam / ramPerBatchConsolidated
+    );
+
+    // scale the thread counts with the consolidated batch data
+    this.hackThreads = Math.floor(
+      this.hackThreads * hackThreadsConsolidated * batchConsolidatedScaling
+    );
+    this.growThreads = Math.floor(
+      this.growThreads * hackThreadsConsolidated * batchConsolidatedScaling
+    );
+    this.weakenThreads = Math.floor(
+      this.weakenThreads * hackThreadsConsolidated * batchConsolidatedScaling
+    );
+
+    // update the batch specific metrics
+    this.batchCount = batchCountConsolidated;
+    this.ramPerBatch = ramPerBatchConsolidated;
   }
 
   /**
