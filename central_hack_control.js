@@ -1,4 +1,4 @@
-import { ScriptHandler } from "./hack_distribution.js";
+import { BatchHandler } from "./hack_distribution.js";
 
 /**
  * Handle the growing, weakening and hacking scripts from one central server.
@@ -18,20 +18,38 @@ export async function main(ns) {
   ns.disableLog("ALL");
 
   /**
+   * The RAM needed to run the hack script.
+   * @type {number}
+   */
+  var hackRam = ns.getScriptRam("hack.js", hostName);
+
+  /**
+   * The RAM needed to run the grow script.
+   * @type {number}
+   */
+  var growRam = ns.getScriptRam("grow.js", hostName);
+
+  /**
+   * The RAM needed to run the weaken script.
+   * @type {number}
+   */
+  var weakenRam = ns.getScriptRam("weaken.js", hostName);
+
+  /**
    * The target server.
    * @type {import(".").Server}
    */
-  var target = ns.getServer("n00dles");
+  var targetServer = ns.getServer("n00dles");
 
   /**
    * The available host servers.
    * @type {import(".").Server[]}
    */
-  var servers = [];
+  var hostServers = [];
 
   /**
    * The script handlers for each available host server.
-   * @type {ScriptHandler[]}
+   * @type {BatchHandler[]}
    */
   var handlers = [];
 
@@ -42,49 +60,80 @@ export async function main(ns) {
   var cycleTime = 50;
 
   /**
-   * The index in the server array that is currently beeing processed.
+   * The running count of batches that have been created.
    * @type {number}
    */
-  var index = 0;
+  var batchCount = 0;
+
+  /**
+   * The loading of all host servers in percent.
+   * @type {number}
+   */
+  var load = 0;
 
   // run an infinate loop that keeps evaluating the status of the target whenever a script has finished
   while (true) {
+    // clean up the log
+    ns.clearLog();
+
+    // reset values for the cycle
+    handlers = [];
+    batchCount = 0;
+    load = 0;
+    cycleTime = 0;
+
     // update the target if debug mode is off
     if (debug) {
       // in debug mode the default target is used (get current server object)
-      target = ns.getServer(target.hostname);
+      targetServer = ns.getServer(targetServer.hostname);
     } else {
       // get the newest target (current copy of the server object will be provided by getTarget())
-      target = getTarget(ns);
+      targetServer = getTarget(ns);
     }
 
-    /**
-     * The available servers, updated in the current calculation cycle to check if new servers became available.
-     * @type {import(".").Server[]}
-     */
-    let newServers = getAvailableServers(ns);
+    // update the available servers
+    hostServers = getAvailableServers(ns);
 
-    // check if new servers have become available
-    if (servers.length != newServers.length) {
-      // reset the handlers and create new handlers for each available server
-      handlers = [];
-      for (let server of newServers) {
-        handlers.push(new ScriptHandler(ns, server, target));
-      }
+    // loop through all host servers and create batch handlers for each one
+    for (let server of hostServers) {
+      handlers.push(
+        new BatchHandler(
+          ns,
+          targetServer.hostname,
+          server.hostname,
+          hackRam,
+          growRam,
+          weakenRam
+        )
+      );
     }
 
-    // take over the new server list
-    servers = newServers;
-
-    // try to start a new batch on the current server
-    handlers[index].update(ns);
-    handlers[index].execute(ns);
-    ns.print(handlers[index].description(ns));
-    index++;
-
-    if (index >= servers.length) {
-      index = 0;
+    // loop through all handlers to update and execute their batches
+    for (let handler of handlers) {
+      handler.update(ns);
+      handler.execute(ns, batchCount);
+      batchCount += handler.batchCount;
+      load += handler.load;
+      cycleTime = Math.max(cycleTime, handler.batchTime);
     }
+
+    // add the number of batches and padding to the cycle time
+    cycleTime += batchCount * 10 + 50;
+
+    // scale the load value by the number of hosts
+    load = load / handlers.length;
+
+    ns.tprint(
+      ns.sprintf(
+        "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f|Batches: %i|%s||",
+        targetServer.hostname,
+        load,
+        (targetServer.moneyAvailable / targetServer.moneyMax) * 100,
+        targetServer.hackDifficulty - targetServer.minDifficulty,
+        batchCount,
+        ns.tFormat(cycleTime)
+      )
+    );
 
     // sleep while the scripts are active
     await ns.sleep(cycleTime);

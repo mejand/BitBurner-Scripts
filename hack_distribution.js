@@ -7,20 +7,11 @@ export class BatchHandler {
    * @param {import(".").NS} ns
    * @param {string} targetName - The name of the target server.
    * @param {string} hostName - The name of the host server.
-   * @param {number} batchNumberOffset - The number of batches that have already been created on others hosts.
    * @param {number} hackRam - The amount of ram needed by the hack script.
    * @param {number} growRam - The amount of ram needed by the grow script.
    * @param {number} weakenRam - The amount of ram needed by the weaken script.
    */
-  constructor(
-    ns,
-    targetName,
-    hostName,
-    batchNumberOffset,
-    hackRam,
-    growRam,
-    weakenRam
-  ) {
+  constructor(ns, targetName, hostName, hackRam, growRam, weakenRam) {
     /**
      * The server object of the target.
      * @type {import(".").Server}
@@ -32,12 +23,6 @@ export class BatchHandler {
      * @type {import(".").Server}
      */
     this.hostServer = ns.getServer(hostName);
-
-    /**
-     * The number of batches that have already been created on others hosts.
-     * @type {number}
-     */
-    this.batchNumberOffset = batchNumberOffset;
 
     /**
      * The amount of ram needed by the hack script.
@@ -160,8 +145,9 @@ export class BatchHandler {
   /**
    * Start the scripts for as many batches as possible.
    * @param {import(".").NS} ns
+   * @param {number} batchNumberOffset - The number of batches that have already been created on others hosts.
    */
-  execute(ns) {
+  execute(ns, batchNumberOffset) {
     for (let i = 0; i < this.batchCount; i++) {
       // start the scripts with their corresponding delays (10ms between batches)
       // the offset caused by other ost servers must also be considered
@@ -170,7 +156,7 @@ export class BatchHandler {
           "hack.js",
           this.hackThreads,
           this.targetServer.hostname,
-          this.hackDelay + (i + this.batchNumberOffset) * 10
+          this.hackDelay + (i + batchNumberOffset) * 10
         );
       }
       if (this.growThreads > 0) {
@@ -178,7 +164,7 @@ export class BatchHandler {
           "grow.js",
           this.growThreads,
           this.targetServer.hostname,
-          this.growDelay + (i + this.batchNumberOffset) * 10
+          this.growDelay + (i + batchNumberOffset) * 10
         );
       }
       if (this.weakenThreads > 0) {
@@ -186,7 +172,7 @@ export class BatchHandler {
           "weaken.js",
           this.weakenThreads,
           this.targetServer.hostname,
-          this.weakenDelay + (i + this.batchNumberOffset) * 10
+          this.weakenDelay + (i + batchNumberOffset) * 10
         );
       }
     }
