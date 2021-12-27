@@ -157,6 +157,7 @@ export class BatchHandler {
       this.updateGrowThreads(ns);
       this.updateHackThreads(ns);
       this.consolidateBatches(ns);
+      this.updateRamPerBatch();
       this.updateBatchCount();
       this.updateDelays();
     }
@@ -259,6 +260,13 @@ export class BatchHandler {
   }
 
   /**
+   * Update the number of batches that can be run on the host.
+   */
+  updateBatchCount() {
+    this.batchCount = Math.floor(this.availableTotalRam / this.ramPerBatch);
+  }
+
+  /**
    * Update the delay times for the scripts in a single batch.
    */
   updateDelays() {
@@ -303,14 +311,6 @@ export class BatchHandler {
       this.weakenThreads * hackThreadsConsolidated * this.weakenRam;
 
     /**
-     * The amount of consolidated batches that can be run on the current host server.
-     * @type {number}
-     */
-    let batchCountConsolidated = Math.floor(
-      this.availableTotalRam / ramPerBatchConsolidated
-    );
-
-    /**
      * The factor that the consolidated hack thread count has to be multiplied with to get the maximum
      * possible hack threads per consolidated batch given the available RAM.
      * @type {number}
@@ -330,10 +330,6 @@ export class BatchHandler {
     this.weakenThreads = Math.floor(
       this.weakenThreads * hackThreadsConsolidated * batchConsolidatedScaling
     );
-
-    // update the batch specific metrics
-    this.batchCount = batchCountConsolidated;
-    this.ramPerBatch = ramPerBatchConsolidated;
   }
 
   /**
