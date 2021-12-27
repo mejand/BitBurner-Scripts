@@ -61,7 +61,7 @@ export class BatchHandler {
      * The number of threads dedicated to hacking.
      * @type {number}
      */
-    this.hackThreads = 0;
+    this.hackThreads = 1;
 
     /**
      * The number of threads needed to compensate the effect of hacking.
@@ -137,5 +137,57 @@ export class BatchHandler {
      * @type {number}
      */
     this.batchCount = 0;
+  }
+
+  /**
+   * Update the batch information and prepare for execution of the scripts.
+   * @param {import(".").NS} ns
+   */
+  update(ns) {
+    this.updateGrowThreads(ns);
+    this.updateHackThreads(ns);
+  }
+
+  /**
+   * Update the value of the number of grow threads to compensate the hack threads.
+   * @param {import(".").NS} ns
+   */
+  updateGrowThreads(ns) {
+    /**
+     * The factor that the available money needs to be multiplied with to get the deltaMoney.
+     * @type {number}
+     */
+    var growFactor =
+      1 + this.hackThreads * ns.hackAnalyze(this.targetServer.hostname);
+
+    this.growThreads = Math.ceil(
+      ns.growthAnalyze(
+        this.hostServer.hostname,
+        growFactor,
+        this.hostServer.cpuCores
+      )
+    );
+  }
+
+  /**
+   * Update the value of the number of weaken threads to compensate the hack and grow threads.
+   * @param {import(".").NS} ns
+   */
+  updateHackThreads(ns) {
+    /**
+     * The security score that needs to be removed to compensate hacking and growing.
+     * @type {number}
+     */
+    var deltaSecurity =
+      ns.hackAnalyzeSecurity(this.hackThreads) +
+      ns.growthAnalyzeSecurity(this.growThreads);
+
+    /**
+     * The security score that will be removed by one thread of the weaken script.
+     * @type {number}
+     */
+    var weakenReduction = ns.weakenAnalyze(1, this.hostServer.cpuCores);
+
+    this.weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
   }
 }
