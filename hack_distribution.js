@@ -224,7 +224,7 @@ export class BatchHandler {
 
     this.growThreads = Math.ceil(
       ns.growthAnalyze(
-        this.hostServer.hostname,
+        this.targetServer.hostname,
         growFactor,
         this.hostServer.cpuCores
       )
