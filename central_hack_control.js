@@ -63,7 +63,7 @@ export async function main(ns) {
    * The time between each calculation cycle.
    * @type {number}
    */
-  var cycleTime = 50;
+  var cycleTime = 1000;
 
   /**
    * The running count of batches that have been created.
@@ -86,7 +86,6 @@ export async function main(ns) {
     handlers = [];
     batchCount = 0;
     load = 0;
-    cycleTime = 0;
 
     // update the target if debug mode is off
     if (debug) {
