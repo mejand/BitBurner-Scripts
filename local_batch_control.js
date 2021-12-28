@@ -81,7 +81,6 @@ export async function main(ns) {
 
   while (true) {
     ns.clearLog();
-    ns.enableLog("run");
 
     /**
      * The server object of the target.
@@ -191,22 +190,18 @@ export async function main(ns) {
      * finishes second in the cycle.
      * @type {number}
      */
-    let growDelay = Math.max(
-      0,
-      hackTime - growTime + 1,
-      weakenTime + weakenDelay - growTime - 300
-    );
+    let growDelay = Math.max(0, weakenTime + weakenDelay - growTime - 500);
 
     /**
      * The time that the hack command has to be delayed to ensure it
      * finishes third in the cycle.
      * @type {number}
      */
-    let hackDelay = Math.max(0, growTime + growDelay - hackTime - 300);
+    let hackDelay = Math.max(0, weakenTime + weakenDelay - hackTime - 1000);
 
-    ns.print("hackDelay = " + ns.tFormat(hackDelay));
-    ns.print("growDelay = " + ns.tFormat(growDelay));
-    ns.print("weakenDelay = " + ns.tFormat(weakenDelay));
+    ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
+    ns.print("growDelay = " + ns.tFormat(growDelay, true));
+    ns.print("weakenDelay = " + ns.tFormat(weakenDelay, true));
     ns.print("batchTime = " + ns.tFormat(batchTime));
 
     if (batchCount > 0) {
@@ -320,6 +315,8 @@ function getWeakenThreads(
   deltaSecurity += ns.hackAnalyzeSecurity(hackThreads);
   deltaSecurity += ns.growthAnalyzeSecurity(growThreads);
 
+  ns.print("deltaSecurity = " + deltaSecurity);
+
   /**
    * The security score that will be removed by one thread of the weaken script.
    * @type {number}
@@ -328,5 +325,5 @@ function getWeakenThreads(
 
   count = Math.ceil(deltaSecurity / weakenReduction);
 
-  return count;
+  return count + 1;
 }
