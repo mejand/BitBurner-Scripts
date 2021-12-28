@@ -20,12 +20,6 @@ export async function main(ns) {
     delay = ns.args[1];
   }
 
-  /**
-   * The time at which grow started.
-   * @type {number}
-   */
-  var timeStampStart = ns.getTimeSinceLastAug();
-
   if (delay > 0) {
     await ns.sleep(delay);
   }
@@ -34,9 +28,9 @@ export async function main(ns) {
 
   /**
    * The time at which grow finished.
-   * @type {number}
+   * @type {string}
    */
-  var timeStampEnd = ns.getTimeSinceLastAug();
+  var timeStampEnd = ns.tFormat(ns.getTimeSinceLastAug(), true);
 
   /**
    * The percentage of the maximum money currently on the target server.
@@ -59,7 +53,7 @@ export async function main(ns) {
       "||Grow Finished | Money: %3.1f | Security: %3.1f | Time: %s ||",
       money,
       security,
-      ns.tFormat(timeStampEnd - timeStampStart, true)
+      timeStampEnd
     )
   );
 }
