@@ -120,6 +120,10 @@ export async function main(ns) {
      */
     let batchCount = Math.floor(threadsAvailable / batchThreads);
 
+    ns.print("Money = " + targetServer.moneyAvailable / targetServer.moneyMax);
+    ns.print(
+      "Security = " + targetServer.hackDifficulty - targetServer.minDifficulty
+    );
     ns.print("hackThreads = " + hackThreads);
     ns.print("growThreads = " + growThreads);
     ns.print("weakenThreads = " + weakenThreads);
