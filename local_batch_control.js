@@ -254,7 +254,7 @@ export async function main(ns) {
          * @type {number}
          */
         let security =
-          ns.getServerRequiredHackingLevel(targetName) -
+          ns.getServerSecurityLevel(targetName) -
           ns.getServerMinSecurityLevel(targetName);
 
         /**
