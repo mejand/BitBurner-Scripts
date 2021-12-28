@@ -358,7 +358,7 @@ export class BatchHandler {
 }
 
 /**
- * A batch of hack, grow and weaken scripts with defined belay times.
+ * A batch of hack, grow and weaken scripts with defined delay times.
  */
 class Batch {
   /**
@@ -461,7 +461,7 @@ class Batch {
    * There are still scripts that have to be started in this batch.
    * @type {boolean}
    */
-  get alive() {
+  get unfinished() {
     return (
       this.hackThreads > 0 && this.growThreads > 0 && this.weakenThreads > 0
     );
