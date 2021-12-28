@@ -119,11 +119,12 @@ export async function main(ns) {
         handler.execute(ns, batchCount);
         batchCount += handler.batches.length;
         load += handler.load;
-        cycleTime = Math.max(cycleTime, handler.batchTime);
         ns.print(
           handler.hostServer.name +
             ": " +
-            ns.tFormat(handler.batchTime, true) +
+            ns.tFormat(
+              handler.batchTime + Batch.offsetPadding * handler.batchCount
+            ) +
             " + " +
             handler.hostServer.ramAvailable +
             "GB " +
@@ -133,11 +134,6 @@ export async function main(ns) {
       }
     }
 
-    ns.print("batchTime = " + ns.tFormat(cycleTime));
-    ns.print(
-      "Time for batchCount = " +
-        ns.tFormat(batchCount * Batch.offsetPadding + 150, true)
-    );
     ns.print(
       "load / handlers.length = " +
         load +
@@ -147,21 +143,17 @@ export async function main(ns) {
         load / handlers.length
     );
 
-    // add the number of batches and padding to the cycle time
-    cycleTime += batchCount * Batch.offsetPadding + 50;
-
     // scale the load value by the number of hosts
     load = load / handlers.length;
 
     ns.tprint(
       ns.sprintf(
-        "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f|Batches: %i|%s||",
+        "||%s|Load: %3.1f|Money: %3.1f|Security: %3.1f|Batches: %i||",
         targetServer.hostname,
         load,
         (targetServer.moneyAvailable / targetServer.moneyMax) * 100,
         targetServer.hackDifficulty - targetServer.minDifficulty,
-        batchCount,
-        ns.tFormat(cycleTime)
+        batchCount
       )
     );
 
