@@ -15,6 +15,30 @@ export async function main(ns) {
     debug = ns.args[0];
   }
 
+  if (debug) {
+    /**
+     * The name of the hack script.
+     * @type {string}
+     */
+    var hackScript = "hack_debug.js";
+
+    /**
+     * The name of the grow script.
+     * @type {string}
+     */
+    var growScript = "grow_debug.js";
+
+    /**
+     * The name of the weaken script.
+     * @type {string}
+     */
+    var weakenScript = "weaken_debug.js",
+  } else {
+    var hackScript = "hack.js";
+    var growScript = "grow.js";
+    var weakenScript = "weaken.js";
+  }
+
   /**
    * The time in milliseconds between batch creation.
    * @type {number}
@@ -49,19 +73,19 @@ export async function main(ns) {
    * The RAM needed to run the hack script.
    * @type {number}
    */
-  var hackRam = ns.getScriptRam("hack.js", hostName);
+  var hackRam = ns.getScriptRam(hackScript, hostName);
 
   /**
    * The RAM needed to run the grow script.
    * @type {number}
    */
-  var growRam = ns.getScriptRam("grow.js", hostName);
+  var growRam = ns.getScriptRam(growScript, hostName);
 
   /**
    * The RAM needed to run the weaken script.
    * @type {number}
    */
-  var weakenRam = ns.getScriptRam("weaken.js", hostName);
+  var weakenRam = ns.getScriptRam(weakenScript, hostName);
 
   /**
    * The amount of RAM needed to run any script.
@@ -88,9 +112,9 @@ export async function main(ns) {
   var running = true;
 
   // copy the scripts to the host
-  await ns.scp("hack.js", "home", hostName);
-  await ns.scp("grow.js", "home", hostName);
-  await ns.scp("weaken.js", "home", hostName);
+  await ns.scp(hackScript, "home", hostName);
+  await ns.scp(growScript, "home", hostName);
+  await ns.scp(weakenScript, "home", hostName);
 
   ns.tail();
 
@@ -226,22 +250,31 @@ export async function main(ns) {
     ns.print("batchTime = " + ns.tFormat(batchTime));
 
     if (batchCount > 0) {
+      if (debug) {
+        /**
+         * The time at which weaken finished.
+         * @type {string}
+         */
+        let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
+        ns.tprint("||Scripts Started | " + timeStampStart + " ||");
+      }
+
       if (
         hackThreads > 0 &&
         targetServer.moneyAvailable > moneyThreshold &&
         targetServer.hackDifficulty < securityThreshld
       ) {
-        ns.run("hack.js", hackThreads, targetName, hackDelay, dummy);
+        ns.run(hackScript, hackThreads, targetName, hackDelay, dummy);
         threadsAvailable -= hackThreads;
       }
 
       if (growThreads > 0) {
-        ns.run("grow.js", growThreads, targetName, growDelay, dummy);
+        ns.run(growScript, growThreads, targetName, growDelay, dummy);
         threadsAvailable -= growThreads;
       }
 
       if (weakenThreads > 0) {
-        ns.run("weaken.js", weakenThreads, targetName, weakenDelay, dummy);
+        ns.run(weakenScript, weakenThreads, targetName, weakenDelay, dummy);
         threadsAvailable -= weakenThreads;
       }
     }
