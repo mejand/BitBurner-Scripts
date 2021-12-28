@@ -20,6 +20,15 @@ export async function main(ns) {
     delay = ns.args[1];
   }
 
+  /**
+   * The ID of the script instance.
+   * @type {number}
+   */
+  var id = 0;
+  if (ns.args.length > 2 && typeof ns.args[2] == "number") {
+    id = ns.args[2];
+  }
+
   if (delay > 0) {
     await ns.sleep(delay);
   }

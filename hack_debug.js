@@ -14,10 +14,20 @@ export async function main(ns) {
 
   /**
    * The delay time before the operation starts.
+   * @type {number}
    */
   var delay = 0;
   if (ns.args.length > 1 && typeof ns.args[1] == "number") {
     delay = ns.args[1];
+  }
+
+  /**
+   * The ID of the script instance.
+   * @type {number}
+   */
+  var id = 0;
+  if (ns.args.length > 2 && typeof ns.args[2] == "number") {
+    id = ns.args[2];
   }
 
   if (delay > 0) {
