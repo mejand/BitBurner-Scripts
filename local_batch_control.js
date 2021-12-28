@@ -46,12 +46,6 @@ export async function main(ns) {
   var scriptPadding = 200;
 
   /**
-   * The time in milliseconds between batch creation.
-   * @type {number}
-   */
-  var period = 1000;
-
-  /**
    * The name of the target server.
    * @type {string}
    */
@@ -122,6 +116,12 @@ export async function main(ns) {
     if (debug && dummy > 10) {
       running = false;
     }
+
+    /**
+     * The time since last Augmentation in milliseconds.
+     * @type {number}
+     */
+    let timeStamp = ns.getTimeSinceLastAug();
 
     /**
      * The server object of the target.
@@ -320,7 +320,17 @@ export async function main(ns) {
       dummy = 0;
     }
 
-    await ns.sleep(period);
+    /**
+     * The amount of time the script needs to sleep to ensure that
+     * it is executed on the full second. This is necessary to avoid
+     * scheduling colisions with the hack, grow and weaken scripts.
+     * @type {number}
+     */
+    let sleepTime = 1000 - (timeStamp % 1000);
+
+    ns.print("sleepTime = " + sleepTime);
+
+    await ns.sleep(sleepTime);
   }
 }
 
