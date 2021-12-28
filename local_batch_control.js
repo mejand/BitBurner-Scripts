@@ -281,7 +281,7 @@ export async function main(ns) {
          */
         let debugText = "        ";
         debugText += ns.sprintf(
-          "||Scripts Started | %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+          "||Scripts Started | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
           dummy,
           money,
           security,
