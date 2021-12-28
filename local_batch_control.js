@@ -43,7 +43,7 @@ export async function main(ns) {
    * The amount of time in milliseconds that shall pass between hack, grow and weaken finishing.
    * @type {number}
    */
-  var scriptPadding = 0;
+  var scriptPadding = 200;
 
   /**
    * The time in milliseconds between batch creation.
@@ -195,19 +195,20 @@ export async function main(ns) {
      * The time it takes to run the hack command.
      * @type {number}
      */
-    let hackTime = ns.getHackTime(hostServer.hostname);
+    let hackTime = Math.ceil(ns.getHackTime(hostServer.hostname) / 200) * 200;
 
     /**
      * The time it takes to run the grow command.
      * @type {number}
      */
-    let growTime = ns.getGrowTime(hostServer.hostname);
+    let growTime = Math.ceil(ns.getGrowTime(hostServer.hostname) / 200) * 200;
 
     /**
      * The time it takes to run the weaken command.
      * @type {number}
      */
-    let weakenTime = ns.getWeakenTime(hostServer.hostname);
+    let weakenTime =
+      Math.ceil(ns.getWeakenTime(hostServer.hostname) / 200) * 200;
 
     /**
      * The time that the complete hack, grow, weaken cycle takes to complete.
