@@ -69,6 +69,7 @@ export async function main(ns) {
 
   while (true) {
     ns.clearLog();
+    ns.enableLog("run");
 
     /**
      * The server object of the target.
