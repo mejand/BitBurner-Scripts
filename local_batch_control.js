@@ -124,8 +124,8 @@ export async function main(ns) {
     // clean up the log
     ns.clearLog();
 
-    // ensure the script runs only once if debug mode is enabled.
-    if (debug) {
+    // ensure the script only runs a certain number of times.
+    if (debug && dummy > 10) {
       running = false;
     }
 
@@ -277,7 +277,8 @@ export async function main(ns) {
 
         ns.tprint(
           ns.sprintf(
-            "||Scripts Started | Money: %3.1f | Security: %3.1f | Time: %s ||",
+            "||Scripts Started | %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+            dummy,
             money,
             security,
             timeStampStart
