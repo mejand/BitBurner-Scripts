@@ -534,7 +534,7 @@ class MyServer {
      * The maximum nunber of threads that can be run on the server.
      * @type {number}
      */
-    this.threadsMax = Math.floor(ns.getServerMaxRam / ramPerScript);
+    this.threadsMax = Math.floor(ns.getServerMaxRam(name) / ramPerScript);
 
     /**
      * The amount of threads available (when this instance was created).
