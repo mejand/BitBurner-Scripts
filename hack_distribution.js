@@ -528,7 +528,7 @@ class MyServer {
      * The amount of ram available on the server (when this instance was created).
      * @type {number}
      */
-    this.ramAvailable = ns.getServerMaxRam(name) - ns.getServerUsedRam;
+    this.ramAvailable = ns.getServerMaxRam(name) - ns.getServerUsedRam(name);
 
     /**
      * The maximum nunber of threads that can be run on the server.
