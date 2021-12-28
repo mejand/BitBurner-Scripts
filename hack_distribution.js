@@ -222,8 +222,14 @@ export class BatchHandler {
    */
   execute(ns, batchNumberOffset) {
     if (this.hostServer.useable) {
+      /**
+       * The number of batches that have already been executed this host.
+       * @type {number}
+       */
+      let i = 0;
       for (let batch of this.batches) {
-        batch.offsetCount = batchNumberOffset;
+        batch.offsetCount = batchNumberOffset + i;
+        i++;
         batch.execute(ns, this.hostServer);
       }
 
