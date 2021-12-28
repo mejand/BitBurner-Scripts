@@ -7,6 +7,15 @@ export async function main(ns) {
   ns.disableLog("ALL");
 
   /**
+   * Enable debug actions.
+   * @type {boolean}
+   */
+  var debug = true;
+  if (ns.args.length > 0 && typeof ns.args[0] == "boolean") {
+    debug = ns.args[0];
+  }
+
+  /**
    * The time in milliseconds between batch creation.
    * @type {number}
    */
@@ -72,6 +81,12 @@ export async function main(ns) {
    */
   var dummy = 0;
 
+  /**
+   * The script is executed periodically.
+   * @type {boolean}
+   */
+  var running = true;
+
   // copy the scripts to the host
   await ns.scp("hack.js", "home", hostName);
   await ns.scp("grow.js", "home", hostName);
@@ -79,8 +94,14 @@ export async function main(ns) {
 
   ns.tail();
 
-  while (true) {
+  while (running) {
+    // clean up the log
     ns.clearLog();
+
+    // ensure the script runs only once if debug mode is enabled.
+    if (debug) {
+      running = false;
+    }
 
     /**
      * The server object of the target.
