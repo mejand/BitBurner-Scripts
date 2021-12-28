@@ -242,7 +242,7 @@ function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
   ns.print("growFactor = " + growFactor);
 
   count = Math.ceil(
-    ns.growthAnalyze(hostServer.hostname, growFactor, hostServer.cpuCores)
+    ns.growthAnalyze(targetServer.hostname, growFactor, hostServer.cpuCores)
   );
 
   return count;
