@@ -122,7 +122,7 @@ export async function main(ns) {
 
     ns.print("Money = " + targetServer.moneyAvailable / targetServer.moneyMax);
     ns.print(
-      "Security = " + targetServer.hackDifficulty - targetServer.minDifficulty
+      "Security = " + (targetServer.hackDifficulty - targetServer.minDifficulty)
     );
     ns.print("hackThreads = " + hackThreads);
     ns.print("growThreads = " + growThreads);
@@ -174,7 +174,7 @@ export async function main(ns) {
     let growDelay = Math.max(
       0,
       hackTime - growTime + 1,
-      batchTime - growTime - 1
+      weakenTime + weakenDelay - growTime - 100
     );
 
     /**
@@ -182,7 +182,11 @@ export async function main(ns) {
      * finishes third in the cycle.
      * @type {number}
      */
-    let hackDelay = Math.max(0, batchTime - hackTime - 2);
+    let hackDelay = Math.max(0, growTime + growDelay - hackTime - 100);
+
+    ns.print("hackDelay = " + ns.tFormat(hackDelay));
+    ns.print("growDelay = " + ns.tFormat(growDelay));
+    ns.print("weakenDelay = " + ns.tFormat(weakenDelay));
 
     if (batchCount > 0) {
       if (hackThreads > 0) {
@@ -241,7 +245,8 @@ function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
    */
-  var growFactor = 1.0 + hackThreads * ns.hackAnalyze(targetServer.hostname);
+  var growFactor =
+    1.0 / (1.0 - hackThreads * ns.hackAnalyze(targetServer.hostname));
 
   ns.print("growFactor = " + growFactor);
 
