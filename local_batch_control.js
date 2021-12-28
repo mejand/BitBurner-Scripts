@@ -323,6 +323,8 @@ function getWeakenThreads(
    */
   var weakenReduction = ns.weakenAnalyze(1, hostServer.cpuCores);
 
+  ns.print("weakenReduction = " + weakenReduction);
+
   count = Math.ceil(deltaSecurity / weakenReduction);
 
   return count + 1;
