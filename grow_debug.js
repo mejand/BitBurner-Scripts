@@ -50,7 +50,7 @@ export async function main(ns) {
   // print the result to the terminal
   ns.tprint(
     ns.sprintf(
-      "||Grow Finished | Money: %3.1f | Security: %3.1f | Time: %s ||",
+      "||Grow Finished   | Money: %3.1f | Security: %3.1f | Time: %s ||",
       money,
       security,
       timeStampEnd

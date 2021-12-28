@@ -1,5 +1,5 @@
 /**
- * Run a single hack operation and print the result for debugging.
+ * Run a single weaken operation and print the result for debugging.
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
@@ -24,10 +24,10 @@ export async function main(ns) {
     await ns.sleep(delay);
   }
 
-  await ns.hack(targetName);
+  await ns.weaken(targetName);
 
   /**
-   * The time at which grow finished.
+   * The time at which weaken finished.
    * @type {string}
    */
   var timeStampEnd = ns.tFormat(ns.getTimeSinceLastAug(), true);
@@ -50,7 +50,7 @@ export async function main(ns) {
   // print the result to the terminal
   ns.tprint(
     ns.sprintf(
-      "||Hack Finished   | Money: %3.1f | Security: %3.1f | Time: %s ||",
+      "||Weaken Finished | Money: %3.1f | Security: %3.1f | Time: %s ||",
       money,
       security,
       timeStampEnd
