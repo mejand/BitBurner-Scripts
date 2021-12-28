@@ -7,95 +7,32 @@ export class BatchHandler {
    * @param {import(".").NS} ns
    * @param {string} targetName - The name of the target server.
    * @param {string} hostName - The name of the host server.
-   * @param {number} hackRam - The amount of ram needed by the hack script.
-   * @param {number} growRam - The amount of ram needed by the grow script.
-   * @param {number} weakenRam - The amount of ram needed by the weaken script.
+   * @param {number} ramPerScript - The amount of ram needed to run any script.
    */
-  constructor(ns, targetName, hostName, hackRam, growRam, weakenRam) {
+  constructor(ns, targetName, hostName, ramPerScript) {
     /**
      * The server object of the target.
-     * @type {import(".").Server}
+     * @type {MyServer}
      */
-    this.targetServer = ns.getServer(targetName);
+    this.targetServer = new MyServer(ns, targetName, ramPerScript);
 
     /**
      * The server object of the host server.
-     * @type {import(".").Server}
+     * @type {MyServer}
      */
-    this.hostServer = ns.getServer(hostName);
+    this.hostServer = new MyServer(ns, hostName, ramPerScript);
 
     /**
-     * Indcates if the host server has free ram.
-     * @type {boolean}
+     * All batches that shall be executed on this host.
+     * @type {Batch[]}
      */
-    this.useable = this.hostServer.maxRam > 0;
-
-    /**
-     * The amount of ram needed by the hack script.
-     * @type {number}
-     */
-    this.hackRam = hackRam;
-
-    /**
-     * The amount of ram needed by the grow script.
-     * @type {number}
-     */
-    this.growRam = growRam;
-
-    /**
-     * The amount of ram needed by the weaken script.
-     * @type {number}
-     */
-    this.weakenRam = weakenRam;
-
-    /**
-     * The number of threads dedicated to hacking.
-     * @type {number}
-     */
-    if (this.useable) {
-      this.hackThreads = 1;
-    } else {
-      this.hackThreads = 0;
-    }
-
-    /**
-     * The number of threads needed to compensate the effect of hacking.
-     * @type {number}
-     */
-    this.growThreads = 0;
-
-    /**
-     * The number of threads needed to compensate the effect of hacking and growing.
-     * @type {number}
-     */
-    this.weakenThreads = 0;
-
-    /**
-     * The amount of time that the execution of hacking is delayed
-     * compared to the start of a single batch.
-     * @type {number}
-     */
-    this.hackDelay = 0;
-
-    /**
-     * The amount of time that the execution of growing is delayed
-     * compared to the start of a single batch.
-     * @type {number}
-     */
-    this.growDelay = 0;
-
-    /**
-     * The amount of time that the execution of weakening is delayed
-     * compared to the start of a single batch.
-     * @type {number}
-     */
-    this.weakenDelay = 0;
+    this.batches = [];
 
     /**
      * The amount of time it takes to run the hack script.
      * @type {number}
      */
-    if (this.useable) {
+    if (this.hostServer.useable) {
       this.hackTime = ns.getHackTime(targetName);
     } else {
       this.hackTime = 0;
@@ -105,7 +42,7 @@ export class BatchHandler {
      * The amount of time it takes to run the grow script.
      * @type {number}
      */
-    if (this.useable) {
+    if (this.hostServer.useable) {
       this.growTime = ns.getGrowTime(targetName);
     } else {
       this.growTime = 0;
@@ -115,7 +52,7 @@ export class BatchHandler {
      * The amount of time it takes to run the grow script.
      * @type {number}
      */
-    if (this.useable) {
+    if (this.hostServer.useable) {
       this.weakenTime = ns.getWeakenTime(targetName);
     } else {
       this.weakenTime = 0;
@@ -127,29 +64,44 @@ export class BatchHandler {
     this.batchTime = Math.max(this.hackTime, this.growTime, this.weakenTime);
 
     /**
-     * The amount of ram available on the host server before
-     * any scripts are started.
+     * The time in milliseconds that the weaken script has to be delayed to ensure
+     * it finishes at the end of a cycle.
      * @type {number}
      */
-    this.availableTotalRam = this.hostServer.maxRam - this.hostServer.ramUsed;
+    this.weakenDelay = Math.max(
+      0, // ensure the dealy can not be negative
+      this.growTime - this.weakenTime + 1, // if weaken finishes before grow it must be delayed
+      this.hackTime - this.weakenTime + 1 // if weaken finishes before hack it must be delayed
+    );
 
     /**
-     * The amount of ram needed to run a single hack, grow, weaken batch.
+     * The time in milliseconds that the grow script has to be delayed to ensure
+     * it finishes before the weaken, but after the hack scripts.
      * @type {number}
      */
-    this.ramPerBatch = 0;
+    this.growDelay = Math.max(
+      0,
+      this.hackTime - this.growTime + 1,
+      this.batchTime - this.growTime - 1 // the grow script must be delayed so it finishes shortly before weaken
+    );
 
     /**
-     * The number of batches that can be run on the host server.
+     * The time in milliseconds that the hack script has to be delayed to ensure
+     * it finishes before the grow script.
      * @type {number}
      */
-    this.batchCount = 0;
+    this.hackDelay = Math.max(0, this.batchTime - this.hackTime - 2);
 
     /**
      * The load of the host server after the scripts have been started in percent.
      * @type {number}
      */
-    this.load = 0;
+    if (this.hostServer.useable) {
+      this.load = 0;
+    } else {
+      // ensure that non useable servers do not falsely impact averaged load calculations
+      this.load = 100;
+    }
   }
 
   /**
@@ -157,13 +109,109 @@ export class BatchHandler {
    * @param {import(".").NS} ns
    */
   update(ns) {
-    if (this.useable) {
-      this.updateGrowThreads(ns);
-      this.updateHackThreads(ns);
-      this.consolidateBatches(ns);
-      this.updateRamPerBatch();
-      this.updateBatchCount();
-      this.updateDelays();
+    if (this.hostServer.useable) {
+      /**
+       * The amount of hack threads needed to steal all money from the target server.
+       * @type {number}
+       */
+      let fullBatchHackThreads = Math.floor(
+        1 / ns.hackAnalyze(this.targetServer.name)
+      );
+
+      /**
+       * The amount of grow threads needed to compensate the hack threads.
+       * @type {number}
+       */
+      let fullBatchGrowThreads = this.getGrowThreads(ns, fullBatchHackThreads);
+
+      /**
+       * The amount of weaken threads needed to compensate the hack and grow threads.
+       * @type {number}
+       */
+      let fullBatchWeakenThreads = this.getWeakenThreads(
+        ns,
+        fullBatchHackThreads,
+        fullBatchGrowThreads
+      );
+
+      /**
+       * The total number of threads to run a full batch.
+       * @type {number}
+       */
+      let fullBatchThreads =
+        fullBatchHackThreads + fullBatchGrowThreads + fullBatchWeakenThreads;
+
+      /**
+       * The amount of full threads that can be run on the host server.
+       * @type {number}
+       */
+      let fullBatchCount = Math.floor(
+        this.hostServer.threadsAvailable / fullBatchThreads
+      );
+
+      // create all full batches and add them to the queue
+      for (let i = 0; i < fullBatchCount; i++) {
+        this.batches.push(
+          new Batch(
+            this.targetServer.name,
+            fullBatchHackThreads,
+            fullBatchGrowThreads,
+            fullBatchWeakenThreads,
+            this.hackDelay,
+            this.growDelay,
+            this.weakenDelay
+          )
+        );
+      }
+
+      /**
+       * The amount of threads remaining on the host server after all full batches
+       * have been executed.
+       * @type {number}
+       */
+      let remainingThreads =
+        this.hostServer.threadsAvailable % fullBatchThreads;
+
+      // create a batch to fill the reamining threads as best as possible
+      if (remainingThreads >= 3) {
+        /**
+         * The factor by which the full batch has to be reduced to fill the remaining threads.
+         * @type {number}
+         */
+        let scaling = remainingThreads / fullBatchThreads;
+
+        /**
+         * The amount of weaken threads to fill out the remaining threads. The value is at least 1
+         * to ensure that the higher number of hack threads does not overwrite it.
+         * @type {number}
+         */
+        let remainingWeakenThreads = Math.max(
+          1,
+          fullBatchWeakenThreads * scaling
+        );
+        remainingThreads -= remainingWeakenThreads;
+
+        /**
+         * The amount of grow threads to fill out the remaining threads. The value is at least 1
+         * to ensure that the higher number of hack threads does not overwrite it.
+         * @type {number}
+         */
+        let remainingGrowThreads = Math.max(1, fullBatchGrowThreads * scaling);
+        remainingThreads -= remainingGrowThreads;
+
+        // create the remaining batch and add it to the queue
+        this.batches.push(
+          new Batch(
+            this.targetServer.name,
+            remainingThreads,
+            remainingGrowThreads,
+            remainingWeakenThreads,
+            this.hackDelay,
+            this.growDelay,
+            this.weakenDelay
+          )
+        );
+      }
     }
   }
 
@@ -173,37 +221,10 @@ export class BatchHandler {
    * @param {number} batchNumberOffset - The number of batches that have already been created on others hosts.
    */
   execute(ns, batchNumberOffset) {
-    if (this.useable) {
-      for (let i = 0; i < this.batchCount; i++) {
-        // start the scripts with their corresponding delays (10ms between batches)
-        // the offset caused by other ost servers must also be considered
-        if (this.hackThreads > 0) {
-          ns.exec(
-            "hack.js",
-            this.hostServer.hostname,
-            this.hackThreads,
-            this.targetServer.hostname,
-            this.hackDelay + (i + batchNumberOffset) * 10
-          );
-        }
-        if (this.growThreads > 0) {
-          ns.exec(
-            "grow.js",
-            this.hostServer.hostname,
-            this.growThreads,
-            this.targetServer.hostname,
-            this.growDelay + (i + batchNumberOffset) * 10
-          );
-        }
-        if (this.weakenThreads > 0) {
-          ns.exec(
-            "weaken.js",
-            this.hostServer.hostname,
-            this.weakenThreads,
-            this.targetServer.hostname,
-            this.weakenDelay + (i + batchNumberOffset) * 10
-          );
-        }
+    if (this.hostServer.useable) {
+      for (let batch of this.batches) {
+        batch.offsetCount = batchNumberOffset;
+        batch.execute(ns, this.hostServer);
       }
 
       this.updateLoad(ns);
@@ -213,132 +234,63 @@ export class BatchHandler {
   /**
    * Update the value of the number of grow threads to compensate the hack threads.
    * @param {import(".").NS} ns
+   * @param {number} hackThreads - The numer of hacking threads that shall be compensated.
+   * @returns {number} The number of threads needed to complete the hack threads.
    */
-  updateGrowThreads(ns) {
+  getGrowThreads(ns, hackThreads) {
     /**
      * The factor that the available money needs to be multiplied with to get the deltaMoney.
      * @type {number}
      */
-    var growFactor =
-      1 + this.hackThreads * ns.hackAnalyze(this.targetServer.hostname);
+    var growFactor = 1 + hackThreads * ns.hackAnalyze(this.targetServer.name);
 
-    this.growThreads = Math.ceil(
+    /**
+     * The amount of threads needed to compensate the hack threads.
+     * @type {number}
+     */
+    var growThreads = Math.ceil(
       ns.growthAnalyze(
-        this.targetServer.hostname,
+        this.targetServer.name,
         growFactor,
-        this.hostServer.cpuCores
+        ns.getServer(this.hostServer.name).cpuCores
       )
     );
+
+    return growThreads;
   }
 
   /**
    * Update the value of the number of weaken threads to compensate the hack and grow threads.
    * @param {import(".").NS} ns
+   * @param {number} hackThreads - The number of threads dedicated to hacking.
+   * @param {number} growThreads - The number of threads dedicated to growing.
+   * @returns {number} The number of threads needed to compensate the hack and grow threads.
    */
-  updateHackThreads(ns) {
+  getWeakenThreads(ns, hackThreads, growThreads) {
     /**
      * The security score that needs to be removed to compensate hacking and growing.
      * @type {number}
      */
     var deltaSecurity =
-      ns.hackAnalyzeSecurity(this.hackThreads) +
-      ns.growthAnalyzeSecurity(this.growThreads);
+      ns.hackAnalyzeSecurity(hackThreads) +
+      ns.growthAnalyzeSecurity(growThreads);
 
     /**
      * The security score that will be removed by one thread of the weaken script.
      * @type {number}
      */
-    var weakenReduction = ns.weakenAnalyze(1, this.hostServer.cpuCores);
-
-    this.weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
-  }
-
-  /**
-   * Update the ram needed to run a single thread.
-   */
-  updateRamPerBatch() {
-    this.ramPerBatch =
-      this.hackThreads * this.hackRam +
-      this.growThreads * this.growRam +
-      this.weakenThreads * this.weakenRam;
-  }
-
-  /**
-   * Update the number of batches that can be run on the host.
-   */
-  updateBatchCount() {
-    // guard against division by zero
-    if (this.ramPerBatch > 0) {
-      this.batchCount = Math.floor(this.availableTotalRam / this.ramPerBatch);
-    } else {
-      this.batchCount = 0;
-    }
-  }
-
-  /**
-   * Update the delay times for the scripts in a single batch.
-   */
-  updateDelays() {
-    // The weaken script must finish last to compensate the security impact of hack and weaken.
-    this.weakenDelay = Math.max(
-      0, // ensure the dealy can not be negative
-      this.growTime - this.weakenTime + 1, // if weaken finishes before grow it must be delayed
-      this.hackTime - this.weakenTime + 1 // if weaken finishes before hack it must be delayed
-    );
-
-    // the grow script must finish between the hack and weaken scripts
-    this.growDelay = Math.max(
-      0,
-      this.hackTime - this.growTime + 1,
-      this.batchTime - this.growTime - 1 // the grow script must be delayed so it finishes shortly before weaken
-    );
-
-    // the hack script must finish shortly before the grow and weaken scripts
-    this.hackDelay = Math.max(0, this.batchTime - this.hackTime - 2);
-  }
-
-  /**
-   * Try to consolidate the 1 hack batches into larger operations to reduce calculations.
-   * @param {import(".").NS} ns
-   */
-  consolidateBatches(ns) {
-    /**
-     * The number of hack threads needed to steal all money from the target Server.
-     * @type {number}
-     */
-    let hackThreadsConsolidated = Math.floor(
-      1.0 / ns.hackAnalyze(this.targetServer.hostname)
+    var weakenReduction = ns.weakenAnalyze(
+      1,
+      ns.getServer(this.hostServer.name).cpuCores
     );
 
     /**
-     * The amount of ram needed to run a consolidated batch (steel all money from the target server).
+     * The number of threads needed to compensate the hack and grow threads.
      * @type {number}
      */
-    let ramPerBatchConsolidated =
-      this.hackThreads * hackThreadsConsolidated * this.hackRam +
-      this.growThreads * hackThreadsConsolidated * this.growRam +
-      this.weakenThreads * hackThreadsConsolidated * this.weakenRam;
+    var weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
 
-    /**
-     * The factor that the consolidated hack thread count has to be multiplied with to get the maximum
-     * possible hack threads per consolidated batch given the available RAM.
-     * @type {number}
-     */
-    let batchConsolidatedScaling = Math.min(
-      1.0,
-      this.availableTotalRam / ramPerBatchConsolidated
-    );
-
-    // scale the thread counts with the consolidated batch data
-    this.hackThreads = Math.floor(
-      this.hackThreads * hackThreadsConsolidated * batchConsolidatedScaling
-    );
-    this.growThreads = Math.floor(
-      this.growThreads * hackThreadsConsolidated * batchConsolidatedScaling
-    );
-    this.weakenThreads = Math.floor(
-      this.weakenThreads * hackThreadsConsolidated * batchConsolidatedScaling
-    );
+    return weakenThreads;
   }
 
   /**
@@ -346,13 +298,9 @@ export class BatchHandler {
    * @param {import(".").NS} ns
    */
   updateLoad(ns) {
-    if (this.useable) {
+    if (this.hostServer.useable) {
       this.load =
-        (ns.getServerUsedRam(this.hostServer.hostname) /
-          this.hostServer.maxRam) *
-        100;
-    } else {
-      this.load = 100;
+        (this.hostServer.threadsAvailable / this.hostServer.threadsMax) * 100;
     }
   }
 }
