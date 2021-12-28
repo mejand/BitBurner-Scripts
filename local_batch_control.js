@@ -239,7 +239,7 @@ function getHackThreads(ns, targetServer) {
    * @type {number}
    */
   var count = Math.floor(0.5 / ns.hackAnalyze(targetServer.hostname));
-  return count;
+  return count + 1;
 }
 
 /**
@@ -270,7 +270,7 @@ function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
     ns.growthAnalyze(targetServer.hostname, growFactor, hostServer.cpuCores)
   );
 
-  return count;
+  return count + 1;
 }
 
 /**
