@@ -25,6 +25,18 @@ export async function main(ns) {
   var hostName = ns.getHostname();
 
   /**
+   * The amount of money below which hacking will be suspended.
+   * @type {number}
+   */
+  var moneyThreshold = ns.getServerMaxMoney(targetName) * 0.9;
+
+  /**
+   * The security level above which hacking will be suspended.
+   * @type {number}
+   */
+  var securityThreshld = ns.getServerMinSecurityLevel(targetName) * 1.1;
+
+  /**
    * The RAM needed to run the hack script.
    * @type {number}
    */
@@ -198,7 +210,11 @@ export async function main(ns) {
     ns.print("batchTime = " + ns.tFormat(batchTime));
 
     if (batchCount > 0) {
-      if (hackThreads > 0) {
+      if (
+        hackThreads > 0 &&
+        targetServer.moneyAvailable > moneyThreshold &&
+        targetServer.hackDifficulty < securityThreshld
+      ) {
         ns.run("hack.js", hackThreads, targetName, hackDelay, dummy);
         threadsAvailable -= hackThreads;
       }
