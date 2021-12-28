@@ -182,7 +182,7 @@ export async function main(ns) {
     let growDelay = Math.max(
       0,
       hackTime - growTime + 1,
-      weakenTime + weakenDelay - growTime - 100
+      weakenTime + weakenDelay - growTime - 200
     );
 
     /**
@@ -190,7 +190,7 @@ export async function main(ns) {
      * finishes third in the cycle.
      * @type {number}
      */
-    let hackDelay = Math.max(0, growTime + growDelay - hackTime - 100);
+    let hackDelay = Math.max(0, growTime + growDelay - hackTime - 200);
 
     ns.print("hackDelay = " + ns.tFormat(hackDelay));
     ns.print("growDelay = " + ns.tFormat(growDelay));
