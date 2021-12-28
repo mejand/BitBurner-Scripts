@@ -158,6 +158,9 @@ export class BatchHandler {
         this.hostServer.threadsAvailable / fullBatchThreads
       );
 
+      // limit the maximum batch count per server to 10 to prevent the script from locking up
+      fullBatchCount = Math.min(fullBatchCount, 10);
+
       // create all full batches and add them to the queue
       for (let i = 0; i < fullBatchCount; i++) {
         this.batches.push(
