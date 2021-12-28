@@ -54,7 +54,7 @@ export async function main(ns) {
    * @type {number}
    */
   var security =
-    ns.getServerRequiredHackingLevel(targetName) -
+    ns.getServerSecurityLevel(targetName) -
     ns.getServerMinSecurityLevel(targetName);
 
   // print the result to the terminal
