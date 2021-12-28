@@ -15,28 +15,28 @@ export async function main(ns) {
     debug = ns.args[0];
   }
 
+  /**
+   * The name of the hack script.
+   * @type {string}
+   */
+  var hackScript = "hack.js";
+
+  /**
+   * The name of the grow script.
+   * @type {string}
+   */
+  var growScript = "grow.js";
+
+  /**
+   * The name of the weaken script.
+   * @type {string}
+   */
+  var weakenScript = "weaken.js";
+
   if (debug) {
-    /**
-     * The name of the hack script.
-     * @type {string}
-     */
-    var hackScript = "hack_debug.js";
-
-    /**
-     * The name of the grow script.
-     * @type {string}
-     */
-    var growScript = "grow_debug.js";
-
-    /**
-     * The name of the weaken script.
-     * @type {string}
-     */
-    var weakenScript = "weaken_debug.js",
-  } else {
-    var hackScript = "hack.js";
-    var growScript = "grow.js";
-    var weakenScript = "weaken.js";
+    hackScript = "hack_debug.js";
+    growScript = "grow_debug.js";
+    weakenScript = "weaken_debug.js";
   }
 
   /**
