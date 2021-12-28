@@ -227,7 +227,7 @@ export class BatchHandler {
         batch.execute(ns, this.hostServer);
       }
 
-      this.updateLoad(ns);
+      this.updateLoad();
     }
   }
 
@@ -295,9 +295,8 @@ export class BatchHandler {
 
   /**
    * Update the load value after starting the scripts.
-   * @param {import(".").NS} ns
    */
-  updateLoad(ns) {
+  updateLoad() {
     if (this.hostServer.useable) {
       this.load =
         (this.hostServer.threadsAvailable / this.hostServer.threadsMax) * 100;
