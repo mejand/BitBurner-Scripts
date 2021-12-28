@@ -122,7 +122,7 @@ export async function main(ns) {
           handler.hostServer.name +
             ": " +
             ns.tFormat(
-              handler.batchTime + Batch.offsetPadding * handler.batchCount
+              handler.batchTime + Batch.offsetPadding * handler.batches.length
             ) +
             " + " +
             handler.hostServer.ramAvailable +
