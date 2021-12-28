@@ -197,7 +197,7 @@ export async function main(ns) {
       }
     }
 
-    ns.print("load = " + (threadsAvailable / threadsMax) * 100);
+    ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
 
     await ns.sleep(period);
   }
