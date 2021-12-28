@@ -468,6 +468,14 @@ class Batch {
   }
 
   /**
+   * The total number of threads needed to execute the batch.
+   * @type {number}
+   */
+  get threadsTotal() {
+    return this.hackThreads + this.growThreads + this.weakenThreads;
+  }
+
+  /**
    * Execute as many of the scripts in the batch as possible on the given server.
    * @param {import(".").NS} ns
    * @param {MyServer} server - The MyServer object on which the scripts shall be executed.
