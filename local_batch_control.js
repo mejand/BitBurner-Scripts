@@ -275,15 +275,20 @@ export async function main(ns) {
          */
         let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
 
-        ns.tprint(
-          ns.sprintf(
-            "||Scripts Started | %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
-            dummy,
-            money,
-            security,
-            timeStampStart
-          )
+        /**
+         * The text that shall be displayed in the terminal in debug mode.
+         * @type {string}
+         */
+        let debugText = "        ";
+        debugText += ns.sprintf(
+          "||Scripts Started | %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+          dummy,
+          money,
+          security,
+          timeStampStart
         );
+
+        ns.tprint(debugText);
       }
 
       if (
