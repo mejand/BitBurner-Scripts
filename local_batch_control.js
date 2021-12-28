@@ -195,20 +195,19 @@ export async function main(ns) {
      * The time it takes to run the hack command.
      * @type {number}
      */
-    let hackTime = Math.ceil(ns.getHackTime(hostServer.hostname) / 200) * 200;
+    let hackTime = ns.getHackTime(hostServer.hostname);
 
     /**
      * The time it takes to run the grow command.
      * @type {number}
      */
-    let growTime = Math.ceil(ns.getGrowTime(hostServer.hostname) / 200) * 200;
+    let growTime = ns.getGrowTime(hostServer.hostname);
 
     /**
      * The time it takes to run the weaken command.
      * @type {number}
      */
-    let weakenTime =
-      Math.ceil(ns.getWeakenTime(hostServer.hostname) / 200) * 200;
+    let weakenTime = ns.getWeakenTime(hostServer.hostname);
 
     /**
      * The time that the complete hack, grow, weaken cycle takes to complete.
@@ -244,8 +243,12 @@ export async function main(ns) {
      */
     let hackDelay = Math.max(
       0,
-      weakenTime + weakenDelay - hackTime - scriptPadding
+      weakenTime + weakenDelay - hackTime - scriptPadding * 2
     );
+
+    // convert the delays to 200ms steps
+    hackDelay = Math.round(hackDelay / 200) * 200;
+    growDelay = Math.round(growDelay / 200) * 200;
 
     ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
     ns.print("growDelay = " + ns.tFormat(growDelay, true));
