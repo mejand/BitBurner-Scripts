@@ -54,6 +54,12 @@ export async function main(ns) {
    */
   var threadsMax = Math.floor(ns.getServerMaxRam(hostName) / scriptRam);
 
+  /**
+   * A dummy argument to allow multiple scripts of the same type to run at the same time.
+   * @type {string}
+   */
+  var dummy = 0;
+
   // copy the scripts to the host
   await ns.scp("hack.js", "home", hostName);
   await ns.scp("grow.js", "home", hostName);
@@ -120,6 +126,7 @@ export async function main(ns) {
      */
     let batchCount = Math.floor(threadsAvailable / batchThreads);
 
+    ns.print("dummy = " + dummy);
     ns.print("Money = " + targetServer.moneyAvailable / targetServer.moneyMax);
     ns.print(
       "Security = " + (targetServer.hackDifficulty - targetServer.minDifficulty)
@@ -191,22 +198,29 @@ export async function main(ns) {
 
     if (batchCount > 0) {
       if (hackThreads > 0) {
-        ns.run("hack.js", hackThreads, targetName, hackDelay);
+        ns.run("hack.js", hackThreads, targetName, hackDelay, dummy);
         threadsAvailable -= hackThreads;
       }
 
       if (growThreads > 0) {
-        ns.run("grow.js", growThreads, targetName, growDelay);
+        ns.run("grow.js", growThreads, targetName, growDelay, dummy);
         threadsAvailable -= growThreads;
       }
 
       if (weakenThreads > 0) {
-        ns.run("weaken.js", weakenThreads, targetName, weakenDelay);
+        ns.run("weaken.js", weakenThreads, targetName, weakenDelay, dummy);
         threadsAvailable -= weakenThreads;
       }
     }
 
     ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
+
+    // let the dummy run to the maximum available thread count and then reset it
+    if (dummy < threadsMax) {
+      dummy++;
+    } else {
+      dummy = 0;
+    }
 
     await ns.sleep(period);
   }
