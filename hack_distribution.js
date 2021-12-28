@@ -308,7 +308,7 @@ export class BatchHandler {
 /**
  * A batch of hack, grow and weaken scripts with defined delay times.
  */
-class Batch {
+export class Batch {
   /**
    * The amount of time in milliseconds that shall be maintained between batches.
    * @type {number}

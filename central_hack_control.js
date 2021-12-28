@@ -1,4 +1,4 @@
-import { BatchHandler } from "./hack_distribution.js";
+import { BatchHandler, Batch } from "./hack_distribution.js";
 
 /**
  * Handle the growing, weakening and hacking scripts from one central server.
@@ -34,6 +34,12 @@ export async function main(ns) {
    * @type {number}
    */
   var weakenRam = ns.getScriptRam("weaken.js", "home");
+
+  /**
+   * The amount of RAM needed to run any script.
+   * @type {number}
+   */
+  var ramPerScript = Math.max(hackRam, growRam, weakenRam);
 
   /**
    * The target server.
@@ -101,27 +107,25 @@ export async function main(ns) {
           ns,
           targetServer.hostname,
           server.hostname,
-          hackRam,
-          growRam,
-          weakenRam
+          ramPerScript
         )
       );
     }
 
     // loop through all handlers to update and execute their batches
     for (let handler of handlers) {
-      if (handler.useable) {
+      if (handler.hostServer.useable) {
         handler.update(ns);
         handler.execute(ns, batchCount);
-        batchCount += handler.batchCount;
+        batchCount += handler.batches.length;
         load += handler.load;
         cycleTime = Math.max(cycleTime, handler.batchTime);
         ns.print(
-          handler.hostServer.hostname +
+          handler.hostServer.name +
             ": " +
             ns.tFormat(handler.batchTime, true) +
             " + " +
-            handler.hostServer.maxRam +
+            handler.hostServer.ramAvailable +
             "GB " +
             handler.batchCount +
             " batches"
@@ -131,7 +135,8 @@ export async function main(ns) {
 
     ns.print("batchTime = " + ns.tFormat(cycleTime));
     ns.print(
-      "Time for batchCount = " + ns.tFormat(batchCount * 10 + 150, true)
+      "Time for batchCount = " +
+        ns.tFormat(batchCount * Batch.offsetPadding + 150, true)
     );
     ns.print(
       "load / handlers.length = " +
@@ -143,7 +148,7 @@ export async function main(ns) {
     );
 
     // add the number of batches and padding to the cycle time
-    cycleTime += batchCount * 10 + 50;
+    cycleTime += batchCount * Batch.offsetPadding + 50;
 
     // scale the load value by the number of hosts
     load = load / handlers.length;
