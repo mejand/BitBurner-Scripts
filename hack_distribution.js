@@ -406,7 +406,7 @@ export class Batch {
      * to maintain the needed distance to the prior batch.
      * @type {number}
      */
-    let offsetActual = offsetCount * Batch.offsetPadding;
+    let offsetActual = newCount * Batch.offsetPadding;
 
     this.hackDelay += offsetActual;
     this.growDelay += offsetActual;
