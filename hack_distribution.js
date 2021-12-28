@@ -3,6 +3,12 @@
  */
 export class BatchHandler {
   /**
+   * The amount of time in milliseconds that passes between the finish of hack,
+   * grow and weaken in a batch.
+   * @type {number}
+   */
+  static delayPadding = 10;
+  /**
    * Create an instance of the batch handler.
    * @param {import(".").NS} ns
    * @param {string} targetName - The name of the target server.
@@ -82,7 +88,7 @@ export class BatchHandler {
     this.growDelay = Math.max(
       0,
       this.hackTime - this.growTime + 1,
-      this.batchTime - this.growTime - 1 // the grow script must be delayed so it finishes shortly before weaken
+      this.batchTime - this.growTime - BatchHandler.delayPadding
     );
 
     /**
@@ -90,7 +96,10 @@ export class BatchHandler {
      * it finishes before the grow script.
      * @type {number}
      */
-    this.hackDelay = Math.max(0, this.batchTime - this.hackTime - 2);
+    this.hackDelay = Math.max(
+      0,
+      this.batchTime - this.hackTime - BatchHandler.delayPadding
+    );
 
     /**
      * The load of the host server after the scripts have been started in percent.
