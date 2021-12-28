@@ -258,9 +258,10 @@ export class BatchHandler {
   getGrowThreads(ns, hackThreads) {
     /**
      * The factor that the available money needs to be multiplied with to get the deltaMoney.
+     * Uses 1.1 as the base instead of 1.0 so there is a safety margin.
      * @type {number}
      */
-    var growFactor = 1 + hackThreads * ns.hackAnalyze(this.targetServer.name);
+    var growFactor = 1.1 + hackThreads * ns.hackAnalyze(this.targetServer.name);
 
     /**
      * The amount of threads needed to compensate the hack threads.
@@ -287,11 +288,13 @@ export class BatchHandler {
   getWeakenThreads(ns, hackThreads, growThreads) {
     /**
      * The security score that needs to be removed to compensate hacking and growing.
+     * Contains a safety margin of 1.
      * @type {number}
      */
     var deltaSecurity =
       ns.hackAnalyzeSecurity(hackThreads) +
-      ns.growthAnalyzeSecurity(growThreads);
+      ns.growthAnalyzeSecurity(growThreads) +
+      1;
 
     /**
      * The security score that will be removed by one thread of the weaken script.
