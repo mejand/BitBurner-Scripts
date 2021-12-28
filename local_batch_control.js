@@ -187,6 +187,7 @@ export async function main(ns) {
     ns.print("hackDelay = " + ns.tFormat(hackDelay));
     ns.print("growDelay = " + ns.tFormat(growDelay));
     ns.print("weakenDelay = " + ns.tFormat(weakenDelay));
+    ns.print("batchTime = " + ns.tFormat(batchTime));
 
     if (batchCount > 0) {
       if (hackThreads > 0) {
