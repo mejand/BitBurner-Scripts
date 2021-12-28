@@ -59,7 +59,7 @@ export async function main(ns) {
   // print the result to the terminal
   ns.tprint(
     ns.sprintf(
-      "||Hack Finished   | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+      "   ||Hack Finished   | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
       id,
       money,
       security,
