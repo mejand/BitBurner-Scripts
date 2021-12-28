@@ -185,7 +185,7 @@ export class BatchHandler {
         this.hostServer.threadsAvailable % fullBatchThreads;
 
       // create a batch to fill the reamining threads as best as possible
-      if (remainingThreads >= 3) {
+      if (fullBatchCount < 10 && remainingThreads >= 3) {
         /**
          * The factor by which the full batch has to be reduced to fill the remaining threads.
          * @type {number}
