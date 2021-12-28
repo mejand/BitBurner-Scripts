@@ -127,7 +127,7 @@ export async function main(ns) {
             " + " +
             handler.hostServer.ramAvailable +
             "GB " +
-            handler.batchCount +
+            handler.batches.length +
             " batches"
         );
       }
