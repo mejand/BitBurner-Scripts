@@ -40,6 +40,12 @@ export async function main(ns) {
   }
 
   /**
+   * The amount of time in milliseconds that shall pass between hack, grow and weaken finishing.
+   * @type {number}
+   */
+  var scriptPadding = 0;
+
+  /**
    * The time in milliseconds between batch creation.
    * @type {number}
    */
@@ -225,14 +231,20 @@ export async function main(ns) {
      * finishes second in the cycle.
      * @type {number}
      */
-    let growDelay = Math.max(0, weakenTime + weakenDelay - growTime - 500);
+    let growDelay = Math.max(
+      0,
+      weakenTime + weakenDelay - growTime - scriptPadding
+    );
 
     /**
      * The time that the hack command has to be delayed to ensure it
      * finishes third in the cycle.
      * @type {number}
      */
-    let hackDelay = Math.max(0, weakenTime + weakenDelay - hackTime - 1000);
+    let hackDelay = Math.max(
+      0,
+      weakenTime + weakenDelay - hackTime - scriptPadding
+    );
 
     ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
     ns.print("growDelay = " + ns.tFormat(growDelay, true));
