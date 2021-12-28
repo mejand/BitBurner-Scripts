@@ -252,11 +252,35 @@ export async function main(ns) {
     if (batchCount > 0) {
       if (debug) {
         /**
-         * The time at which weaken finished.
+         * The percentage of the maximum money currently on the target server.
+         * @type {number}
+         */
+        let money =
+          ns.getServerMoneyAvailable(targetName) /
+          ns.getServerMaxMoney(targetName);
+
+        /**
+         * The difference between current security and minimum security on the target server.
+         * @type {number}
+         */
+        let security =
+          ns.getServerRequiredHackingLevel(targetName) -
+          ns.getServerMinSecurityLevel(targetName);
+
+        /**
+         * The time at which scripts were started.
          * @type {string}
          */
         let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
-        ns.tprint("||Scripts Started | " + timeStampStart + " ||");
+
+        ns.tprint(
+          ns.sprintf(
+            "||Scripts Started | Money: %3.1f | Security: %3.1f | Time: %s ||",
+            money,
+            security,
+            timeStampStart
+          )
+        );
       }
 
       if (
