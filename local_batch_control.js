@@ -226,7 +226,7 @@ function getHackThreads(ns, targetServer) {
  * @param {number} hackThreads - The number of threads dedicated to hacking the target.
  * @returns {number} The number of threads needed to grow the target to max money.
  */
-function getGrowThreads(ns, targetName, hostServer, hackThreads) {
+function getGrowThreads(ns, targetServer, hostServer, hackThreads) {
   /**
    * The number of threads needed to grow the target to max money.
    * @type {number}
