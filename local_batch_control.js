@@ -218,19 +218,19 @@ export async function main(ns) {
        * The time it takes to run the hack command.
        * @type {number}
        */
-      let hackTime = ns.getHackTime(targetServer.hostname);
+      let hackTime = getTimeInRaster(ns.getHackTime(targetServer.hostname));
 
       /**
        * The time it takes to run the grow command.
        * @type {number}
        */
-      let growTime = ns.getGrowTime(targetServer.hostname);
+      let growTime = getTimeInRaster(ns.getGrowTime(targetServer.hostname));
 
       /**
        * The time it takes to run the weaken command.
        * @type {number}
        */
-      let weakenTime = ns.getWeakenTime(targetServer.hostname);
+      let weakenTime = getTimeInRaster(ns.getWeakenTime(targetServer.hostname));
 
       /**
        * The time that the complete hack, grow, weaken cycle takes to complete.
