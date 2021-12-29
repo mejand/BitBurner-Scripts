@@ -270,8 +270,8 @@ export async function main(ns) {
       );
 
       // convert the delays to 200ms steps
-      hackDelay = Math.round(hackDelay / 200) * 200;
-      growDelay = Math.round(growDelay / 200) * 200;
+      hackDelay = getTimeInRaster(hackDelay);
+      growDelay = getTimeInRaster(growDelay);
 
       ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
       ns.print("growDelay = " + ns.tFormat(growDelay, true));
@@ -442,4 +442,13 @@ function getWeakenThreads(
   count = Math.ceil(deltaSecurity / weakenReduction);
 
   return count + 1;
+}
+
+/**
+ * Convert a time in milliseconds to 200ms precision.
+ * @param {number} time - The time that shall be converted into 200ms steps.
+ * @returns {number} The input time converted into 200ms increments.
+ */
+function getTimeInRaster(time) {
+  return Math.ceil(time / 200) * 200;
 }
