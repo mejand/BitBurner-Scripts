@@ -18,10 +18,19 @@ export async function main(ns) {
   }
 
   /**
+   * The amount of time that shall be reserved between actions.
+   * @type {number}
+   */
+  var timePerAction = 400;
+
+  /**
    * The period between executions of the scripts control functions.
    * @type {number}
    */
-  var period = 2000;
+  var period = 4 * timePerAction;
+  /**
+   * There are 4 actions: hack, grow, weaken, control (this script)
+   */
 
   /**
    * The name of the hack script.
@@ -227,7 +236,7 @@ export async function main(ns) {
        * that it finishes at x seconds and 600ms.
        * @type {number}
        */
-      let weakenDelay = 1400 - (weakenTime % period);
+      let weakenDelay = 3 * timePerAction - (weakenTime % period);
 
       /**
        * The delay caan not be negative -> if the batch finishes too late it has to be
@@ -247,13 +256,13 @@ export async function main(ns) {
        * The point in time at which the grow script shall finish.
        * @type {number}
        */
-      let growEndTime = weakenEndTime - 400;
+      let growEndTime = weakenEndTime - timePerAction;
 
       /**
        * The point in time at which the hack script shall finish.
        * @type {number}
        */
-      let hackEndTime = weakenEndTime - 800;
+      let hackEndTime = weakenEndTime - 2 * timePerAction;
 
       ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
       ns.print("timeStamp =      " + timeStamp);
