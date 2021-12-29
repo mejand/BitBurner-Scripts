@@ -105,13 +105,14 @@ export async function main(ns) {
 
     switch (scriptType) {
       case 0:
-        predictedFinish = timeNow + ns.getHackTime(targetName);
+        predictedFinish = timeNow + getTimeInRaster(ns.getHackTime(targetName));
         break;
       case 1:
-        predictedFinish = timeNow + ns.getGrowTime(targetName);
+        predictedFinish = timeNow + getTimeInRaster(ns.getGrowTime(targetName));
         break;
       case 2:
-        predictedFinish = timeNow + ns.getWeakenTime(targetName);
+        predictedFinish =
+          timeNow + getTimeInRaster(ns.getWeakenTime(targetName));
         break;
       default:
         running = false;
@@ -169,4 +170,13 @@ export async function main(ns) {
 
   // print the result to the terminal
   ns.tprint(debugText);
+}
+
+/**
+ * Convert a time in milliseconds to 200ms precision.
+ * @param {number} time - The time that shall be converted into 200ms steps.
+ * @returns {number} The input time converted into 200ms increments.
+ */
+function getTimeInRaster(time) {
+  return Math.ceil(time / 200) * 200;
 }
