@@ -142,204 +142,223 @@ export async function main(ns) {
       }
 
       /**
-       * The server object of the target.
-       * @type {import(".").Server}
-       */
-      let targetServer = ns.getServer(targetName);
-
-      /**
-       * The server object of the host.
-       * @type {import(".").Server}
-       */
-      let hostServer = ns.getServer(hostName);
-
-      /**
-       * The amount of threads that are available for tasking on the host server.
-       *  @type {number}
-       */
-      let threadsAvailable = Math.floor(
-        (hostServer.maxRam - hostServer.ramUsed) / scriptRam
-      );
-
-      /**
-       * The number threads dedicated to hacking the target.
+       * The time stamp currently on the coordination port.
        * @type {number}
        */
-      let hackThreads = getHackThreads(ns, targetServer);
+      let portTime = ns.peek(2);
 
       /**
-       * The number of threads needed to grow the target to max money.
-       * @type {number}
+       * If another batch controller has already started a new batch
+       * it will have updated the time stamp of the port. If the time
+       * on the port is not up to date then no batch has been started yet.
        */
-      let growThreads = getGrowThreads(
-        ns,
-        targetServer,
-        hostServer,
-        hackThreads
-      );
+      if (portTime != timeStamp) {
+        /**
+         * The server object of the target.
+         * @type {import(".").Server}
+         */
+        let targetServer = ns.getServer(targetName);
 
-      /**
-       * The number of threads needed to reduce the target security to minimum.
-       * @type {number}
-       */
-      let weakenThreads = getWeakenThreads(
-        ns,
-        targetServer,
-        hostServer,
-        hackThreads,
-        growThreads
-      );
+        /**
+         * The server object of the host.
+         * @type {import(".").Server}
+         */
+        let hostServer = ns.getServer(hostName);
 
-      /**
-       * The number of threads it takes to run a full batch.
-       * @type {number}
-       */
-      let batchThreads = hackThreads + growThreads + weakenThreads;
+        /**
+         * The amount of threads that are available for tasking on the host server.
+         *  @type {number}
+         */
+        let threadsAvailable = Math.floor(
+          (hostServer.maxRam - hostServer.ramUsed) / scriptRam
+        );
 
-      /**
-       * The amount of batches that can be run on the host.
-       * @type {number}
-       */
-      let batchCount = Math.floor(threadsAvailable / batchThreads);
+        /**
+         * The number threads dedicated to hacking the target.
+         * @type {number}
+         */
+        let hackThreads = getHackThreads(ns, targetServer);
 
-      ns.print("dummy = " + dummy);
-      ns.print(
-        "Money = " + targetServer.moneyAvailable / targetServer.moneyMax
-      );
-      ns.print(
-        "Security = " +
-          (targetServer.hackDifficulty - targetServer.minDifficulty)
-      );
-      ns.print("hackThreads =      " + hackThreads);
-      ns.print("growThreads =      " + growThreads);
-      ns.print("weakenThreads =    " + weakenThreads);
-      ns.print("batchThreads =     " + batchThreads);
-      ns.print("threadsAvailable = " + threadsAvailable);
-      ns.print("batchCount =       " + batchCount);
+        /**
+         * The number of threads needed to grow the target to max money.
+         * @type {number}
+         */
+        let growThreads = getGrowThreads(
+          ns,
+          targetServer,
+          hostServer,
+          hackThreads
+        );
 
-      /**
-       * The time it takes to run the weaken command.
-       * @type {number}
-       */
-      let weakenDuration = getTimeInRaster(
-        ns.getWeakenTime(targetServer.hostname)
-      );
+        /**
+         * The number of threads needed to reduce the target security to minimum.
+         * @type {number}
+         */
+        let weakenThreads = getWeakenThreads(
+          ns,
+          targetServer,
+          hostServer,
+          hackThreads,
+          growThreads
+        );
 
-      /**
-       * The point in time at which the batch of scripts will finish, if started now.
-       * @type {number}
-       */
-      let weakenTime = timeStamp + weakenDuration;
+        /**
+         * The number of threads it takes to run a full batch.
+         * @type {number}
+         */
+        let batchThreads = hackThreads + growThreads + weakenThreads;
 
-      /**
-       * The time by which the start of the batch has to be delayed to ensure
-       * that it finishes at x seconds and 600ms.
-       * @type {number}
-       */
-      let weakenDelay = 3 * timePerAction - (weakenTime % period);
+        /**
+         * The amount of batches that can be run on the host.
+         * @type {number}
+         */
+        let batchCount = Math.floor(threadsAvailable / batchThreads);
 
-      /**
-       * The delay caan not be negative -> if the batch finishes too late it has to be
-       * shifted to the next second.
-       */
-      if (weakenDelay < 0) {
-        weakenDelay = period + weakenDelay;
-      }
+        ns.print("dummy = " + dummy);
+        ns.print(
+          "Money = " + targetServer.moneyAvailable / targetServer.moneyMax
+        );
+        ns.print(
+          "Security = " +
+            (targetServer.hackDifficulty - targetServer.minDifficulty)
+        );
+        ns.print("hackThreads =      " + hackThreads);
+        ns.print("growThreads =      " + growThreads);
+        ns.print("weakenThreads =    " + weakenThreads);
+        ns.print("batchThreads =     " + batchThreads);
+        ns.print("threadsAvailable = " + threadsAvailable);
+        ns.print("batchCount =       " + batchCount);
 
-      /**
-       * The point in time at which the weaken script shall finish.
-       * @type {number}
-       */
-      let weakenEndTime = timeStamp + weakenDelay + weakenDuration;
+        /**
+         * The time it takes to run the weaken command.
+         * @type {number}
+         */
+        let weakenDuration = getTimeInRaster(
+          ns.getWeakenTime(targetServer.hostname)
+        );
 
-      /**
-       * The point in time at which the grow script shall finish.
-       * @type {number}
-       */
-      let growEndTime = weakenEndTime - timePerAction;
+        /**
+         * The point in time at which the batch of scripts will finish, if started now.
+         * @type {number}
+         */
+        let weakenTime = timeStamp + weakenDuration;
 
-      /**
-       * The point in time at which the hack script shall finish.
-       * @type {number}
-       */
-      let hackEndTime = weakenEndTime - 2 * timePerAction;
+        /**
+         * The time by which the start of the batch has to be delayed to ensure
+         * that it finishes at x seconds and 600ms.
+         * @type {number}
+         */
+        let weakenDelay = 3 * timePerAction - (weakenTime % period);
 
-      ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
-      ns.print("timeStamp =      " + timeStamp);
-      ns.print("hackEndTime =    " + hackEndTime);
-      ns.print("growEndTime =    " + growEndTime);
-      ns.print("weakenEndTime =  " + weakenEndTime);
-
-      if (batchCount > 0) {
-        if (debug) {
-          /**
-           * The percentage of the maximum money currently on the target server.
-           * @type {number}
-           */
-          let money =
-            ns.getServerMoneyAvailable(targetName) /
-            ns.getServerMaxMoney(targetName);
-
-          /**
-           * The difference between current security and minimum security on the target server.
-           * @type {number}
-           */
-          let security =
-            ns.getServerSecurityLevel(targetName) -
-            ns.getServerMinSecurityLevel(targetName);
-
-          /**
-           * The time at which scripts were started.
-           * @type {string}
-           */
-          let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
-
-          /**
-           * The text that shall be displayed in the terminal in debug mode.
-           * @type {string}
-           */
-          let debugText = "      ";
-          debugText += ns.sprintf(
-            "||Scripts Started | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
-            dummy,
-            money,
-            security,
-            timeStampStart
-          );
-
-          ns.tprint(debugText);
+        /**
+         * The delay caan not be negative -> if the batch finishes too late it has to be
+         * shifted to the next second.
+         */
+        if (weakenDelay < 0) {
+          weakenDelay = period + weakenDelay;
         }
 
-        if (hackThreads > 0) {
-          ns.run(hackScript, hackThreads, targetName, hackEndTime, dummy, 0);
-          threadsAvailable -= hackThreads;
+        /**
+         * The point in time at which the weaken script shall finish.
+         * @type {number}
+         */
+        let weakenEndTime = timeStamp + weakenDelay + weakenDuration;
+
+        /**
+         * The point in time at which the grow script shall finish.
+         * @type {number}
+         */
+        let growEndTime = weakenEndTime - timePerAction;
+
+        /**
+         * The point in time at which the hack script shall finish.
+         * @type {number}
+         */
+        let hackEndTime = weakenEndTime - 2 * timePerAction;
+
+        ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
+        ns.print("timeStamp =      " + timeStamp);
+        ns.print("hackEndTime =    " + hackEndTime);
+        ns.print("growEndTime =    " + growEndTime);
+        ns.print("weakenEndTime =  " + weakenEndTime);
+
+        if (batchCount > 0) {
+          if (debug) {
+            /**
+             * The percentage of the maximum money currently on the target server.
+             * @type {number}
+             */
+            let money =
+              ns.getServerMoneyAvailable(targetName) /
+              ns.getServerMaxMoney(targetName);
+
+            /**
+             * The difference between current security and minimum security on the target server.
+             * @type {number}
+             */
+            let security =
+              ns.getServerSecurityLevel(targetName) -
+              ns.getServerMinSecurityLevel(targetName);
+
+            /**
+             * The time at which scripts were started.
+             * @type {string}
+             */
+            let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
+
+            /**
+             * The text that shall be displayed in the terminal in debug mode.
+             * @type {string}
+             */
+            let debugText = "      ";
+            debugText += ns.sprintf(
+              "||Scripts Started | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+              dummy,
+              money,
+              security,
+              timeStampStart
+            );
+
+            ns.tprint(debugText);
+          }
+
+          if (hackThreads > 0) {
+            ns.run(hackScript, hackThreads, targetName, hackEndTime, dummy, 0);
+            threadsAvailable -= hackThreads;
+          }
+
+          if (growThreads > 0) {
+            ns.run(growScript, growThreads, targetName, growEndTime, dummy, 1);
+            threadsAvailable -= growThreads;
+          }
+
+          if (weakenThreads > 0) {
+            ns.run(
+              weakenScript,
+              weakenThreads,
+              targetName,
+              weakenEndTime,
+              dummy,
+              2
+            );
+            threadsAvailable -= weakenThreads;
+          }
+
+          /**
+           * If a batch was started -> update the time stamp on the port
+           */
+          ns.clearPort(2);
+          ns.writePort(2, timeStamp);
         }
 
-        if (growThreads > 0) {
-          ns.run(growScript, growThreads, targetName, growEndTime, dummy, 1);
-          threadsAvailable -= growThreads;
+        ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
+
+        // let the dummy run to the maximum available thread count and then reset it
+        if (dummy < threadsMax) {
+          dummy++;
+        } else {
+          dummy = 0;
         }
-
-        if (weakenThreads > 0) {
-          ns.run(
-            weakenScript,
-            weakenThreads,
-            targetName,
-            weakenEndTime,
-            dummy,
-            2
-          );
-          threadsAvailable -= weakenThreads;
-        }
-      }
-
-      ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
-
-      // let the dummy run to the maximum available thread count and then reset it
-      if (dummy < threadsMax) {
-        dummy++;
-      } else {
-        dummy = 0;
       }
     }
 
