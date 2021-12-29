@@ -19,7 +19,7 @@ export async function main(ns) {
    * The period between executions of the scripts control functions.
    * @type {number}
    */
-  var period = 1000;
+  var period = 2000;
 
   /**
    * The name of the hack script.
@@ -199,12 +199,12 @@ export async function main(ns) {
         "Security = " +
           (targetServer.hackDifficulty - targetServer.minDifficulty)
       );
-      ns.print("hackThreads = " + hackThreads);
-      ns.print("growThreads = " + growThreads);
-      ns.print("weakenThreads = " + weakenThreads);
-      ns.print("batchThreads = " + batchThreads);
+      ns.print("hackThreads =      " + hackThreads);
+      ns.print("growThreads =      " + growThreads);
+      ns.print("weakenThreads =    " + weakenThreads);
+      ns.print("batchThreads =     " + batchThreads);
       ns.print("threadsAvailable = " + threadsAvailable);
-      ns.print("batchCount = " + batchCount);
+      ns.print("batchCount =       " + batchCount);
 
       /**
        * The time it takes to run the weaken command.
@@ -225,14 +225,14 @@ export async function main(ns) {
        * that it finishes at x seconds and 600ms.
        * @type {number}
        */
-      let weakenDelay = 600 - (weakenTime % period);
+      let weakenDelay = 1400 - (weakenTime % period);
 
       /**
        * The delay caan not be negative -> if the batch finishes too late it has to be
        * shifted to the next second.
        */
       if (weakenDelay < 0) {
-        weakenDelay = 1000 + weakenDelay;
+        weakenDelay = period + weakenDelay;
       }
 
       /**
@@ -245,19 +245,19 @@ export async function main(ns) {
        * The point in time at which the grow script shall finish.
        * @type {number}
        */
-      let growEndTime = weakenEndTime - 200;
+      let growEndTime = weakenEndTime - 400;
 
       /**
        * The point in time at which the hack script shall finish.
        * @type {number}
        */
-      let hackEndTime = weakenEndTime - 400;
+      let hackEndTime = weakenEndTime - 800;
 
       ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
-      ns.print("timeStamp = " + timeStamp);
-      ns.print("hackEndTime = " + hackEndTime);
-      ns.print("growEndTime = " + growEndTime);
-      ns.print("weakenEndTime = " + weakenEndTime);
+      ns.print("timeStamp =      " + timeStamp);
+      ns.print("hackEndTime =    " + hackEndTime);
+      ns.print("growEndTime =    " + growEndTime);
+      ns.print("weakenEndTime =  " + weakenEndTime);
 
       if (batchCount > 0) {
         if (debug) {
