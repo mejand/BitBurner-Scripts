@@ -218,65 +218,29 @@ export async function main(ns) {
        * The time it takes to run the hack command.
        * @type {number}
        */
-      let hackTime = getTimeInRaster(ns.getHackTime(targetServer.hostname));
+      let hackDuration = getTimeInRaster(ns.getHackTime(targetServer.hostname));
 
       /**
        * The time it takes to run the grow command.
        * @type {number}
        */
-      let growTime = getTimeInRaster(ns.getGrowTime(targetServer.hostname));
+      let growDuration = getTimeInRaster(ns.getGrowTime(targetServer.hostname));
 
       /**
        * The time it takes to run the weaken command.
        * @type {number}
        */
-      let weakenTime = getTimeInRaster(ns.getWeakenTime(targetServer.hostname));
+      let weakenDuration = getTimeInRaster(
+        ns.getWeakenTime(targetServer.hostname)
+      );
 
       /**
        * The time that the complete hack, grow, weaken cycle takes to complete.
        * @type {number}
        */
-      let batchTime = Math.max(hackTime, growTime, weakenTime);
+      let batchDuration = Math.max(hackDuration, growDuration, weakenDuration);
 
-      /**
-       * The time that the weaken command has to be delayed to ensure it
-       * finishes last in the cycle.
-       * @type {number}
-       */
-      let weakenDelay = Math.max(
-        0,
-        growTime - weakenTime + 1,
-        hackTime - weakenTime + 1
-      );
-
-      /**
-       * The time that the grow command has to be delayed to ensure it
-       * finishes second in the cycle.
-       * @type {number}
-       */
-      let growDelay = Math.max(
-        0,
-        weakenTime + weakenDelay - growTime - scriptPadding
-      );
-
-      /**
-       * The time that the hack command has to be delayed to ensure it
-       * finishes third in the cycle.
-       * @type {number}
-       */
-      let hackDelay = Math.max(
-        0,
-        weakenTime + weakenDelay - hackTime - scriptPadding * 2
-      );
-
-      // convert the delays to 200ms steps
-      hackDelay = getTimeInRaster(hackDelay);
-      growDelay = getTimeInRaster(growDelay);
-
-      ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
-      ns.print("growDelay = " + ns.tFormat(growDelay, true));
-      ns.print("weakenDelay = " + ns.tFormat(weakenDelay, true));
-      ns.print("batchTime = " + ns.tFormat(batchTime));
+      ns.print("batchTime = " + ns.tFormat(batchDuration));
 
       if (batchCount > 0) {
         if (debug) {
