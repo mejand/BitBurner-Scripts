@@ -240,7 +240,34 @@ export async function main(ns) {
        */
       let batchDuration = Math.max(hackDuration, growDuration, weakenDuration);
 
-      ns.print("batchTime = " + ns.tFormat(batchDuration));
+      /**
+       * The point in time at which the batch of scripts will finish, if started now.
+       * @type {number}
+       */
+      let batchTime = timeStamp + batchDuration;
+
+      /**
+       * The time by which the ending of the batch has to be delayed to ensure
+       * that it finishes at x seconds and 600ms.
+       * @type {number}
+       */
+      let weakenDelay = 600 - (batchTime % period);
+
+      /**
+       * The delay caan not be negative -> if the batch finishes too late it has to be
+       * shifted to the next second.
+       */
+      if (weakenDelay < 0) {
+        weakenDelay = 1000 - weakenDelay;
+      }
+
+      /**
+       * The point in time at which the weaken script must be started.
+       * @type {number}
+       */
+      let weakenStartTime = timeStamp + weakenDelay;
+
+      ns.print("batchDuration = " + ns.tFormat(batchDuration));
 
       if (batchCount > 0) {
         if (debug) {
@@ -293,7 +320,13 @@ export async function main(ns) {
         }
 
         if (weakenThreads > 0) {
-          ns.run(weakenScript, weakenThreads, targetName, weakenDelay, dummy);
+          ns.run(
+            weakenScript,
+            weakenThreads,
+            targetName,
+            weakenStartTime,
+            dummy
+          );
           threadsAvailable -= weakenThreads;
         }
       }
