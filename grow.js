@@ -1,7 +1,7 @@
 import { getTimeInRaster } from "./utilities.js";
 
 /**
- * Run a single hack operation and print the result for debugging.
+ * Run a single grow operation and print the result for debugging.
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
@@ -54,7 +54,7 @@ export async function main(ns) {
    * The time it takes for the main operation to finish.
    * @type {number}
    */
-  var runTime = getTimeInRaster(ns.getHackTime(targetName));
+  var runTime = getTimeInRaster(ns.getGrowTime(targetName));
 
   /**
    * Keep looping until the execution start time has arrived
@@ -84,7 +84,7 @@ export async function main(ns) {
       /**
        * Start the main operation.
        */
-      await ns.hack(targetName);
+      await ns.grow(targetName);
     } else if (predictedFinish > targetTime) {
       /**
        * Stop the script if the correct time was missed.
