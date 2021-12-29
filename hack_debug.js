@@ -13,12 +13,12 @@ export async function main(ns) {
   }
 
   /**
-   * The delay time before the operation starts.
+   * The time at which the script shall start its execution.
    * @type {number}
    */
-  var delay = 0;
+  var targetTime = 0;
   if (ns.args.length > 1 && typeof ns.args[1] == "number") {
-    delay = ns.args[1];
+    targetTime = ns.args[1];
   }
 
   /**
@@ -30,41 +30,64 @@ export async function main(ns) {
     id = ns.args[2];
   }
 
-  if (delay > 0) {
-    await ns.sleep(delay);
+  /**
+   * The script is waiting for the right time to start its operation.
+   * @type {boolean}
+   */
+  var running = true;
+
+  /**
+   * Keep looping until the execution start time has arrived
+   */
+  while (running) {
+    if (ns.getTimeSinceLastAug() >= targetTime) {
+      // stop the while loop
+      running = false;
+
+      // start the actual operation of the script
+      await ns.hack(targetName);
+
+      /**
+       * Print debug information
+       */
+
+      /**
+       * The time at which grow finished.
+       * @type {string}
+       */
+      let timeStampEnd = ns.tFormat(ns.getTimeSinceLastAug(), true);
+
+      /**
+       * The percentage of the maximum money currently on the target server.
+       * @type {number}
+       */
+      let money =
+        ns.getServerMoneyAvailable(targetName) /
+        ns.getServerMaxMoney(targetName);
+
+      /**
+       * The difference between current security and minimum security on the target server.
+       * @type {number}
+       */
+      let security =
+        ns.getServerSecurityLevel(targetName) -
+        ns.getServerMinSecurityLevel(targetName);
+
+      // print the result to the terminal
+      ns.tprint(
+        ns.sprintf(
+          "  ||Hack Finished   | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+          id,
+          money,
+          security,
+          timeStampEnd
+        )
+      );
+    } else {
+      /**
+       * If the time is not right yet wait for the next 200ms step
+       */
+      await ns.sleep(200);
+    }
   }
-
-  await ns.hack(targetName);
-
-  /**
-   * The time at which grow finished.
-   * @type {string}
-   */
-  var timeStampEnd = ns.tFormat(ns.getTimeSinceLastAug(), true);
-
-  /**
-   * The percentage of the maximum money currently on the target server.
-   * @type {number}
-   */
-  var money =
-    ns.getServerMoneyAvailable(targetName) / ns.getServerMaxMoney(targetName);
-
-  /**
-   * The difference between current security and minimum security on the target server.
-   * @type {number}
-   */
-  var security =
-    ns.getServerSecurityLevel(targetName) -
-    ns.getServerMinSecurityLevel(targetName);
-
-  // print the result to the terminal
-  ns.tprint(
-    ns.sprintf(
-      "  ||Hack Finished   | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
-      id,
-      money,
-      security,
-      timeStampEnd
-    )
-  );
 }
