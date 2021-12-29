@@ -3,6 +3,8 @@
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
+  ns.disableLog("ALL");
+
   /**
    * The name of the target server.
    * @type {string}
@@ -58,6 +60,13 @@ export async function main(ns) {
   var predictedFinish = 0;
 
   /**
+   * The time at which script execution is predicted to finish
+   * (not convetred to the 200ms raster).
+   * @type {number}
+   */
+  var predictedFinishRaw = 0;
+
+  /**
    * The current time.
    * @type {number}
    */
@@ -81,15 +90,34 @@ export async function main(ns) {
    */
   var securityEnd = 0;
 
+  /**
+   * The time it takes for the main operation to finish.
+   * @type {number}
+   */
+  var runTime = 0;
+
+  /**
+   * The time it takes for the main operation to finish
+   * (not convetred to the 200ms raster).
+   * @type {number}
+   */
+  var runTimeRaw = 0;
+
   switch (scriptType) {
     case 0:
       debugText = ns.sprintf("||Hack Finished   | ID: %3i |", id);
+      runTimeRaw = ns.getHackTime(targetName);
+      runTime = getTimeInRaster(runTimeRaw);
       break;
     case 1:
       debugText = ns.sprintf("||Grow Finished   | ID: %3i |", id);
+      runTimeRaw = ns.getGrowTime(targetName);
+      runTime = getTimeInRaster(runTimeRaw);
       break;
     case 2:
       debugText = ns.sprintf("||Weaken Finished | ID: %3i |", id);
+      runTimeRaw = ns.getWeakenTime(targetName);
+      runTime = getTimeInRaster(runTimeRaw);
       break;
     default:
       running = false;
@@ -97,31 +125,22 @@ export async function main(ns) {
       break;
   }
 
+  ns.print("Raw - 200ms = " + (runTimeRaw - runTime));
+
   /**
    * Keep looping until the execution start time has arrived
    */
   while (running) {
     timeNow = ns.getTimeSinceLastAug();
 
-    switch (scriptType) {
-      case 0:
-        predictedFinish = timeNow + getTimeInRaster(ns.getHackTime(targetName));
-        break;
-      case 1:
-        predictedFinish = timeNow + getTimeInRaster(ns.getGrowTime(targetName));
-        break;
-      case 2:
-        predictedFinish =
-          timeNow + getTimeInRaster(ns.getWeakenTime(targetName));
-        break;
-      default:
-        running = false;
-        break;
-    }
+    predictedFinish = timeNow + runTime;
+    predictedFinishRaw = timeNow + runTimeRaw;
 
     if (predictedFinish == targetTime) {
       // stop the while loop
       running = false;
+
+      ns.print("Started =         " + timeNow);
 
       switch (scriptType) {
         case 0:
@@ -136,6 +155,12 @@ export async function main(ns) {
         default:
           break;
       }
+
+      ns.print("Finished =        " + ns.getTimeSinceLastAug());
+      ns.print(
+        "Error Predicted = " + (predictedFinishRaw - ns.getTimeSinceLastAug())
+      );
+      ns.print("Error Real =      " + (targetTime - ns.getTimeSinceLastAug()));
 
       /**
        * Print debug information
@@ -154,6 +179,8 @@ export async function main(ns) {
       running = false;
       debugText += " Time Window Missed |";
     } else {
+      ns.print("Waiting =         " + timeNow);
+
       /**
        * If the time is not right yet wait for the next 200ms step
        */
@@ -178,5 +205,5 @@ export async function main(ns) {
  * @returns {number} The input time converted into 200ms increments.
  */
 function getTimeInRaster(time) {
-  return Math.ceil(time / 200) * 200;
+  return Math.floor(time / 200) * 200;
 }
