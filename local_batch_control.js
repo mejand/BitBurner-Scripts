@@ -119,7 +119,9 @@ export async function main(ns) {
   await ns.scp(growScript, "home", hostName);
   await ns.scp(weakenScript, "home", hostName);
 
-  ns.tail();
+  if (debug) {
+    ns.tail();
+  }
 
   while (running) {
     /**
