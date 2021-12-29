@@ -254,6 +254,7 @@ export async function main(ns) {
       let hackEndTime = weakenEndTime - 400;
 
       ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
+      ns.print("timeStamp = " + timeStamp);
       ns.print("hackEndTime = " + hackEndTime);
       ns.print("growEndTime = " + growEndTime);
       ns.print("weakenEndTime = " + weakenEndTime);
