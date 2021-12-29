@@ -235,23 +235,17 @@ export async function main(ns) {
       );
 
       /**
-       * The time that the complete hack, grow, weaken cycle takes to complete.
-       * @type {number}
-       */
-      let batchDuration = Math.max(hackDuration, growDuration, weakenDuration);
-
-      /**
        * The point in time at which the batch of scripts will finish, if started now.
        * @type {number}
        */
-      let batchTime = timeStamp + batchDuration;
+      let weakenTime = timeStamp + weakenDuration;
 
       /**
-       * The time by which the ending of the batch has to be delayed to ensure
+       * The time by which the start of the batch has to be delayed to ensure
        * that it finishes at x seconds and 600ms.
        * @type {number}
        */
-      let weakenDelay = 600 - (batchTime % period);
+      let weakenDelay = 600 - (weakenTime % period);
 
       /**
        * The delay caan not be negative -> if the batch finishes too late it has to be
@@ -267,7 +261,20 @@ export async function main(ns) {
        */
       let weakenStartTime = timeStamp + weakenDelay;
 
-      ns.print("batchDuration = " + ns.tFormat(batchDuration));
+      /**
+       * The time by which the start of the grow script has to be delayed to
+       * ensure that it finishes at x seconds and 400ms.
+       * @type {number}
+       */
+      let growDelay = weakenDelay + weakenDuration - growDuration - 200;
+
+      /**
+       * The point in time at which the grow script must be started.
+       * @type {number}
+       */
+      let growStartTime = timeStamp + growDuration;
+
+      ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
 
       if (batchCount > 0) {
         if (debug) {
@@ -315,7 +322,7 @@ export async function main(ns) {
         }
 
         if (growThreads > 0) {
-          ns.run(growScript, growThreads, targetName, growDelay, dummy);
+          ns.run(growScript, growThreads, targetName, growStartTime, dummy);
           threadsAvailable -= growThreads;
         }
 
