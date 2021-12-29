@@ -348,7 +348,7 @@ export async function main(ns) {
            * If a batch was started -> update the time stamp on the port
            */
           ns.clearPort(2);
-          ns.writePort(2, timeStamp);
+          await ns.writePort(2, timeStamp);
         }
 
         ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
