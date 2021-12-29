@@ -438,5 +438,13 @@ function getWeakenThreads(
  * @returns {number} The input time converted into 200ms increments.
  */
 function getTimeInRaster(time) {
+  /**
+   * Note: This method can cause a script to finish 200ms before
+   * the target time. This error seems to be random since the same
+   * execution time input can lead to both outcomes. Currently there
+   * appears to be no way around this and the accuracy of 400ms has to
+   * be accounted for in the controller script.
+   */
+
   return Math.ceil(time / 200) * 200;
 }
