@@ -64,6 +64,7 @@ export async function main(ns) {
     "weaken.js",
     "find_target.js",
     "hack_distribution.js",
+    "utilities.js",
   ];
 
   // download the necessary scripts from the git repository to get newest versions.
