@@ -272,7 +272,20 @@ export async function main(ns) {
        * The point in time at which the grow script must be started.
        * @type {number}
        */
-      let growStartTime = timeStamp + growDuration;
+      let growStartTime = timeStamp + growDelay;
+
+      /**
+       * The time by which the start of the hack script has to be delayed to
+       * ensure that it finishes at x seconds and 200ms.
+       * @type {number}
+       */
+      let hackDelay = weakenDelay + weakenDuration - hackDuration - 400;
+
+      /**
+       * The point in time at which the hack script must be started.
+       * @type {number}
+       */
+      let hackStartTime = timeStamp + hackDelay;
 
       ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
 
@@ -317,7 +330,7 @@ export async function main(ns) {
         }
 
         if (hackThreads > 0) {
-          ns.run(hackScript, hackThreads, targetName, hackDelay, dummy);
+          ns.run(hackScript, hackThreads, targetName, hackStartTime, dummy);
           threadsAvailable -= hackThreads;
         }
 
