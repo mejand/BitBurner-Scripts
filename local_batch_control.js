@@ -209,18 +209,6 @@ export async function main(ns) {
       ns.print("batchCount = " + batchCount);
 
       /**
-       * The time it takes to run the hack command.
-       * @type {number}
-       */
-      let hackDuration = getTimeInRaster(ns.getHackTime(targetServer.hostname));
-
-      /**
-       * The time it takes to run the grow command.
-       * @type {number}
-       */
-      let growDuration = getTimeInRaster(ns.getGrowTime(targetServer.hostname));
-
-      /**
        * The time it takes to run the weaken command.
        * @type {number}
        */
@@ -250,36 +238,22 @@ export async function main(ns) {
       }
 
       /**
-       * The point in time at which the weaken script must be started.
+       * The point in time at which the weaken script shall finish.
        * @type {number}
        */
-      let weakenStartTime = timeStamp + weakenDelay;
+      let weakenEndTime = timeStamp + weakenDelay + weakenDuration;
 
       /**
-       * The time by which the start of the grow script has to be delayed to
-       * ensure that it finishes at x seconds and 400ms.
+       * The point in time at which the grow script shall finish.
        * @type {number}
        */
-      let growDelay = weakenDelay + weakenDuration - growDuration - 200;
+      let growEndTime = weakenEndTime - 200;
 
       /**
-       * The point in time at which the grow script must be started.
+       * The point in time at which the hack script shall finish.
        * @type {number}
        */
-      let growStartTime = timeStamp + growDelay;
-
-      /**
-       * The time by which the start of the hack script has to be delayed to
-       * ensure that it finishes at x seconds and 200ms.
-       * @type {number}
-       */
-      let hackDelay = weakenDelay + weakenDuration - hackDuration - 400;
-
-      /**
-       * The point in time at which the hack script must be started.
-       * @type {number}
-       */
-      let hackStartTime = timeStamp + hackDelay;
+      let hackEndTime = weakenEndTime - 400;
 
       ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
 
@@ -324,12 +298,12 @@ export async function main(ns) {
         }
 
         if (hackThreads > 0) {
-          ns.run(hackScript, hackThreads, targetName, hackStartTime, dummy, 0);
+          ns.run(hackScript, hackThreads, targetName, hackEndTime, dummy, 0);
           threadsAvailable -= hackThreads;
         }
 
         if (growThreads > 0) {
-          ns.run(growScript, growThreads, targetName, growStartTime, dummy, 1);
+          ns.run(growScript, growThreads, targetName, growEndTime, dummy, 1);
           threadsAvailable -= growThreads;
         }
 
@@ -338,7 +312,7 @@ export async function main(ns) {
             weakenScript,
             weakenThreads,
             targetName,
-            weakenStartTime,
+            weakenEndTime,
             dummy,
             2
           );
