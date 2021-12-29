@@ -252,7 +252,7 @@ export async function main(ns) {
        * shifted to the next second.
        */
       if (weakenDelay < 0) {
-        weakenDelay = 1000 - weakenDelay;
+        weakenDelay = 1000 + weakenDelay;
       }
 
       /**
