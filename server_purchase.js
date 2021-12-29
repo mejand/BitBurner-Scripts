@@ -108,6 +108,10 @@ export async function main(ns) {
       await ns.scp("grow.js", "home", newServerName);
       await ns.scp("hack.js", "home", newServerName);
 
+      // copy the local controller to the new server and start it
+      await ns.scp("local_batch_control.js", "home", newServerName);
+      ns.exec("local_batch_control.js", newServerName, 1, false);
+
       // print the name for debugging purposes
       if (debug) {
         ns.tprint("bought " + newServerName + " - " + maxAffordableRam + "GB");
