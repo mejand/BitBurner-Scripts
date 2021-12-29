@@ -1,7 +1,7 @@
 import { getTimeInRaster } from "./utilities.js";
 
 /**
- * Run a single grow operation and print the result for debugging.
+ * Run a single grow operation at the specified time.
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
