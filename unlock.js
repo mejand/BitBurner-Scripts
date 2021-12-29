@@ -112,7 +112,7 @@ export async function main(ns) {
            * The names of all files on the server.
            * @type {string[]}
            */
-          let filesToCopy = ns.ls(server.hostname);
+          let filesToCopy = ns.ls(server.hostname, ".lit");
 
           if (filesToCopy) {
             for (let file of filesToCopy) {
