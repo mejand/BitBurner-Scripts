@@ -110,6 +110,7 @@ export async function main(ns) {
 
       // copy the local controller to the new server and start it
       await ns.scp("local_batch_control.js", "home", newServerName);
+      await ns.scp("utilities.js", "home", server.hostname);
       ns.exec("local_batch_control.js", newServerName, 1, false);
 
       // print the name for debugging purposes
