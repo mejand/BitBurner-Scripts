@@ -16,6 +16,12 @@ export async function main(ns) {
   }
 
   /**
+   * The period between executions of the scripts control functions.
+   * @type {number}
+   */
+  var period = 1000;
+
+  /**
    * The name of the hack script.
    * @type {string}
    */
@@ -109,14 +115,6 @@ export async function main(ns) {
   }
 
   while (running) {
-    // clean up the log
-    ns.clearLog();
-
-    // ensure the script only runs a certain number of times.
-    if (debug && dummy > 10) {
-      running = false;
-    }
-
     /**
      * The time since last Augmentation in milliseconds.
      * @type {number}
@@ -124,213 +122,229 @@ export async function main(ns) {
     let timeStamp = ns.getTimeSinceLastAug();
 
     /**
-     * The server object of the target.
-     * @type {import(".").Server}
+     * The script runs every 200ms, but the control functions are only excuted
+     * when the time stamp is a multiple of the period time.
      */
-    let targetServer = ns.getServer(targetName);
+    if (timeStamp % period === 0) {
+      // clean up the log
+      ns.clearLog();
 
-    /**
-     * The server object of the host.
-     * @type {import(".").Server}
-     */
-    let hostServer = ns.getServer(hostName);
-
-    /**
-     * The amount of threads that are available for tasking on the host server.
-     *  @type {number}
-     */
-    let threadsAvailable = Math.floor(
-      (hostServer.maxRam - hostServer.ramUsed) / scriptRam
-    );
-
-    /**
-     * The number threads dedicated to hacking the target.
-     * @type {number}
-     */
-    let hackThreads = getHackThreads(ns, targetServer);
-
-    /**
-     * The number of threads needed to grow the target to max money.
-     * @type {number}
-     */
-    let growThreads = getGrowThreads(ns, targetServer, hostServer, hackThreads);
-
-    /**
-     * The number of threads needed to reduce the target security to minimum.
-     * @type {number}
-     */
-    let weakenThreads = getWeakenThreads(
-      ns,
-      targetServer,
-      hostServer,
-      hackThreads,
-      growThreads
-    );
-
-    /**
-     * The number of threads it takes to run a full batch.
-     * @type {number}
-     */
-    let batchThreads = hackThreads + growThreads + weakenThreads;
-
-    /**
-     * The amount of batches that can be run on the host.
-     * @type {number}
-     */
-    let batchCount = Math.floor(threadsAvailable / batchThreads);
-
-    ns.print("dummy = " + dummy);
-    ns.print("Money = " + targetServer.moneyAvailable / targetServer.moneyMax);
-    ns.print(
-      "Security = " + (targetServer.hackDifficulty - targetServer.minDifficulty)
-    );
-    ns.print("hackThreads = " + hackThreads);
-    ns.print("growThreads = " + growThreads);
-    ns.print("weakenThreads = " + weakenThreads);
-    ns.print("batchThreads = " + batchThreads);
-    ns.print("threadsAvailable = " + threadsAvailable);
-    ns.print("batchCount = " + batchCount);
-
-    /**
-     * The time it takes to run the hack command.
-     * @type {number}
-     */
-    let hackTime = ns.getHackTime(targetServer.hostname);
-
-    /**
-     * The time it takes to run the grow command.
-     * @type {number}
-     */
-    let growTime = ns.getGrowTime(targetServer.hostname);
-
-    /**
-     * The time it takes to run the weaken command.
-     * @type {number}
-     */
-    let weakenTime = ns.getWeakenTime(targetServer.hostname);
-
-    /**
-     * The time that the complete hack, grow, weaken cycle takes to complete.
-     * @type {number}
-     */
-    let batchTime = Math.max(hackTime, growTime, weakenTime);
-
-    /**
-     * The time that the weaken command has to be delayed to ensure it
-     * finishes last in the cycle.
-     * @type {number}
-     */
-    let weakenDelay = Math.max(
-      0,
-      growTime - weakenTime + 1,
-      hackTime - weakenTime + 1
-    );
-
-    /**
-     * The time that the grow command has to be delayed to ensure it
-     * finishes second in the cycle.
-     * @type {number}
-     */
-    let growDelay = Math.max(
-      0,
-      weakenTime + weakenDelay - growTime - scriptPadding
-    );
-
-    /**
-     * The time that the hack command has to be delayed to ensure it
-     * finishes third in the cycle.
-     * @type {number}
-     */
-    let hackDelay = Math.max(
-      0,
-      weakenTime + weakenDelay - hackTime - scriptPadding * 2
-    );
-
-    // convert the delays to 200ms steps
-    hackDelay = Math.round(hackDelay / 200) * 200;
-    growDelay = Math.round(growDelay / 200) * 200;
-
-    ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
-    ns.print("growDelay = " + ns.tFormat(growDelay, true));
-    ns.print("weakenDelay = " + ns.tFormat(weakenDelay, true));
-    ns.print("batchTime = " + ns.tFormat(batchTime));
-
-    if (batchCount > 0) {
-      if (debug) {
-        /**
-         * The percentage of the maximum money currently on the target server.
-         * @type {number}
-         */
-        let money =
-          ns.getServerMoneyAvailable(targetName) /
-          ns.getServerMaxMoney(targetName);
-
-        /**
-         * The difference between current security and minimum security on the target server.
-         * @type {number}
-         */
-        let security =
-          ns.getServerSecurityLevel(targetName) -
-          ns.getServerMinSecurityLevel(targetName);
-
-        /**
-         * The time at which scripts were started.
-         * @type {string}
-         */
-        let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
-
-        /**
-         * The text that shall be displayed in the terminal in debug mode.
-         * @type {string}
-         */
-        let debugText = "        ";
-        debugText += ns.sprintf(
-          "||Scripts Started | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
-          dummy,
-          money,
-          security,
-          timeStampStart
-        );
-
-        ns.tprint(debugText);
+      // ensure the script only runs a certain number of times.
+      if (debug && dummy > 10) {
+        running = false;
       }
 
-      if (hackThreads > 0) {
-        ns.run(hackScript, hackThreads, targetName, hackDelay, dummy);
-        threadsAvailable -= hackThreads;
+      /**
+       * The server object of the target.
+       * @type {import(".").Server}
+       */
+      let targetServer = ns.getServer(targetName);
+
+      /**
+       * The server object of the host.
+       * @type {import(".").Server}
+       */
+      let hostServer = ns.getServer(hostName);
+
+      /**
+       * The amount of threads that are available for tasking on the host server.
+       *  @type {number}
+       */
+      let threadsAvailable = Math.floor(
+        (hostServer.maxRam - hostServer.ramUsed) / scriptRam
+      );
+
+      /**
+       * The number threads dedicated to hacking the target.
+       * @type {number}
+       */
+      let hackThreads = getHackThreads(ns, targetServer);
+
+      /**
+       * The number of threads needed to grow the target to max money.
+       * @type {number}
+       */
+      let growThreads = getGrowThreads(
+        ns,
+        targetServer,
+        hostServer,
+        hackThreads
+      );
+
+      /**
+       * The number of threads needed to reduce the target security to minimum.
+       * @type {number}
+       */
+      let weakenThreads = getWeakenThreads(
+        ns,
+        targetServer,
+        hostServer,
+        hackThreads,
+        growThreads
+      );
+
+      /**
+       * The number of threads it takes to run a full batch.
+       * @type {number}
+       */
+      let batchThreads = hackThreads + growThreads + weakenThreads;
+
+      /**
+       * The amount of batches that can be run on the host.
+       * @type {number}
+       */
+      let batchCount = Math.floor(threadsAvailable / batchThreads);
+
+      ns.print("dummy = " + dummy);
+      ns.print(
+        "Money = " + targetServer.moneyAvailable / targetServer.moneyMax
+      );
+      ns.print(
+        "Security = " +
+          (targetServer.hackDifficulty - targetServer.minDifficulty)
+      );
+      ns.print("hackThreads = " + hackThreads);
+      ns.print("growThreads = " + growThreads);
+      ns.print("weakenThreads = " + weakenThreads);
+      ns.print("batchThreads = " + batchThreads);
+      ns.print("threadsAvailable = " + threadsAvailable);
+      ns.print("batchCount = " + batchCount);
+
+      /**
+       * The time it takes to run the hack command.
+       * @type {number}
+       */
+      let hackTime = ns.getHackTime(targetServer.hostname);
+
+      /**
+       * The time it takes to run the grow command.
+       * @type {number}
+       */
+      let growTime = ns.getGrowTime(targetServer.hostname);
+
+      /**
+       * The time it takes to run the weaken command.
+       * @type {number}
+       */
+      let weakenTime = ns.getWeakenTime(targetServer.hostname);
+
+      /**
+       * The time that the complete hack, grow, weaken cycle takes to complete.
+       * @type {number}
+       */
+      let batchTime = Math.max(hackTime, growTime, weakenTime);
+
+      /**
+       * The time that the weaken command has to be delayed to ensure it
+       * finishes last in the cycle.
+       * @type {number}
+       */
+      let weakenDelay = Math.max(
+        0,
+        growTime - weakenTime + 1,
+        hackTime - weakenTime + 1
+      );
+
+      /**
+       * The time that the grow command has to be delayed to ensure it
+       * finishes second in the cycle.
+       * @type {number}
+       */
+      let growDelay = Math.max(
+        0,
+        weakenTime + weakenDelay - growTime - scriptPadding
+      );
+
+      /**
+       * The time that the hack command has to be delayed to ensure it
+       * finishes third in the cycle.
+       * @type {number}
+       */
+      let hackDelay = Math.max(
+        0,
+        weakenTime + weakenDelay - hackTime - scriptPadding * 2
+      );
+
+      // convert the delays to 200ms steps
+      hackDelay = Math.round(hackDelay / 200) * 200;
+      growDelay = Math.round(growDelay / 200) * 200;
+
+      ns.print("hackDelay = " + ns.tFormat(hackDelay, true));
+      ns.print("growDelay = " + ns.tFormat(growDelay, true));
+      ns.print("weakenDelay = " + ns.tFormat(weakenDelay, true));
+      ns.print("batchTime = " + ns.tFormat(batchTime));
+
+      if (batchCount > 0) {
+        if (debug) {
+          /**
+           * The percentage of the maximum money currently on the target server.
+           * @type {number}
+           */
+          let money =
+            ns.getServerMoneyAvailable(targetName) /
+            ns.getServerMaxMoney(targetName);
+
+          /**
+           * The difference between current security and minimum security on the target server.
+           * @type {number}
+           */
+          let security =
+            ns.getServerSecurityLevel(targetName) -
+            ns.getServerMinSecurityLevel(targetName);
+
+          /**
+           * The time at which scripts were started.
+           * @type {string}
+           */
+          let timeStampStart = ns.tFormat(ns.getTimeSinceLastAug(), true);
+
+          /**
+           * The text that shall be displayed in the terminal in debug mode.
+           * @type {string}
+           */
+          let debugText = "        ";
+          debugText += ns.sprintf(
+            "||Scripts Started | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
+            dummy,
+            money,
+            security,
+            timeStampStart
+          );
+
+          ns.tprint(debugText);
+        }
+
+        if (hackThreads > 0) {
+          ns.run(hackScript, hackThreads, targetName, hackDelay, dummy);
+          threadsAvailable -= hackThreads;
+        }
+
+        if (growThreads > 0) {
+          ns.run(growScript, growThreads, targetName, growDelay, dummy);
+          threadsAvailable -= growThreads;
+        }
+
+        if (weakenThreads > 0) {
+          ns.run(weakenScript, weakenThreads, targetName, weakenDelay, dummy);
+          threadsAvailable -= weakenThreads;
+        }
       }
 
-      if (growThreads > 0) {
-        ns.run(growScript, growThreads, targetName, growDelay, dummy);
-        threadsAvailable -= growThreads;
-      }
+      ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
 
-      if (weakenThreads > 0) {
-        ns.run(weakenScript, weakenThreads, targetName, weakenDelay, dummy);
-        threadsAvailable -= weakenThreads;
+      // let the dummy run to the maximum available thread count and then reset it
+      if (dummy < threadsMax) {
+        dummy++;
+      } else {
+        dummy = 0;
       }
     }
 
-    ns.print("load = " + (1.0 - threadsAvailable / threadsMax) * 100);
-
-    // let the dummy run to the maximum available thread count and then reset it
-    if (dummy < threadsMax) {
-      dummy++;
-    } else {
-      dummy = 0;
-    }
-
     /**
-     * The amount of time the script needs to sleep to ensure that
-     * it is executed on the full second. This is necessary to avoid
-     * scheduling colisions with the hack, grow and weaken scripts.
-     * @type {number}
+     * The script runs every 200ms, but the control functions are only excuted
+     * when the time stamp is a multiple of the period time.
      */
-    let sleepTime = 1000 - (timeStamp % 1000);
-
-    ns.print("sleepTime = " + sleepTime);
-
-    await ns.sleep(sleepTime);
+    await ns.sleep(200);
   }
 }
 
