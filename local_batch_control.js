@@ -1,3 +1,5 @@
+import { getTimeInRaster } from "./utilities.js";
+
 /**
  * Handle the growing, weakening and hacking scripts in batches on the local server.
  * @param {import(".").NS} ns
@@ -430,21 +432,4 @@ function getWeakenThreads(
   count = Math.ceil(deltaSecurity / weakenReduction);
 
   return count + 1;
-}
-
-/**
- * Convert a time in milliseconds to 200ms precision.
- * @param {number} time - The time that shall be converted into 200ms steps.
- * @returns {number} The input time converted into 200ms increments.
- */
-function getTimeInRaster(time) {
-  /**
-   * Note: This method can cause a script to finish 200ms before
-   * the target time. This error seems to be random since the same
-   * execution time input can lead to both outcomes. Currently there
-   * appears to be no way around this and the accuracy of 400ms has to
-   * be accounted for in the controller script.
-   */
-
-  return Math.ceil(time / 200) * 200;
 }
