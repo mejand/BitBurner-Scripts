@@ -83,10 +83,10 @@ export async function main(ns) {
 
   switch (scriptType) {
     case 0:
-      debugText = ns.sprintf("  ||Hack Finished   | ID: %3i |", id);
+      debugText = ns.sprintf("||Hack Finished   | ID: %3i |", id);
       break;
     case 1:
-      debugText = ns.sprintf("  ||Grow Finished   | ID: %3i |", id);
+      debugText = ns.sprintf("||Grow Finished   | ID: %3i |", id);
       break;
     case 2:
       debugText = ns.sprintf("||Weaken Finished | ID: %3i |", id);

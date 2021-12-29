@@ -108,9 +108,7 @@ export async function main(ns) {
   await ns.scp(growScript, "home", hostName);
   await ns.scp(weakenScript, "home", hostName);
 
-  if (!debug) {
-    ns.tail();
-  }
+  ns.tail();
 
   while (running) {
     /**
@@ -256,6 +254,9 @@ export async function main(ns) {
       let hackEndTime = weakenEndTime - 400;
 
       ns.print("weakenDuration = " + ns.tFormat(weakenDuration));
+      ns.print("hackEndTime = " + hackEndTime);
+      ns.print("growEndTime = " + growEndTime);
+      ns.print("weakenEndTime = " + weakenEndTime);
 
       if (batchCount > 0) {
         if (debug) {
@@ -285,7 +286,7 @@ export async function main(ns) {
            * The text that shall be displayed in the terminal in debug mode.
            * @type {string}
            */
-          let debugText = "        ";
+          let debugText = "      ";
           debugText += ns.sprintf(
             "||Scripts Started | ID: %3i | Money: %3.1f | Security: %3.1f | Time: %s ||",
             dummy,
