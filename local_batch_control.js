@@ -41,15 +41,9 @@ export async function main(ns) {
 
   if (debug) {
     hackScript = "hack_debug.js";
-    growScript = "grow_debug.js";
-    weakenScript = "weaken_debug.js";
+    growScript = "hack_debug.js";
+    weakenScript = "hack_debug.js";
   }
-
-  /**
-   * The amount of time in milliseconds that shall pass between hack, grow and weaken finishing.
-   * @type {number}
-   */
-  var scriptPadding = 200;
 
   /**
    * The name of the target server.
@@ -330,12 +324,12 @@ export async function main(ns) {
         }
 
         if (hackThreads > 0) {
-          ns.run(hackScript, hackThreads, targetName, hackStartTime, dummy);
+          ns.run(hackScript, hackThreads, targetName, hackStartTime, dummy, 0);
           threadsAvailable -= hackThreads;
         }
 
         if (growThreads > 0) {
-          ns.run(growScript, growThreads, targetName, growStartTime, dummy);
+          ns.run(growScript, growThreads, targetName, growStartTime, dummy, 1);
           threadsAvailable -= growThreads;
         }
 
@@ -345,7 +339,8 @@ export async function main(ns) {
             weakenThreads,
             targetName,
             weakenStartTime,
-            dummy
+            dummy,
+            2
           );
           threadsAvailable -= weakenThreads;
         }
