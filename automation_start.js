@@ -58,13 +58,12 @@ export async function main(ns) {
     "unlock.js",
     "hacknet.js",
     "server_purchase.js",
-    "central_hack_control.js",
+    "local_batch_control.js",
     "hack.js",
     "grow.js",
     "weaken.js",
-    "find_target.js",
-    "hack_distribution.js",
     "utilities.js",
+    "hack_debug.js",
   ];
 
   // download the necessary scripts from the git repository to get newest versions.
@@ -100,8 +99,8 @@ export async function main(ns) {
     await ns.sleep(wait_time);
 
     // start the centralized hacking control script
-    ns.run("central_hack_control.js", 1, true);
-    ns.tprint("#### Central Hack Control Started ####");
+    ns.run("local_batch_control.js", 1, false);
+    ns.tprint("#### Local Hack Control Started ####");
     await ns.sleep(wait_time);
   } else {
     ns.alert("Download of advanced scripts failed");
