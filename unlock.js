@@ -126,6 +126,10 @@ export async function main(ns) {
             await ns.scp("weaken.js", "home", server.hostname);
             await ns.scp("grow.js", "home", server.hostname);
             await ns.scp("hack.js", "home", server.hostname);
+
+            // copy the local control script and start it
+            await ns.scp("local_batch_control.js", "home", server.hostname);
+            ns.exec("local_batch_control.js", server.hostname, 1, false);
           }
         }
       }
