@@ -55,7 +55,11 @@ export async function main(ns) {
    * The name of the target server.
    * @type {string}
    */
-  var targetName = "n00dles";
+  var targetName = "iron-gym";
+
+  if (debug) {
+    targetName = "n00dles";
+  }
 
   /**
    * The name of the host server.
