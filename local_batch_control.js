@@ -182,7 +182,7 @@ export async function main(ns) {
 
         /** Decide if the controller should use Preparation or Farming Mode */
         if (
-          targetServer.moneyAvailable < moneyThreshold &&
+          targetServer.moneyAvailable < moneyThreshold ||
           targetServer.hackDifficulty > securityThreshold
         ) {
           /** Get the batch for Preparation Mode */
@@ -287,6 +287,11 @@ function getFarmingBatch(ns, targetServer, hostServer) {
   /** Calculate the number of threads needed to compensate the hack and grow actions */
   result.weakenThreads = Math.ceil(deltaSecurity / weakenReduction) + 1;
 
+  /** Print information to log screen */
+  ns.print("+++++++  Farming  +++++++");
+  ns.print("deltaSecurity = " + deltaSecurity);
+  ns.print("growFactor    = " + growFactor);
+
   return result;
 }
 
@@ -322,10 +327,8 @@ function getPreparationBatch(ns, targetServer, hostServer, threadsAvailable) {
   var deltaSecurity = targetServer.hackDifficulty - targetServer.minDifficulty;
 
   /** Calculate how many threads are needed to grow the target to max money */
-  result.growThreads = ns.growthAnalyze(
-    targetServer.hostname,
-    growFactor,
-    hostServer.cpuCores
+  result.growThreads = Math.ceil(
+    ns.growthAnalyze(targetServer.hostname, growFactor, hostServer.cpuCores)
   );
 
   /** Calculate the security impact of the grow operation */
@@ -341,6 +344,11 @@ function getPreparationBatch(ns, targetServer, hostServer, threadsAvailable) {
     result.growThreads,
     threadsAvailable - result.weakenThreads
   );
+
+  /** Print information to log screen */
+  ns.print("+++++++  Preparation  +++++++");
+  ns.print("deltaSecurity = " + deltaSecurity);
+  ns.print("growFactor    = " + growFactor);
 
   return result;
 }
