@@ -178,7 +178,7 @@ export async function main(ns) {
   }
 
   debugText += ns.sprintf(
-    " Money: %3.1f | Security: %3.1f | Time: %16i ||",
+    " Money: %3.1f | Security: %3.1f | Time: %16i ms ||",
     moneyEnd,
     securityEnd,
     timeStampEnd

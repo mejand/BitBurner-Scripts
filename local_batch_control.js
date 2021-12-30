@@ -142,17 +142,19 @@ export async function main(ns) {
   }
 
   while (running) {
+    /** Clean up the log */
+    ns.clearLog();
+    ns.print("#######  " + targetName + "  #######");
+
     /** Get the current time stamp */
     timeStamp = ns.getTimeSinceLastAug();
+    ns.print("timeStamp = " + timeStamp);
 
     /**
      * The script runs every 200ms, but the control functions are only excuted
      * when the time stamp is a multiple of the period time.
      */
     if (timeStamp % period === 0) {
-      /** Clean up the log */
-      ns.clearLog();
-
       /** Ensure the script only runs a certain number of times in debug mode */
       if (debug && dummy > 10) {
         running = false;
@@ -160,6 +162,7 @@ export async function main(ns) {
 
       /** Get the time stamp saved on the coordination port */
       portTime = ns.peek(2);
+      ns.print("portTime = " + portTime);
 
       /**
        * If another batch controller has already started a new batch
@@ -175,6 +178,7 @@ export async function main(ns) {
         threadsAvailable = Math.floor(
           (hostServer.maxRam - hostServer.ramUsed) / scriptRam
         );
+        ns.print("threadsAvailable = " + threadsAvailable);
 
         /** Decide if the controller should use Preparation or Farming Mode */
         if (
@@ -202,6 +206,8 @@ export async function main(ns) {
           timePerAction,
           targetServer
         );
+
+        ns.print(batch);
 
         if (batch.totalThreads <= threadsAvailable) {
           /** Execute the batch */
