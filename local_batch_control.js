@@ -608,3 +608,48 @@ function updateFinishTimes(ns, batch, timeNow, period, timePerAction) {
 
   batch.hackFinish = batch.weakenFinish - 2 * timePerAction;
 }
+
+/**
+ * Execute a batch.
+ * @param {import(".").NS} ns
+ * @param {Batch} batch - The batch that shall be executed.
+ * @param {number} dummy - A number used to make up a unique id for the scripts so
+ * they can run in parallel.
+ * @param {string} hackScript - The name of the hack script.
+ * @param {string} growScript - The name of the grow script.
+ * @param {string} weakenScript - The name of the weaken script.
+ */
+function executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript) {
+  if (batch.hackThreads > 0) {
+    ns.run(
+      hackScript,
+      batch.hackThreads,
+      batch.targetName,
+      batch.hackFinish,
+      dummy,
+      0
+    );
+  }
+
+  if (batch.growThreads > 0) {
+    ns.run(
+      growScript,
+      batch.growThreads,
+      batch.targetName,
+      batch.growFinish,
+      dummy,
+      1
+    );
+  }
+
+  if (batch.weakenThreads > 0) {
+    ns.run(
+      weakenScript,
+      batch.weakenThreads,
+      batch.targetName,
+      batch.weakenFinish,
+      dummy,
+      2
+    );
+  }
+}
