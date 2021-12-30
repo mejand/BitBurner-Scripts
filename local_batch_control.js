@@ -365,7 +365,7 @@ function updateFinishTimes(
    * The point in time at which the batch of scripts will finish, if started now.
    * @type {number}
    */
-  var weakenTime = timeStamp + weakenDuration;
+  var weakenTime = timeNow + weakenDuration;
   /**
    * The time by which the start of the batch has to be delayed to ensure
    * that it finishes at x seconds and 600ms.
