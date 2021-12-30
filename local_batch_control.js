@@ -56,7 +56,7 @@ export async function main(ns) {
    * The name of the target server.
    * @type {string}
    */
-  var targetName = "iron-gym";
+  var targetName = "n00dles";
   /**
    * The name of the host server.
    * @type {string}
@@ -129,11 +129,10 @@ export async function main(ns) {
    * The delta security below which controller switches to "Preparation Mode".
    * @type {number}
    */
-  var securityThreshold = targetServer.minDifficulty * 1.1;
+  var securityThreshold = targetServer.minDifficulty + 5;
 
   if (debug) {
-    /** Overwrite the target in debug mode and open the log window */
-    targetName = "n00dles";
+    /** Open the log window in debug mode */
     ns.tail();
     /** Use the debug hack script */
     hackScript = "hack_debug.js";
@@ -179,6 +178,11 @@ export async function main(ns) {
           (hostServer.maxRam - hostServer.ramUsed) / scriptRam
         );
         ns.print("threadsAvailable = " + threadsAvailable);
+
+        ns.print("moneyAvailable    = " + targetServer.moneyAvailable);
+        ns.print("moneyThreshold    = " + moneyThreshold);
+        ns.print("hackDifficulty    = " + targetServer.hackDifficulty);
+        ns.print("securityThreshold = " + securityThreshold);
 
         /** Decide if the controller should use Preparation or Farming Mode */
         if (
