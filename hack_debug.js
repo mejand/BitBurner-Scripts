@@ -1,3 +1,5 @@
+import { getTimeInRaster } from "./utilities.js";
+
 /**
  * Run a single hack, grow or weaken operation and print the result for debugging.
  * @param {import(".").NS } ns
@@ -13,7 +15,6 @@ export async function main(ns) {
   if (ns.args.length > 0 && typeof ns.args[0] == "string") {
     targetName = ns.args[0];
   }
-
   /**
    * The time at which the script shall finish its execution.
    * @type {number}
@@ -22,7 +23,6 @@ export async function main(ns) {
   if (ns.args.length > 1 && typeof ns.args[1] == "number") {
     targetTime = ns.args[1];
   }
-
   /**
    * The ID of the script instance.
    * @type {number}
@@ -31,7 +31,6 @@ export async function main(ns) {
   if (ns.args.length > 2 && typeof ns.args[2] == "number") {
     id = ns.args[2];
   }
-
   /**
    * The type of operation that shall be run: 0 = hack, 1 = grow, 2 = weaken.
    * @type {number}
@@ -40,62 +39,52 @@ export async function main(ns) {
   if (ns.args.length > 3 && typeof ns.args[3] == "number") {
     scriptType = ns.args[3];
   }
-
   /**
    * The script is waiting for the right time to start its operation.
    * @type {boolean}
    */
   var running = true;
-
   /**
    * The text that will be printed to the terminal after the script finishes.
    * @type {string}
    */
-  var debugText = "";
-
+  var debugText = "         ";
   /**
    * The time at which script execution is predicted to finish.
    * @type {number}
    */
   var predictedFinish = 0;
-
   /**
    * The time at which script execution is predicted to finish
    * (not convetred to the 200ms raster).
    * @type {number}
    */
   var predictedFinishRaw = 0;
-
   /**
    * The current time.
    * @type {number}
    */
   var timeNow = 0;
-
   /**
    * The time at which the operation finished.
    * @type {string}
    */
   var timeStampEnd = 0;
-
   /**
    * The percentage of the maximum money on the target server when the script finished.
    * @type {number}
    */
   var moneyEnd = 0;
-
   /**
    * The difference between current security and minimum security on the target server.
    * @type {number}
    */
   var securityEnd = 0;
-
   /**
    * The time it takes for the main operation to finish.
    * @type {number}
    */
   var runTime = 0;
-
   /**
    * The time it takes for the main operation to finish
    * (not convetred to the 200ms raster).
@@ -105,17 +94,17 @@ export async function main(ns) {
 
   switch (scriptType) {
     case 0:
-      debugText = ns.sprintf("||Hack Finished   | ID: %3i |", id);
+      debugText += ns.sprintf("||Hack Finished   | ID: %3i |", id);
       runTimeRaw = ns.getHackTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     case 1:
-      debugText = ns.sprintf("||Grow Finished   | ID: %3i |", id);
+      debugText += ns.sprintf("||Grow Finished   | ID: %3i |", id);
       runTimeRaw = ns.getGrowTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     case 2:
-      debugText = ns.sprintf("||Weaken Finished | ID: %3i |", id);
+      debugText += ns.sprintf("||Weaken Finished | ID: %3i |", id);
       runTimeRaw = ns.getWeakenTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
@@ -166,7 +155,7 @@ export async function main(ns) {
        * Print debug information
        */
 
-      timeStampEnd = ns.tFormat(ns.getTimeSinceLastAug(), true);
+      timeStampEnd = ns.getTimeSinceLastAug();
 
       moneyEnd =
         ns.getServerMoneyAvailable(targetName) /
@@ -189,7 +178,7 @@ export async function main(ns) {
   }
 
   debugText += ns.sprintf(
-    " Money: %3.1f | Security: %3.1f | Time: %s ||",
+    " Money: %3.1f | Security: %3.1f | Time: %16i ||",
     moneyEnd,
     securityEnd,
     timeStampEnd
@@ -197,21 +186,4 @@ export async function main(ns) {
 
   // print the result to the terminal
   ns.tprint(debugText);
-}
-
-/**
- * Convert a time in milliseconds to 200ms precision.
- * @param {number} time - The time that shall be converted into 200ms steps.
- * @returns {number} The input time converted into 200ms increments.
- */
-function getTimeInRaster(time) {
-  /**
-   * Note: This method can cause the script to finish 200ms before
-   * the target time. This error seems to be random since the same
-   * execution time input can lead to both outcomes. Currently there
-   * appears to be no way around this and the accuracy of 400ms has to
-   * be accounted for in the controller script.
-   */
-
-  return Math.ceil(time / 200) * 200;
 }

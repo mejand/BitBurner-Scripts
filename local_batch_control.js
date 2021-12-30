@@ -445,7 +445,7 @@ function printDebugToTerminal(ns, dummy, targetServer, timeNow) {
    * The text that shall be displayed in the terminal in debug mode.
    * @type {string}
    */
-  var debugText = "      ";
+  var debugText = "";
   /**
    * The relative amount of money available on the target server.
    * @type {number}
