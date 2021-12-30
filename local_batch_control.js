@@ -389,10 +389,11 @@ function updateFinishTimes(
   var weakenTime = timeNow + weakenDuration;
   /**
    * The time by which the start of the batch has to be delayed to ensure
-   * that it finishes at x seconds and 600ms.
+   * that it finishes at x seconds and 600ms. A safety margin of 1 period
+   * is included.
    * @type {number}
    */
-  var weakenDelay = 3 * timePerAction - (weakenTime % period);
+  var weakenDelay = 3 * timePerAction - (weakenTime % period) + period;
 
   /**
    * The delay caan not be negative -> if the batch finishes too late it has to be
