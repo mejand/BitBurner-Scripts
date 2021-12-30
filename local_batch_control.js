@@ -111,6 +111,22 @@ export async function main(ns) {
   var threadsAvailable = Math.floor(
     (hostServer.maxRam - hostServer.ramUsed) / scriptRam
   );
+  /**
+   * The batch that shall be exectued on the host server.
+   * @type {Batch}
+   */
+  var batch = new Batch(targetName);
+  /**
+   * The threshold of available money below which the controller switches
+   * to "Preparation Mode".
+   * @type {number}
+   */
+  var moneyThreshold = targetServer.moneyMax * 0.8;
+  /**
+   * The delta security below which controller switches to "Preparation Mode".
+   * @type {number}
+   */
+  var securityThreshold = targetServer.minDifficulty * 1.1;
 
   /** Clean up the log file */
   ns.disableLog("ALL");
@@ -137,7 +153,7 @@ export async function main(ns) {
       /** Clean up the log */
       ns.clearLog();
 
-      /** Ensure the script only runs a certain number of times */
+      /** Ensure the script only runs a certain number of times in debug mode */
       if (debug && dummy > 10) {
         running = false;
       }
@@ -151,13 +167,39 @@ export async function main(ns) {
        * on the port is not up to date then no batch has been started yet.
        */
       if (portTime != timeStamp) {
+        /** Get the current server objects to update the information */
         targetServer = ns.getServer(targetName);
         hostServer = ns.getServer(hostName);
+
+        /** Calculate the number of threads available for tasking */
         threadsAvailable = Math.floor(
           (hostServer.maxRam - hostServer.ramUsed) / scriptRam
         );
 
-        if (batchCount > 0) {
+        /** Decide if the controller should use Preparation or Farming Mode */
+        if (
+          targetServer.moneyAvailable < moneyThreshold &&
+          targetServer.hackDifficulty > securityThreshold
+        ) {
+          /** Get the batch for Preparation Mode */
+          batch = getPreparationBatch(
+            ns,
+            targetServer,
+            hostServer,
+            threadsAvailable
+          );
+        } else {
+          /** Get the batch for Farming Mode */
+          batch = getFarmingBatch(ns, targetServer, hostServer);
+        }
+
+        /** Update the finish times */
+        updateFinishTimes(ns, batch, timeStamp, period, timePerAction);
+
+        if (batch.totalThreads <= threadsAvailable) {
+          /** Execute the batch */
+          executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript);
+
           /** If a batch was started -> update the time stamp on the port */
           ns.clearPort(2);
           await ns.writePort(2, timeStamp);
