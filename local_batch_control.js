@@ -161,7 +161,7 @@ export async function main(ns) {
 
       /** Get the time stamp saved on the coordination port */
       portTime = ns.peek(2);
-      ns.print("portTime = " + portTime);
+      ns.print("portTime  = " + portTime);
 
       /**
        * If another batch controller has already started a new batch
@@ -177,7 +177,7 @@ export async function main(ns) {
         threadsAvailable = Math.floor(
           (hostServer.maxRam - hostServer.ramUsed) / scriptRam
         );
-        ns.print("threadsAvailable = " + threadsAvailable);
+        ns.print("threadsAvailable  = " + threadsAvailable);
 
         ns.print("moneyAvailable    = " + targetServer.moneyAvailable);
         ns.print("moneyThreshold    = " + moneyThreshold);
