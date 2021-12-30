@@ -74,20 +74,20 @@ export class Batch {
    * @param {import(".").NS} ns
    */
   print(ns) {
-    var text = "____________________________________________________\n";
+    var text = "##################################################\n";
     text += ns.sprintf(
-      "|| Threads | %10i | %10i | %10i ||\n",
+      "# Threads # %10i # %10i # %10i #\n",
       this.hackThreads,
       this.growThreads,
       this.weakenThreads
     );
     text += ns.sprintf(
-      "||  Time   | %10i | %10i | %10i ||\n",
+      "#  Time   # %10i # %10i # %10i #\n",
       this.hackTime,
       this.growTime,
       this.weakenTime
     );
-    text += "____________________________________________________";
+    text += "##################################################";
     ns.print(text);
   }
 }
