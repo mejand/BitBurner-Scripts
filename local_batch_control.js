@@ -194,7 +194,14 @@ export async function main(ns) {
         }
 
         /** Update the finish times */
-        updateFinishTimes(ns, batch, timeStamp, period, timePerAction);
+        updateFinishTimes(
+          ns,
+          batch,
+          timeStamp,
+          period,
+          timePerAction,
+          targetServer
+        );
 
         if (batch.totalThreads <= threadsAvailable) {
           /** Execute the batch */
@@ -339,8 +346,16 @@ function getPreparationBatch(ns, targetServer, hostServer, threadsAvailable) {
  * @param {number} timeNow - The current time stamp.
  * @param {number} period - The time between executions of the controller.
  * @param {number} timePerAction - The time that is reserved for each action.
+ * @param {import(".").Server} targetServer - The server that is targeted.
  */
-function updateFinishTimes(ns, batch, timeNow, period, timePerAction) {
+function updateFinishTimes(
+  ns,
+  batch,
+  timeNow,
+  period,
+  timePerAction,
+  targetServer
+) {
   /**
    * The time it takes to run the weaken command.
    * @type {number}
