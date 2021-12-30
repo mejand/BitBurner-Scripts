@@ -5,6 +5,9 @@ import { getTimeInRaster, Batch } from "./utilities.js";
  * @param {import(".").NS} ns
  */
 export async function main(ns) {
+  /** Clean up the log file */
+  ns.disableLog("ALL");
+
   /**
    * Enable debug actions.
    * @type {boolean}
@@ -128,9 +131,6 @@ export async function main(ns) {
    */
   var securityThreshold = targetServer.minDifficulty * 1.1;
 
-  /** Clean up the log file */
-  ns.disableLog("ALL");
-
   if (debug) {
     /** Overwrite the target in debug mode and open the log window */
     targetName = "n00dles";
@@ -142,19 +142,19 @@ export async function main(ns) {
   }
 
   while (running) {
-    /** Clean up the log */
-    ns.clearLog();
-    ns.print("#######  " + targetName + "  #######");
-
     /** Get the current time stamp */
     timeStamp = ns.getTimeSinceLastAug();
-    ns.print("timeStamp = " + timeStamp);
 
     /**
      * The script runs every 200ms, but the control functions are only excuted
      * when the time stamp is a multiple of the period time.
      */
     if (timeStamp % period === 0) {
+      /** Clean up the log */
+      ns.clearLog();
+      ns.print("#######  " + targetName + "  #######");
+      ns.print("timeStamp = " + timeStamp);
+
       /** Ensure the script only runs a certain number of times in debug mode */
       if (debug && dummy > 10) {
         running = false;
