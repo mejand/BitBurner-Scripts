@@ -200,6 +200,11 @@ export async function main(ns) {
           /** Execute the batch */
           executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript);
 
+          /** Print a statement to the terminal */
+          if (debug) {
+            printDebugToTerminal(ns, dummy, targetServer, timeStamp);
+          }
+
           /** If a batch was started -> update the time stamp on the port */
           ns.clearPort(2);
           await ns.writePort(2, timeStamp);
@@ -409,4 +414,38 @@ function executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript) {
       2
     );
   }
+}
+
+/**
+ * Print information to the terminal for debugging.
+ * @param {import(".").NS} ns
+ * @param {number} dummy - The ID of the started batch.
+ * @param {import(".").Server} targetServer - The server object of the target.
+ * @param {number} timeNow - The current time stamp.
+ */
+function printDebugToTerminal(ns, dummy, targetServer, timeNow) {
+  /**
+   * The text that shall be displayed in the terminal in debug mode.
+   * @type {string}
+   */
+  var debugText = "      ";
+  /**
+   * The relative amount of money available on the target server.
+   * @type {number}
+   */
+  var money = targetServer.moneyAvailable / targetServer.moneyMax;
+  /**
+   * The difference between current and minimum security on the target.
+   * @type {number}
+   */
+  var security = targetServer.hackDifficulty - targetServer.minDifficulty;
+
+  /** Create the bulk of the text */
+  debugText += ns.sprintf("||Scripts Started | ID: %3i |", dummy);
+  debugText += ns.sprintf(" Money: %3.1f |", money * 100);
+  debugText += ns.sprintf(" Security: %3.1f |", security);
+  debugText += ns.sprintf(" Time: %16i ms ||", timeNow);
+
+  /** Print the finished text to the terminal */
+  ns.tprint(debugText);
 }
