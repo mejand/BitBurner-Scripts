@@ -262,8 +262,7 @@ function getFarmingBatch(ns, targetServer, hostServer) {
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
    */
-  var growFactor =
-    1.0 / (1.0 - result.hackThreads * ns.hackAnalyze(targetServer.hostname));
+  var growFactor = 1.0;
   /**
    * The security score that will be removed by one thread of the weaken script.
    * @type {number}
@@ -278,6 +277,10 @@ function getFarmingBatch(ns, targetServer, hostServer) {
   /** Calculate the hack threads needed to steal half the money on the target server */
   result.hackThreads =
     Math.floor(0.5 / ns.hackAnalyze(targetServer.hostname)) + 1;
+
+  /** Calculate the percentage the target needs to be grown to compensate the hacking */
+  growFactor =
+    1.0 / (1.0 - result.hackThreads * ns.hackAnalyze(targetServer.hostname));
 
   /** Calculate the number of threads needed to compensate the stolen money */
   result.growThreads = Math.ceil(
