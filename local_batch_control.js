@@ -481,8 +481,8 @@ function printDebugToTerminal(ns, dummy, targetServer, timeNow) {
 
   /** Create the bulk of the text */
   debugText += ns.sprintf("||Scripts Started | ID: %3i |", dummy);
-  debugText += ns.sprintf(" Money: %3.1d |", money * 100);
-  debugText += ns.sprintf(" Security: %3.1d |", security);
+  debugText += ns.sprintf(" Money: %3.1f |", money * 100);
+  debugText += ns.sprintf(" Security: %3.1f |", security);
   debugText += ns.sprintf(" Time: %16i ms ||", timeNow);
 
   /** Print the finished text to the terminal */
