@@ -1,4 +1,4 @@
-import { getTimeInRaster } from "./utilities.js";
+import { getTimeInRaster, logPrintVar } from "./utilities.js";
 
 /**
  * Run a single hack, grow or weaken operation and print the result for debugging.
@@ -114,7 +114,7 @@ export async function main(ns) {
       break;
   }
 
-  ns.print("Raw - 200ms = " + (runTimeRaw - runTime));
+  logPrintVar(ns, "Runtime Error", runTimeRaw - runTime);
 
   /**
    * Keep looping until the execution start time has arrived
@@ -129,7 +129,7 @@ export async function main(ns) {
       // stop the while loop
       running = false;
 
-      ns.print("Started =         " + timeNow);
+      logPrintVar(ns, "Started", timeNow);
 
       switch (scriptType) {
         case 0:
@@ -145,17 +145,12 @@ export async function main(ns) {
           break;
       }
 
-      ns.print("Finished =        " + ns.getTimeSinceLastAug());
-      ns.print(
-        "Error Predicted = " + (predictedFinishRaw - ns.getTimeSinceLastAug())
-      );
-      ns.print("Error Real =      " + (targetTime - ns.getTimeSinceLastAug()));
-
-      /**
-       * Print debug information
-       */
-
+      /** Print debug information */
       timeStampEnd = ns.getTimeSinceLastAug();
+
+      logPrintVar(ns, "Finished", timeStampEnd);
+      logPrintVar(ns, "Error Predicted", predictedFinishRaw - timeStampEnd);
+      logPrintVar(ns, "Error Real", targetTime - timeStampEnd);
 
       moneyEnd =
         ns.getServerMoneyAvailable(targetName) /
@@ -168,11 +163,9 @@ export async function main(ns) {
       running = false;
       debugText += " Time Window Missed |";
     } else {
-      ns.print("Waiting =         " + timeNow);
+      logPrintVar(ns, "Waiting", timeNow);
 
-      /**
-       * If the time is not right yet wait for the next 200ms step
-       */
+      /** If the time is not right yet wait for the next 200ms step */
       await ns.sleep(200);
     }
   }
@@ -184,6 +177,6 @@ export async function main(ns) {
     timeStampEnd
   );
 
-  // print the result to the terminal
+  /** print the result to the terminal */
   ns.tprint(debugText);
 }

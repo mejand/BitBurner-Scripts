@@ -91,3 +91,34 @@ export class Batch {
     ns.print(text);
   }
 }
+
+/**
+ * Print a named variable to the log window with a unified format.
+ * @param {import(".").NS} ns
+ * @param {string} varName - The name of the variable.
+ * @param {any} varValue - The value of the variable.
+ */
+export function logPrintVar(ns, varName, varValue) {
+  /**
+   * The text that will be printed to the debug log.
+   * @type {string}
+   */
+  var text = "# ";
+
+  /** Add the name of the variable to the left */
+  text += ns.sprintf("%-21s =", varName);
+
+  /** Add the value in the appropriate formatting */
+  if (typeof varValue == "string") {
+    text += ns.sprintf("= %21s", varValue);
+  } else if (typeof varValue == "number") {
+    text += ns.sprintf("= %21d", varValue);
+  } else {
+    text += "=    Format Not Defined";
+  }
+
+  /** Add a # to the end to complete the look */
+  text += " #";
+
+  ns.print(text);
+}
