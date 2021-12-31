@@ -139,10 +139,11 @@ export async function main(ns) {
 
       /** Print debug information */
       debugText.time = ns.getTimeSinceLastAug();
+      debugText.timeError = targetTime - debugText.time;
 
       logPrintVar(ns, "Finished", debugText.time);
       logPrintVar(ns, "Error Predicted", predictedFinishRaw - debugText.time);
-      logPrintVar(ns, "Error Real", targetTime - debugText.time);
+      logPrintVar(ns, "Error Real", debugText.timeError);
 
       debugText.money =
         (ns.getServerMoneyAvailable(targetName) /
