@@ -135,16 +135,18 @@ export function tPrintHeader(ns) {
   var text = "||    Action    |";
   /**
    * The amount of sapces that must be filled in to align the text with other scripts.
-   * The maximum script name length is assumed to be 20 characters.
+   * The maximum script name length is assumed to be 25 characters. The debug string
+   * itself is 75 characters long.
    * @type {number}
    */
-  var padding = Math.max(20 - ns.getScriptName().length, 0);
+  var padding = 100 - ns.getScriptName().length;
 
-  text.padStart(padding);
-
+  text += "||    Action    |";
   text += "   ID   | Money | Sec ";
   text += "|   Time   | Time Err ";
   text += "|   Error   ||";
+
+  text.padStart(padding);
 
   ns.tprint(text);
 }
@@ -208,12 +210,11 @@ export function tPrintScript(ns, actionText) {
   var text = "|| ";
   /**
    * The amount of sapces that must be filled in to align the text with other scripts.
-   * The maximum script name length is assumed to be 20 characters.
+   * The maximum script name length is assumed to be 25 characters. The debug string
+   * itself is 75 characters long.
    * @type {number}
    */
-  var padding = Math.max(20 - ns.getScriptName().length, 0);
-
-  text.padStart(padding);
+  var padding = 100 - ns.getScriptName().length;
 
   text += ns.sprintf("%12s | ", actionText.action);
   text += ns.sprintf("%6i | ", actionText.id);
@@ -222,6 +223,8 @@ export function tPrintScript(ns, actionText) {
   text += ns.sprintf("%8i | ", actionText.time);
   text += ns.sprintf("%+7d | ", actionText.timeError);
   text += ns.sprintf("%9s ||", actionText.error);
+
+  text.padStart(padding);
 
   ns.tprint(text);
 }
