@@ -112,7 +112,7 @@ export function logPrintVar(ns, varName, varValue) {
   if (typeof varValue == "string") {
     text += ns.sprintf("= %21s", varValue);
   } else if (typeof varValue == "number") {
-    text += ns.sprintf("= %21d", varValue);
+    text += ns.sprintf("= %21.2f", varValue);
   } else {
     text += "=    Format Not Defined";
   }
