@@ -17,7 +17,7 @@ export class MyServer {
      * The server object provided by the game.
      * @type {import("..").Server}
      */
-    var server = ns.getServer(name);
+    this.server = ns.getServer(name);
     /**
      * The name ot the server.
      * @type {string}
@@ -107,7 +107,7 @@ export class MyServer {
      * The server object provided by the game.
      * @type {import("..").NS}
      */
-    var server = ns.getServer(this.name);
+    this.server = ns.getServer(this.name);
     this.ramAvailable = server.ramMax - server.ramUsed;
     this.threadsAvailable = Math.floor(this.ramAvailable / this.scriptRam);
     this.threadsMax = Math.floor(server.ramMax / this.scriptRam);

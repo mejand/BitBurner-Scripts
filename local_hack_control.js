@@ -1,5 +1,10 @@
 import { logPrintVar } from "./utilities/log.js";
-import { getFarmingBatch, getPreparationBatch } from "./utilities/batch.js";
+import {
+  Batch,
+  getFarmingBatch,
+  getPreparationBatch,
+} from "./utilities/batch.js";
+import { MyServer } from "./utilities/server.js";
 
 /**
  * Handle a single batch at a time on the local host server.
@@ -21,93 +26,108 @@ export async function main(ns) {
    */
   var hostName = ns.getHostname();
   /**
-   * The server object of the target.
-   * @type {import(".").Server}
+   * The name of the hack script used in this controller.
+   * @type {string}
    */
-  var target = ns.getServer(targetName);
+  var hackScript = "/bots/singleHack.js";
   /**
-   * The server object of the host the script is running on.
-   * @type {import(".").Server}
+   * The name of the grow script used in this controller.
+   * @type {string}
    */
-  var host = ns.getServer(hostName);
+  var growScript = "/bots/singleGrow.js";
   /**
-   * The amount of ram available on the host server.
+   * The name of the hack script used in this controller.
+   * @type {string}
+   */
+  var weakenScript = "/bots/singleWeaken.js";
+  /**
+   * The RAM needed to run the hack script.
    * @type {number}
    */
-  var availableRam = host.maxRam - host.ramUsed;
-  var hackThreads = 1;
-  var growThreads = 0;
-  var weakenThreads = 0;
-  var hackRam = ns.getScriptRam("dummyHack.js", hostName);
-  var growRam = ns.getScriptRam("dummyGrow.js", hostName);
-  var weakenRam = ns.getScriptRam("dummyWeaken.js", hostName);
-  var id = 0;
+  var hackRam = ns.getScriptRam(hackScript, hostName);
+  /**
+   * The RAM needed to run the grow script.
+   * @type {number}
+   */
+  var growRam = ns.getScriptRam(growScript, hostName);
+  /**
+   * The RAM needed to run the weaken script.
+   * @type {number}
+   */
+  var weakenRam = ns.getScriptRam(weakenScript, hostName);
+  /**
+   * The RAM needed to run any of the bot scripts.
+   * @type {number}
+   */
+  var scriptRam = Math.max(hackRam, growRam, weakenRam);
+  /**
+   * The server object of the target.
+   * @type {MyServer}
+   */
+  var target = new MyServer(ns, targetName, scriptRam);
+  /**
+   * The server object of the host the script is running on.
+   * @type {MyServer}
+   */
+  var host = new MyServer(ns, hostName, scriptRam);
+  /**
+   * The time in milliseconds the script shall wait before attempting
+   * to start the next batch.
+   * @type {number}
+   */
   var sleepTime = 150;
+  /**
+   * The batch object that will be started by this cotnroler.
+   * @type {Batch}
+   */
+  var batch = null;
 
+  /** Open the log window */
   ns.tail();
 
   while (true) {
     ns.clearLog();
     /** Update the server objects */
-    target = ns.getServer(targetName);
-    host = ns.getServer(hostName);
+    target.update(ns);
+    host.update(ns);
 
+    /** Reset the sleep time to ensure there are no unecessary wait times */
     sleepTime = 150;
 
-    logPrintVar(ns, "Money", (target.moneyAvailable / target.moneyMax) * 100);
-    logPrintVar(
-      ns,
-      "Delta Security",
-      target.hackDifficulty - target.minDifficulty
-    );
-
-    let ramAvailable = host.maxRam - host.ramUsed;
-    let batch = null;
-    if (
-      target.moneyAvailable < target.moneyMax * 0.8 ||
-      target.hackDifficulty - target.minDifficulty > 1
-    ) {
-      batch = getPreparationBatch(ns, target, host, ramAvailable / 2);
-    } else {
+    if (target.farming) {
       batch = getFarmingBatch(ns, target, host);
+    } else {
+      batch = getPreparationBatch(
+        ns,
+        target.server,
+        host.server,
+        host.threadsAvailable
+      );
     }
-    let ramNeeded =
-      batch.hackThreads * hackRam +
-      batch.growThreads +
-      growRam +
-      batch.weakenThreads * weakenRam;
 
-    logPrintVar(ns, "Hack Threads", batch.hackThreads);
-    logPrintVar(ns, "Grow Threads", batch.growThreads);
-    logPrintVar(ns, "Weaken Threads", batch.weakenThreads);
-    logPrintVar(ns, "RAM Available", ramAvailable);
-    logPrintVar(ns, "RAM Needed", ramNeeded);
-    logPrintVar(
-      ns,
-      "MoneyGain",
-      ns.getScriptIncome(ns.getScriptName(), host.hostname, ns.args[0])
-    );
-
-    if (ramNeeded < ramAvailable) {
+    /** Start the batch if there are enough threads available */
+    if (batch.totalThreads <= host.threadsAvailable) {
       if (batch.hackThreads > 0) {
-        ns.run("dummyHack.js", batch.hackThreads, target.hostname, id);
+        ns.run(hackScript, batch.hackThreads, target.name);
       }
       if (batch.growThreads > 0) {
-        ns.run("dummyGrow.js", batch.growThreads, target.hostname, id);
+        ns.run(growScript, batch.growThreads, target.name);
       }
       if (batch.weakenThreads > 0) {
-        ns.run("dummyWeaken.js", batch.weakenThreads, target.hostname, id);
+        ns.run(weakenScript, batch.weakenThreads, target.name);
       }
 
-      id++;
-
-      if (id > 10000) {
-        id = 0;
-      }
-
+      /** Wait until the batch is finished to start the next patch.
+       * If no patch could be started the script will try again after 200ms.
+       */
       sleepTime = ns.getWeakenTime(target.hostname) + 400;
-      logPrintVar(ns, "Sleep Time", sleepTime);
     }
+
+    /** Print information to the log window */
+    logPrintVar(ns, "Money on Target", target.moneyPercent);
+    logPrintVar(ns, "Load on Host", host.load);
+    logPrintVar(ns, "Sleep Time", sleepTime);
+    batch.print(ns);
 
     await ns.sleep(sleepTime);
   }
