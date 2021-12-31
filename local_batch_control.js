@@ -297,16 +297,21 @@ function getFarmingBatch(ns, targetServer, hostServer) {
     1.0 / (1.0 - result.hackThreads * ns.hackAnalyze(targetServer.hostname));
 
   /** Calculate the number of threads needed to compensate the stolen money */
-  result.growThreads = Math.ceil(
-    ns.growthAnalyze(targetServer.hostname, growFactor, hostServer.cpuCores)
+  result.growThreads = ns.growthAnalyze(
+    targetServer.hostname,
+    growFactor,
+    hostServer.cpuCores
   );
+
+  /** Convert growth threads to integer and add safety margin */
+  result.growthThreads = Math.ceil(result.growthThreads * 1.1);
 
   /** Add the security impact of hack and grow */
   deltaSecurity += ns.hackAnalyzeSecurity(result.hackThreads);
   deltaSecurity += ns.growthAnalyzeSecurity(result.growThreads);
 
   /** Calculate the number of threads needed to compensate the hack and grow actions */
-  result.weakenThreads = Math.ceil(deltaSecurity / weakenReduction) + 1;
+  result.weakenThreads = Math.ceil((deltaSecurity / weakenReduction) * 1.1);
 
   /** Print information to log window */
   logPrintVar(ns, "Mode", "Farming");
