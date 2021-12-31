@@ -164,12 +164,6 @@ export async function main(ns) {
      * when the time stamp is a multiple of the period time.
      */
     if (timeStamp % period === 0) {
-      /** Clean up the log */
-      ns.clearLog();
-      logPrintVar(ns, "#####################", "#####################");
-      logPrintVar(ns, "Target Name", targetName);
-      logPrintVar(ns, "Time", timeStamp);
-
       /** Ensure the script only runs a certain number of times in debug mode */
       if (debug && scriptId > 50) {
         running = false;
@@ -177,7 +171,6 @@ export async function main(ns) {
 
       /** Get the time stamp saved on the coordination port */
       portTime = ns.peek(2);
-      logPrintVar(ns, "Port Time", portTime);
 
       /**
        * If another batch controller has already started a new batch
@@ -185,6 +178,13 @@ export async function main(ns) {
        * on the port is not up to date then no batch has been started yet.
        */
       if (portTime != timeStamp) {
+        /** Clean up the log */
+        ns.clearLog();
+        logPrintVar(ns, "#####################", "#####################");
+        logPrintVar(ns, "Target Name", targetName);
+        logPrintVar(ns, "Time", timeStamp);
+        logPrintVar(ns, "Port Time", portTime);
+
         /** Get the current server objects to update the information */
         targetServer = ns.getServer(targetName);
         hostServer = ns.getServer(hostName);
