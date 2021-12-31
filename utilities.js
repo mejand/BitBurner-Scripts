@@ -135,6 +135,7 @@ export function tPrintHeader(ns) {
   var text = "||    Action    |";
   /**
    * The amount of sapces that must be filled in to align the text with other scripts.
+   * The maximum script name length is assumed to be 20 characters.
    * @type {number}
    */
   var padding = Math.max(20 - ns.getScriptName().length, 0);
@@ -207,6 +208,7 @@ export function tPrintScript(ns, actionText) {
   var text = "|| ";
   /**
    * The amount of sapces that must be filled in to align the text with other scripts.
+   * The maximum script name length is assumed to be 20 characters.
    * @type {number}
    */
   var padding = Math.max(20 - ns.getScriptName().length, 0);
