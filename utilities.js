@@ -83,9 +83,9 @@ export class Batch {
     );
     text += ns.sprintf(
       "# Time    # %10i # %10i # %10i #\n",
-      this.hackTime,
-      this.growTime,
-      this.weakenTime
+      this.hackFinish,
+      this.growFinish,
+      this.weakenFinish
     );
     text += "##################################################";
     ns.print(text);
