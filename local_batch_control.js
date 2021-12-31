@@ -161,6 +161,7 @@ export async function main(ns) {
     if (timeStamp % period === 0) {
       /** Clean up the log */
       ns.clearLog();
+      logPrintVar(ns, "#####################", "#####################");
       logPrintVar(ns, "Target Name", targetName);
       logPrintVar(ns, "Time", timeStamp);
 

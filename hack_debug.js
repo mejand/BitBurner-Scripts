@@ -84,17 +84,17 @@ export async function main(ns) {
 
   switch (scriptType) {
     case 0:
-      debugText.action = "Hack Fnshd";
+      debugText.action = "Hack";
       runTimeRaw = ns.getHackTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     case 1:
-      debugText.action = "Grow Fnshd";
+      debugText.action = "Grow";
       runTimeRaw = ns.getGrowTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     case 2:
-      debugText.action = "Weaken Fnshd";
+      debugText.action = "Weaken";
       runTimeRaw = ns.getWeakenTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
@@ -106,7 +106,8 @@ export async function main(ns) {
 
   debugText.id = id;
 
-  logPrintVar(ns, "Runtime Error", runTimeRaw - runTime);
+  logPrintVar(ns, "Runtime Delta", runTimeRaw - runTime);
+  logPrintVar(ns, "Target Time", targetTime);
 
   /**
    * Keep looping until the execution start time has arrived
@@ -117,11 +118,14 @@ export async function main(ns) {
     predictedFinish = timeNow + runTime;
     predictedFinishRaw = timeNow + runTimeRaw;
 
+    logPrintVar(ns, "Time Now", timeNow);
+    logPrintVar(ns, "Predicted Finish", predictedFinish);
+
     if (predictedFinish == targetTime) {
       // stop the while loop
       running = false;
 
-      logPrintVar(ns, "Started", timeNow);
+      logPrintVar(ns, "Started", "-");
 
       switch (scriptType) {
         case 0:
@@ -137,27 +141,45 @@ export async function main(ns) {
           break;
       }
 
-      /** Print debug information */
+      /** Update Debug Text */
       debugText.time = ns.getTimeSinceLastAug();
       debugText.timeError = targetTime - debugText.time;
-
-      logPrintVar(ns, "Finished", debugText.time);
-      logPrintVar(ns, "Error Predicted", predictedFinishRaw - debugText.time);
-      logPrintVar(ns, "Error Real", debugText.timeError);
-
       debugText.money =
         (ns.getServerMoneyAvailable(targetName) /
           ns.getServerMaxMoney(targetName)) *
         100;
-
       debugText.security =
         ns.getServerSecurityLevel(targetName) -
         ns.getServerMinSecurityLevel(targetName);
+
+      /** Print debug information */
+      logPrintVar(ns, "Finished", debugText.time);
+      logPrintVar(ns, "Error Predicted", predictedFinishRaw - debugText.time);
+      logPrintVar(ns, "Error Real", debugText.timeError);
     } else if (predictedFinish > targetTime) {
       running = false;
+
+      /** Update Debug Text */
+      debugText.time = timeNow;
+      debugText.timeError = targetTime - debugText.time;
+      debugText.money =
+        (ns.getServerMoneyAvailable(targetName) /
+          ns.getServerMaxMoney(targetName)) *
+        100;
+      debugText.security =
+        ns.getServerSecurityLevel(targetName) -
+        ns.getServerMinSecurityLevel(targetName);
       debugText.error = "Time Miss";
+
+      /** Print debug information */
+      logPrintVar(ns, "Aborted", "-");
+      logPrintVar(ns, "Error Predicted", predictedFinishRaw - debugText.time);
+      logPrintVar(ns, "Error Real", debugText.timeError);
+
+      /** Open the log window */
+      ns.tail();
     } else {
-      logPrintVar(ns, "Waiting", timeNow);
+      logPrintVar(ns, "Waiting", "-");
 
       /** If the time is not right yet wait for the next 200ms step */
       await ns.sleep(200);
