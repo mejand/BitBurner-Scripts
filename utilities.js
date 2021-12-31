@@ -133,6 +133,13 @@ export function tPrintHeader(ns) {
    * @type {string}
    */
   var text = "||    Action    |";
+  /**
+   * The amount of sapces that must be filled in to align the text with other scripts.
+   * @type {number}
+   */
+  var padding = Math.max(20 - ns.getScriptName().length, 0);
+
+  text.padStart(padding);
 
   text += "   ID   | Money | Sec ";
   text += "|   Time   | Time Err ";
@@ -198,6 +205,13 @@ export function tPrintScript(ns, actionText) {
    * @type {string}
    */
   var text = "|| ";
+  /**
+   * The amount of sapces that must be filled in to align the text with other scripts.
+   * @type {number}
+   */
+  var padding = Math.max(20 - ns.getScriptName().length, 0);
+
+  text.padStart(padding);
 
   text += ns.sprintf("%12s | ", actionText.action);
   text += ns.sprintf("%6i | ", actionText.id);
