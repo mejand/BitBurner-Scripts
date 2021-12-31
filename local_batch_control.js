@@ -63,7 +63,7 @@ export async function main(ns) {
    * The name of the target server.
    * @type {string}
    */
-  var targetName = "n00dles";
+  var targetName = "iron-gym";
   /**
    * The name of the host server.
    * @type {string}
@@ -301,8 +301,7 @@ function getFarmingBatch(ns, targetServer, hostServer) {
   var deltaSecurity = targetServer.hackDifficulty - targetServer.minDifficulty;
 
   /** Calculate the hack threads needed to steal half the money on the target server */
-  result.hackThreads =
-    Math.floor(0.5 / ns.hackAnalyze(targetServer.hostname)) + 1;
+  result.hackThreads = Math.floor(0.5 / ns.hackAnalyze(targetServer.hostname));
 
   /** Calculate the percentage the target needs to be grown to compensate the hacking */
   growFactor =
@@ -316,14 +315,14 @@ function getFarmingBatch(ns, targetServer, hostServer) {
   );
 
   /** Convert growth threads to integer and add safety margin */
-  result.growthThreads = Math.ceil(result.growthThreads * 1.1);
+  result.growThreads = Math.ceil(result.growThreads * 1.2);
 
   /** Add the security impact of hack and grow */
   deltaSecurity += ns.hackAnalyzeSecurity(result.hackThreads);
   deltaSecurity += ns.growthAnalyzeSecurity(result.growThreads);
 
   /** Calculate the number of threads needed to compensate the hack and grow actions */
-  result.weakenThreads = Math.ceil((deltaSecurity / weakenReduction) * 1.1);
+  result.weakenThreads = Math.ceil((deltaSecurity / weakenReduction) * 1.3);
 
   /** Print information to log window */
   logPrintVar(ns, "Mode", "Farming");
