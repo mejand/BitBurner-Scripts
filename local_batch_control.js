@@ -432,6 +432,8 @@ function updateFinishTimes(
   batch.growFinish = batch.weakenFinish - timePerAction;
 
   batch.hackFinish = batch.weakenFinish - 2 * timePerAction;
+
+  logPrintVar(ns, "Execution Time", weakenTime);
 }
 
 /**
