@@ -15,7 +15,7 @@ export class MyServer {
   constructor(ns, name, scriptRam = 2, moneyFactor = 0.9, securityOffset = 1) {
     /**
      * The server object provided by the game.
-     * @type {import("..").NS}
+     * @type {import("..").Server}
      */
     var server = ns.getServer(name);
     /**
@@ -91,6 +91,11 @@ export class MyServer {
     this.farming =
       this.moneyPercent < this.moneyFactor ||
       this.deltaSecurity > this.securityOffset;
+    /**
+     * The number of CPU cores available on the server.
+     * @type {number}
+     */
+    this.cores = server.cpuCores;
   }
 
   /**
@@ -115,5 +120,6 @@ export class MyServer {
     this.farming =
       this.moneyPercent < this.moneyFactor ||
       this.deltaSecurity > this.securityOffset;
+    this.cores = server.cpuCores;
   }
 }
