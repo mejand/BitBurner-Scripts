@@ -1,11 +1,8 @@
-import {
-  logPrintVar,
-  getFarmingBatch,
-  getPreparationBatch,
-} from "./utilities.js";
+import { logPrintVar } from "./utilities/log.js";
+import { getFarmingBatch, getPreparationBatch } from "./utilities/batch.js";
 
 /**
- * Handle grow, weaken and hack scripts on the same host as the control script.
+ * Handle a single batch at a time on the local host server.
  * @param {import(".").NS } ns
  */
 export async function main(ns) {
