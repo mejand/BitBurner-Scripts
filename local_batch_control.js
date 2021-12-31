@@ -484,7 +484,7 @@ function printDebugToTerminal(ns, dummy, targetServer, timeNow) {
   var debugText = new ActionText();
 
   debugText.action = "Controller";
-  debugText.money = targetServer.moneyAvailable / targetServer.moneyMax;
+  debugText.money = (targetServer.moneyAvailable / targetServer.moneyMax) * 100;
   debugText.security = targetServer.hackDifficulty - targetServer.minDifficulty;
   debugText.id = dummy;
   debugText.time = timeNow;
