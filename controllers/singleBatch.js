@@ -1,14 +1,14 @@
-import { logPrintVar } from "./utilities/log.js";
+import { logPrintVar } from "../utilities/log.js";
 import {
   Batch,
   getFarmingBatch,
   getPreparationBatch,
-} from "./utilities/batch.js";
-import { MyServer } from "./utilities/server.js";
+} from "../utilities/batch.js";
+import { MyServer } from "../utilities/server.js";
 
 /**
  * Handle a single batch at a time on the local host server.
- * @param {import(".").NS } ns
+ * @param {import("..").NS } ns
  */
 export async function main(ns) {
   ns.disableLog("ALL");
