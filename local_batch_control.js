@@ -249,9 +249,12 @@ export async function main(ns) {
 
     /**
      * The script runs every 200ms, but the control functions are only excuted
-     * when the time stamp is a multiple of the period time.
+     * when the time stamp is a multiple of the period time. It seems that the
+     * script is only consistently executed every 200ms if the sleep time is set to
+     * less than 200ms. If it is set to 200ms the script is sometimes only executed
+     * after 400ms.
      */
-    await ns.sleep(200);
+    await ns.sleep(150);
   }
 }
 

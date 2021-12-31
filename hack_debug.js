@@ -182,7 +182,7 @@ export async function main(ns) {
       logPrintVar(ns, "Waiting", "-");
 
       /** If the time is not right yet wait for the next 200ms step */
-      await ns.sleep(200);
+      await ns.sleep(150);
     }
   }
 
