@@ -148,6 +148,11 @@ export async function main(ns) {
     hackScript = "hack_debug.js";
     growScript = "hack_debug.js";
     weakenScript = "hack_debug.js";
+    /** Re-calculate the script ram usage */
+    hackRam = ns.getScriptRam(hackScript, hostName);
+    growRam = ns.getScriptRam(growScript, hostName);
+    weakenRam = ns.getScriptRam(weakenScript, hostName);
+    scriptRam = Math.max(hackRam, growRam, weakenRam);
   }
 
   while (running) {
