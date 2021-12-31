@@ -124,6 +124,31 @@ export function logPrintVar(ns, varName, varValue) {
 }
 
 /**
+ * Print a named variable to the log window with a unified format.
+ * @param {import(".").NS} ns
+ * @param {string} varName - The name of the variable.
+ * @param {number} varValue - The value of the variable.
+ */
+export function logPrintFloat(ns, varName, varValue) {
+  /**
+   * The text that will be printed to the debug log.
+   * @type {string}
+   */
+  var text = "# ";
+
+  /** Add the name of the variable to the left */
+  text += ns.sprintf("%-21s =", varName);
+
+  /** Add the value in the appropriate formatting */
+  text += ns.sprintf("= %21.6f", varValue);
+
+  /** Add a # to the end to complete the look */
+  text += " #";
+
+  ns.print(text);
+}
+
+/**
  * Print a header to the terminal to display script executions.
  * @param {import(".").NS} ns
  */
