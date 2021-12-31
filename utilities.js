@@ -74,7 +74,7 @@ export class Batch {
    * @param {import(".").NS} ns
    */
   print(ns) {
-    var text = "##################################################\n";
+    var text = "############## Hack ####### Grow ###### Weaken ###\n";
     text += ns.sprintf(
       "# Threads # %10i # %10i # %10i #\n",
       this.hackThreads,
@@ -82,7 +82,7 @@ export class Batch {
       this.weakenThreads
     );
     text += ns.sprintf(
-      "#  Time   # %10i # %10i # %10i #\n",
+      "# Time    # %10i # %10i # %10i #\n",
       this.hackTime,
       this.growTime,
       this.weakenTime
