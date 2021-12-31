@@ -146,9 +146,7 @@ export function tPrintHeader(ns) {
   text += "|   Time   | Time Err ";
   text += "|   Error   ||";
 
-  text.padStart(padding);
-
-  ns.tprint(text);
+  ns.tprint(text.padStart(padding));
 }
 
 /**
@@ -224,7 +222,5 @@ export function tPrintScript(ns, actionText) {
   text += ns.sprintf("%+7d | ", actionText.timeError);
   text += ns.sprintf("%9s ||", actionText.error);
 
-  text.padStart(padding);
-
-  ns.tprint(text);
+  ns.tprint(text.padStart(padding));
 }
