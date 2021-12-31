@@ -213,7 +213,7 @@ export function tPrintScript(ns, actionText) {
    */
   var padding = 100 - ns.getScriptName().length;
 
-  text += ns.sprintf("%12s | ", actionText.action);
+  text += ns.sprintf("%-12s | ", actionText.action);
   text += ns.sprintf("%6i | ", actionText.id);
   text += ns.sprintf("%3d ", actionText.money) + "% | ";
   text += ns.sprintf("%3d | ", actionText.security);
