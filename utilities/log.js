@@ -1,6 +1,6 @@
 /**
  * Print a named variable to the log window with a unified format.
- * @param {import(".").NS} ns
+ * @param {import("..").NS} ns
  * @param {string} varName - The name of the variable.
  * @param {any} varValue - The value of the variable.
  */
@@ -31,7 +31,7 @@ export function logPrintVar(ns, varName, varValue) {
 
 /**
  * Print a named variable to the log window with a unified format.
- * @param {import(".").NS} ns
+ * @param {import("..").NS} ns
  * @param {string} varName - The name of the variable.
  * @param {number} varValue - The value of the variable.
  */
@@ -56,7 +56,7 @@ export function logPrintFloat(ns, varName, varValue) {
 
 /**
  * Print a header to the terminal to display script executions.
- * @param {import(".").NS} ns
+ * @param {import("..").NS} ns
  */
 export function tPrintHeader(ns) {
   /**
@@ -127,7 +127,7 @@ export class ActionText {
 
 /**
  * Print the outcome of a script execution to the terminal.
- * @param {import(".").NS} ns
+ * @param {import("..").NS} ns
  * @param {ActionText} actionText - The debug text object that shall be printed.
  */
 export function tPrintScript(ns, actionText) {

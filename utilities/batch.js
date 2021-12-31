@@ -56,7 +56,7 @@ export class Batch {
 
   /**
    * Print a summary of the batch to the log.
-   * @param {import(".").NS} ns
+   * @param {import("..").NS} ns
    */
   print(ns) {
     var text = "############## Hack ####### Grow ###### Weaken ###\n";
@@ -80,9 +80,9 @@ export class Batch {
 /**
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
- * @param {import(".").NS} ns
- * @param {import(".").Server} targetServer - The target server.
- * @param {import(".").Server} hostServer - The host server.
+ * @param {import("..").NS} ns
+ * @param {import("..").Server} targetServer - The target server.
+ * @param {import("..").Server} hostServer - The host server.
  * @returns {Batch} The number of threads needed to grow the target to max money.
  */
 export function getFarmingBatch(ns, targetServer, hostServer) {
@@ -142,9 +142,9 @@ export function getFarmingBatch(ns, targetServer, hostServer) {
 /**
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
- * @param {import(".").NS} ns
- * @param {import(".").Server} targetServer - The target server.
- * @param {import(".").Server} hostServer - The host server.
+ * @param {import("..").NS} ns
+ * @param {import("..").Server} targetServer - The target server.
+ * @param {import("..").Server} hostServer - The host server.
  * @param {number} threadsAvailable - The number of threads currently available.
  * @returns {Batch} The number of threads needed to grow the target to max money.
  */
@@ -204,12 +204,12 @@ export function getPreparationBatch(
 
 /**
  * Update the finish times of a batch.
- * @param {import(".").NS} ns
+ * @param {import("..").NS} ns
  * @param {Batch} batch - The batch object that shall be updated.
  * @param {number} timeNow - The current time stamp.
  * @param {number} period - The time between executions of the controller.
  * @param {number} timePerAction - The time that is reserved for each action.
- * @param {import(".").Server} targetServer - The server that is targeted.
+ * @param {import("..").Server} targetServer - The server that is targeted.
  */
 export function updateFinishTimes(
   ns,
@@ -256,7 +256,7 @@ export function updateFinishTimes(
 
 /**
  * Run a batch on the local host.
- * @param {import(".").NS} ns
+ * @param {import("..").NS} ns
  * @param {Batch} batch - The batch that shall be executed.
  * @param {number} id - A number used to make up a unique id for the scripts so
  * they can run in parallel.
