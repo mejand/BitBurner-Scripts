@@ -1,4 +1,9 @@
-import { getTimeInRaster, logPrintVar } from "./utilities.js";
+import {
+  getTimeInRaster,
+  logPrintVar,
+  ActionText,
+  tPrintScript,
+} from "./utilities.js";
 
 /**
  * Run a single hack, grow or weaken operation and print the result for debugging.
@@ -40,15 +45,15 @@ export async function main(ns) {
     scriptType = ns.args[3];
   }
   /**
+   * An object that holds the debug information.
+   * @type {ActionText}
+   */
+  var debugText = new ActionText();
+  /**
    * The script is waiting for the right time to start its operation.
    * @type {boolean}
    */
   var running = true;
-  /**
-   * The text that will be printed to the terminal after the script finishes.
-   * @type {string}
-   */
-  var debugText = "         ";
   /**
    * The time at which script execution is predicted to finish.
    * @type {number}
@@ -66,21 +71,6 @@ export async function main(ns) {
    */
   var timeNow = 0;
   /**
-   * The time at which the operation finished.
-   * @type {string}
-   */
-  var timeStampEnd = 0;
-  /**
-   * The percentage of the maximum money on the target server when the script finished.
-   * @type {number}
-   */
-  var moneyEnd = 0;
-  /**
-   * The difference between current security and minimum security on the target server.
-   * @type {number}
-   */
-  var securityEnd = 0;
-  /**
    * The time it takes for the main operation to finish.
    * @type {number}
    */
@@ -94,25 +84,27 @@ export async function main(ns) {
 
   switch (scriptType) {
     case 0:
-      debugText += ns.sprintf("||Hack Finished   | ID: %3i |", id);
+      debugText.action = "Hack Fnshd";
       runTimeRaw = ns.getHackTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     case 1:
-      debugText += ns.sprintf("||Grow Finished   | ID: %3i |", id);
+      debugText.action = "Grow Fnshd";
       runTimeRaw = ns.getGrowTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     case 2:
-      debugText += ns.sprintf("||Weaken Finished | ID: %3i |", id);
+      debugText.action = "Weaken Fnshd";
       runTimeRaw = ns.getWeakenTime(targetName);
       runTime = getTimeInRaster(runTimeRaw);
       break;
     default:
       running = false;
-      debugText += " Wrong scriptType |";
+      debugText.error = "WrongType";
       break;
   }
+
+  debugText.id = id;
 
   logPrintVar(ns, "Runtime Error", runTimeRaw - runTime);
 
@@ -146,22 +138,23 @@ export async function main(ns) {
       }
 
       /** Print debug information */
-      timeStampEnd = ns.getTimeSinceLastAug();
+      debugText.time = ns.getTimeSinceLastAug();
 
-      logPrintVar(ns, "Finished", timeStampEnd);
-      logPrintVar(ns, "Error Predicted", predictedFinishRaw - timeStampEnd);
-      logPrintVar(ns, "Error Real", targetTime - timeStampEnd);
+      logPrintVar(ns, "Finished", debugText.time);
+      logPrintVar(ns, "Error Predicted", predictedFinishRaw - debugText.time);
+      logPrintVar(ns, "Error Real", targetTime - debugText.time);
 
-      moneyEnd =
-        ns.getServerMoneyAvailable(targetName) /
-        ns.getServerMaxMoney(targetName);
+      debugText.money =
+        (ns.getServerMoneyAvailable(targetName) /
+          ns.getServerMaxMoney(targetName)) *
+        100;
 
-      securityEnd =
+      debugText.security =
         ns.getServerSecurityLevel(targetName) -
         ns.getServerMinSecurityLevel(targetName);
     } else if (predictedFinish > targetTime) {
       running = false;
-      debugText += " Time Window Missed |";
+      debugText.error = "Time Miss";
     } else {
       logPrintVar(ns, "Waiting", timeNow);
 
@@ -170,13 +163,6 @@ export async function main(ns) {
     }
   }
 
-  debugText += ns.sprintf(
-    " Money: %3d | Security: %3d | Time: %16i ms ||",
-    moneyEnd * 100,
-    securityEnd,
-    timeStampEnd
-  );
-
   /** print the result to the terminal */
-  ns.tprint(debugText);
+  tPrintScript(ns, debugText);
 }

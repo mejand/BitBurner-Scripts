@@ -122,3 +122,90 @@ export function logPrintVar(ns, varName, varValue) {
 
   ns.print(text);
 }
+
+/**
+ * Print a header to the terminal to display script executions.
+ * @param {import(".").NS} ns
+ */
+export function tPrintHeader(ns) {
+  /**
+   * The text that will be printed to the terminal.
+   * @type {string}
+   */
+  var text = "||    Action    |";
+
+  text += "   ID   | Money | Sec ";
+  text += "|   Time   | Time Err ";
+  text += "|   Error   ||";
+
+  ns.tprint(text);
+}
+
+/**
+ * A class that holds debug information about a script execution.
+ */
+export class ActionText {
+  /**
+   * Create an instance of the debug information class.
+   */
+  constructor() {
+    /**
+     * The name of the action.
+     * @type {string}
+     */
+    this.action = "Default";
+    /**
+     * The ID of the action.
+     * @type {number}
+     */
+    this.id = 0;
+    /**
+     * The money percentage on the target.
+     * @type {number}
+     */
+    this.money = 0;
+    /**
+     * The security difference compared to minimum security.
+     * @type {number}
+     */
+    this.security = 0;
+    /**
+     * The time when the action finished.
+     * @type {number}
+     */
+    this.time = 0;
+    /**
+     * The difference between commanded and actual finish time.
+     * @type {number}
+     */
+    this.timeError = 0;
+    /**
+     * Additional error information.
+     * @type {string}
+     */
+    this.error = "";
+  }
+}
+
+/**
+ * Print the outcome of a script execution to the terminal.
+ * @param {import(".").NS} ns
+ * @param {ActionText} actionText - The debug text object that shall be printed.
+ */
+export function tPrintScript(ns, actionText) {
+  /**
+   * The text that will be printed to the terminal.
+   * @type {string}
+   */
+  var text = "|| ";
+
+  text += ns.sprintf("%12s | ", actionText.action);
+  text += ns.sprintf("%6i | ", actionText.id);
+  text += ns.sprintf("%3d ", actionText.money) + "% | ";
+  text += ns.sprintf("%3d | ", actionText.security);
+  text += ns.sprintf("%8i | ", actionText.time);
+  text += ns.sprintf("%+7d | ", actionText.timeError);
+  text += ns.sprintf("%9s ||", actionText.error);
+
+  ns.tprint(text);
+}
