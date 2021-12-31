@@ -142,7 +142,7 @@ export function tPrintHeader(ns) {
   var padding = 100 - ns.getScriptName().length;
 
   text += "   ID   | Money | Sec ";
-  text += "|   Time    | Time Err ";
+  text += "|   Time   | Time Err ";
   text += "|   Error   ||";
 
   ns.tprint(text.padStart(padding));
@@ -218,7 +218,7 @@ export function tPrintScript(ns, actionText) {
   text += ns.sprintf("%3d ", actionText.money) + "% | ";
   text += ns.sprintf("%3d | ", actionText.security);
   text += ns.sprintf("%8i | ", actionText.time);
-  text += ns.sprintf("%+7d | ", actionText.timeError);
+  text += ns.sprintf("%+8d | ", actionText.timeError);
   text += ns.sprintf("%9s ||", actionText.error);
 
   ns.tprint(text.padStart(padding));
