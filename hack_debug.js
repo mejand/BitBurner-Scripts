@@ -3,6 +3,7 @@ import {
   logPrintVar,
   ActionText,
   tPrintScript,
+  logPrintFloat,
 } from "./utilities.js";
 
 /**
@@ -81,6 +82,11 @@ export async function main(ns) {
    * @type {number}
    */
   var runTimeRaw = 0;
+  /**
+   * The security level above the minimum.
+   * @type {number}
+   */
+  var deltaSecurity = 0;
 
   switch (scriptType) {
     case 0:
@@ -125,7 +131,12 @@ export async function main(ns) {
       // stop the while loop
       running = false;
 
+      deltaSecurity =
+        ns.getServerSecurityLevel(targetName) -
+        ns.getServerMinSecurityLevel(targetName);
+
       logPrintVar(ns, "Started", "-");
+      logPrintFloat(ns, "Delta Security", deltaSecurity);
 
       switch (scriptType) {
         case 0:
@@ -156,6 +167,11 @@ export async function main(ns) {
       logPrintVar(ns, "Finished", debugText.time);
       logPrintVar(ns, "Error Predicted", predictedFinishRaw - debugText.time);
       logPrintVar(ns, "Error Real", debugText.timeError);
+
+      /** Open the log window if the script finished too late */
+      if (debugText.timeError < -200) {
+        ns.tail();
+      }
     } else if (predictedFinish > targetTime) {
       running = false;
 
