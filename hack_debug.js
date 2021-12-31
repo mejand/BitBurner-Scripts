@@ -85,18 +85,12 @@ export async function main(ns) {
   switch (scriptType) {
     case 0:
       debugText.action = "Hack";
-      runTimeRaw = ns.getHackTime(targetName);
-      runTime = getTimeInRaster(runTimeRaw);
       break;
     case 1:
       debugText.action = "Grow";
-      runTimeRaw = ns.getGrowTime(targetName);
-      runTime = getTimeInRaster(runTimeRaw);
       break;
     case 2:
       debugText.action = "Weaken";
-      runTimeRaw = ns.getWeakenTime(targetName);
-      runTime = getTimeInRaster(runTimeRaw);
       break;
     default:
       running = false;
@@ -114,6 +108,25 @@ export async function main(ns) {
    */
   while (running) {
     timeNow = ns.getTimeSinceLastAug();
+
+    switch (scriptType) {
+      case 0:
+        runTimeRaw = ns.getHackTime(targetName);
+        runTime = getTimeInRaster(runTimeRaw);
+        break;
+      case 1:
+        runTimeRaw = ns.getGrowTime(targetName);
+        runTime = getTimeInRaster(runTimeRaw);
+        break;
+      case 2:
+        runTimeRaw = ns.getWeakenTime(targetName);
+        runTime = getTimeInRaster(runTimeRaw);
+        break;
+      default:
+        running = false;
+        debugText.error = "WrongType";
+        break;
+    }
 
     predictedFinish = timeNow + runTime;
     predictedFinishRaw = timeNow + runTimeRaw;
