@@ -98,7 +98,7 @@ export async function main(ns) {
    * A dummy argument to allow multiple scripts of the same type to run at the same time.
    * @type {string}
    */
-  var dummy = 0;
+  var scriptId = 0;
   /**
    * The script is executed periodically.
    * @type {boolean}
@@ -171,7 +171,7 @@ export async function main(ns) {
       logPrintVar(ns, "Time", timeStamp);
 
       /** Ensure the script only runs a certain number of times in debug mode */
-      if (debug && dummy > 50) {
+      if (debug && scriptId > 50) {
         running = false;
       }
 
@@ -231,23 +231,30 @@ export async function main(ns) {
           batch.print(ns);
 
           /** Execute the batch */
-          executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript);
+          executeBatch(
+            ns,
+            batch,
+            scriptId,
+            hackScript,
+            growScript,
+            weakenScript
+          );
 
           /** Print a statement to the terminal */
           if (debug) {
-            printDebugToTerminal(ns, dummy, targetServer, timeStamp);
+            printDebugToTerminal(ns, scriptId, targetServer, timeStamp);
+          }
+
+          /** Let the dummy run to the maximum available thread count and then reset it */
+          if (scriptId < threadsMax) {
+            scriptId++;
+          } else {
+            scriptId = 0;
           }
 
           /** If a batch was started -> update the time stamp on the port */
           ns.clearPort(2);
           await ns.writePort(2, timeStamp);
-        }
-
-        /** Let the dummy run to the maximum available thread count and then reset it */
-        if (dummy < threadsMax) {
-          dummy++;
-        } else {
-          dummy = 0;
         }
       }
     }
