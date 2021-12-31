@@ -1,4 +1,11 @@
-import { getTimeInRaster, Batch } from "./utilities.js";
+import {
+  getTimeInRaster,
+  Batch,
+  logPrintVar,
+  ActionText,
+  tPrintScript,
+  tPrintHeader,
+} from "./utilities.js";
 
 /**
  * Handle the growing, weakening and hacking scripts in batches on the local server.
@@ -131,6 +138,9 @@ export async function main(ns) {
    */
   var securityThreshold = targetServer.minDifficulty + 5;
 
+  /** Print a new header line to the terminal */
+  tPrintHeader(ns);
+
   if (debug) {
     /** Open the log window in debug mode */
     ns.tail();
@@ -151,8 +161,8 @@ export async function main(ns) {
     if (timeStamp % period === 0) {
       /** Clean up the log */
       ns.clearLog();
-      ns.print("#######  " + targetName + "  #######");
-      ns.print("timeStamp = " + timeStamp);
+      logPrintVar(ns, "Target Name", targetName);
+      logPrintVar(ns, "Time", timeStamp);
 
       /** Ensure the script only runs a certain number of times in debug mode */
       if (debug && dummy > 50) {
@@ -161,7 +171,7 @@ export async function main(ns) {
 
       /** Get the time stamp saved on the coordination port */
       portTime = ns.peek(2);
-      ns.print("portTime  = " + portTime);
+      logPrintVar(ns, "Port Time", portTime);
 
       /**
        * If another batch controller has already started a new batch
@@ -177,12 +187,11 @@ export async function main(ns) {
         threadsAvailable = Math.floor(
           (hostServer.maxRam - hostServer.ramUsed) / scriptRam
         );
-        ns.print("threadsAvailable  = " + threadsAvailable);
-
-        ns.print("moneyAvailable    = " + targetServer.moneyAvailable);
-        ns.print("moneyThreshold    = " + moneyThreshold);
-        ns.print("hackDifficulty    = " + targetServer.hackDifficulty);
-        ns.print("securityThreshold = " + securityThreshold);
+        logPrintVar(ns, "Threads Available", threadsAvailable);
+        logPrintVar(ns, "Money Available", targetServer.moneyAvailable);
+        logPrintVar(ns, "Money Threshold", moneyThreshold);
+        logPrintVar(ns, "Hack Difficulty", targetServer.hackDifficulty);
+        logPrintVar(ns, "Difficulty Threshold", securityThreshold);
 
         /** Decide if the controller should use Preparation or Farming Mode */
         if (
@@ -201,19 +210,20 @@ export async function main(ns) {
           batch = getFarmingBatch(ns, targetServer, hostServer);
         }
 
-        /** Update the finish times */
-        updateFinishTimes(
-          ns,
-          batch,
-          timeStamp,
-          period,
-          timePerAction,
-          targetServer
-        );
-
-        ns.print(batch);
-
         if (batch.totalThreads <= threadsAvailable) {
+          /** Update the finish times */
+          updateFinishTimes(
+            ns,
+            batch,
+            timeStamp,
+            period,
+            timePerAction,
+            targetServer
+          );
+
+          /** Print the batch informtion to the log window */
+          batch.print(ns);
+
           /** Execute the batch */
           executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript);
 
@@ -294,10 +304,10 @@ function getFarmingBatch(ns, targetServer, hostServer) {
   /** Calculate the number of threads needed to compensate the hack and grow actions */
   result.weakenThreads = Math.ceil(deltaSecurity / weakenReduction) + 1;
 
-  /** Print information to log screen */
-  ns.print("+++++++  Farming  +++++++");
-  ns.print("deltaSecurity = " + deltaSecurity);
-  ns.print("growFactor    = " + growFactor);
+  /** Print information to log window */
+  logPrintVar(ns, "Mode", "Farming");
+  logPrintVar(ns, "Delta Security", deltaSecurity);
+  logPrintVar(ns, "Grow Factor", growFactor);
 
   return result;
 }
@@ -353,9 +363,9 @@ function getPreparationBatch(ns, targetServer, hostServer, threadsAvailable) {
   );
 
   /** Print information to log screen */
-  ns.print("+++++++  Preparation  +++++++");
-  ns.print("deltaSecurity = " + deltaSecurity);
-  ns.print("growFactor    = " + growFactor);
+  logPrintVar(ns, "Mode", "Preparation");
+  logPrintVar(ns, "Delta Security", deltaSecurity);
+  logPrintVar(ns, "Grow Factor", growFactor);
 
   return result;
 }
@@ -465,26 +475,16 @@ function executeBatch(ns, batch, dummy, hackScript, growScript, weakenScript) {
 function printDebugToTerminal(ns, dummy, targetServer, timeNow) {
   /**
    * The text that shall be displayed in the terminal in debug mode.
-   * @type {string}
+   * @type {ActionText}
    */
-  var debugText = "";
-  /**
-   * The relative amount of money available on the target server.
-   * @type {number}
-   */
-  var money = targetServer.moneyAvailable / targetServer.moneyMax;
-  /**
-   * The difference between current and minimum security on the target.
-   * @type {number}
-   */
-  var security = targetServer.hackDifficulty - targetServer.minDifficulty;
+  var debugText = new ActionText();
 
-  /** Create the bulk of the text */
-  debugText += ns.sprintf("||Scripts Started | ID: %3i |", dummy);
-  debugText += ns.sprintf(" Money: %3d |", money * 100);
-  debugText += ns.sprintf(" Security: %3d |", security);
-  debugText += ns.sprintf(" Time: %16i ms ||", timeNow);
+  debugText.action = "Controller";
+  debugText.money = targetServer.moneyAvailable / targetServer.moneyMax;
+  debugText.security = targetServer.hackDifficulty - targetServer.minDifficulty;
+  debugText.id = dummy;
+  debugText.time = timeNow;
 
   /** Print the finished text to the terminal */
-  ns.tprint(debugText);
+  tPrintScript(ns, debugText);
 }
