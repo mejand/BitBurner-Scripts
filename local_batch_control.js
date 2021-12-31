@@ -211,7 +211,7 @@ export async function main(ns) {
           batch = getFarmingBatch(ns, targetServer, hostServer);
         }
 
-        if (batch.totalThreads <= threadsAvailable) {
+        if (batch.totalThreads <= threadsAvailable && batch.totalThreads > 0) {
           /** Update the finish times */
           updateFinishTimes(
             ns,
