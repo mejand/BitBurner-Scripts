@@ -141,7 +141,6 @@ export function tPrintHeader(ns) {
    */
   var padding = 100 - ns.getScriptName().length;
 
-  text += "||    Action    |";
   text += "   ID   | Money | Sec ";
   text += "|   Time   | Time Err ";
   text += "|   Error   ||";
