@@ -10,19 +10,24 @@ export function getNetworkMap(ns) {
    * The rows of network_map.txt
    * @type {string[]}
    */
-  var rows = ns.read("network_map.txt").split("\r\n");
+  var rows = null;
   /**
    * The server objects that are in the network.
    * @type {MyServer[]}
    */
   var servers = [];
 
-  /** loop through all server names from the file and add them the array */
-  for (let row of rows) {
-    // Ignore last blank row
-    if (row) {
-      // add the server name to the list
-      servers.push(new MyServer(ns, row));
+  if (ns.fileExists("/servers/MappedServers.txt")) {
+    /** Read the contents of the file */
+    rows = ns.read("/servers/MappedServers.txt").split("\r\n");
+
+    /** loop through all server names from the file and add them the array */
+    for (let row of rows) {
+      // Ignore last blank row
+      if (row) {
+        // add the server name to the list
+        servers.push(new MyServer(ns, row));
+      }
     }
   }
 
