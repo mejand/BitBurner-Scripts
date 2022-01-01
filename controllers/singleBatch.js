@@ -5,6 +5,7 @@ import {
   getPreparationBatch,
 } from "../utilities/batch.js";
 import { MyServer } from "../utilities/server.js";
+import { getTarget } from "../utilities/com.js";
 
 /**
  * Handle a single batch at a time on the local host server.
@@ -12,14 +13,6 @@ import { MyServer } from "../utilities/server.js";
  */
 export async function main(ns) {
   ns.disableLog("ALL");
-  /**
-   * The name of the target server.
-   * @type {string}
-   */
-  var targetName = "n00dles";
-  if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
-    targetName = ns.args[0];
-  }
   /**
    * The name of the host server the script runs on.
    * @type {string}
@@ -64,7 +57,7 @@ export async function main(ns) {
    * The server object of the target.
    * @type {MyServer}
    */
-  var target = new MyServer(ns, targetName, scriptRam);
+  var target = getTarget(ns);
   /**
    * The server object of the host the script is running on.
    * @type {MyServer}
@@ -88,46 +81,47 @@ export async function main(ns) {
   while (true) {
     ns.clearLog();
     /** Update the server objects */
-    target.update(ns);
+    target = getTarget(ns);
     host.update(ns);
 
     /** Reset the sleep time to ensure there are no unecessary wait times */
     sleepTime = 150;
+    if (target) {
+      if (target.farming) {
+        batch = getFarmingBatch(ns, target.server, host.server);
+      } else {
+        batch = getPreparationBatch(
+          ns,
+          target.server,
+          host.server,
+          host.threadsAvailable
+        );
+      }
 
-    if (target.farming) {
-      batch = getFarmingBatch(ns, target.server, host.server);
-    } else {
-      batch = getPreparationBatch(
-        ns,
-        target.server,
-        host.server,
-        host.threadsAvailable
-      );
+      /** Start the batch if there are enough threads available */
+      if (batch.totalThreads <= host.threadsAvailable) {
+        if (batch.hackThreads > 0) {
+          ns.run(hackScript, batch.hackThreads, target.name);
+        }
+        if (batch.growThreads > 0) {
+          ns.run(growScript, batch.growThreads, target.name);
+        }
+        if (batch.weakenThreads > 0) {
+          ns.run(weakenScript, batch.weakenThreads, target.name);
+        }
+
+        /** Wait until the batch is finished to start the next patch.
+         * If no patch could be started the script will try again after 200ms.
+         */
+        sleepTime = ns.getWeakenTime(target.name) + 400;
+      }
+
+      /** Print information to the log window */
+      logPrintVar(ns, "Money on Target", target.moneyPercent);
+      logPrintVar(ns, "Load on Host", host.load);
+      logPrintVar(ns, "Sleep Time", sleepTime);
+      batch.print(ns);
     }
-
-    /** Start the batch if there are enough threads available */
-    if (batch.totalThreads <= host.threadsAvailable) {
-      if (batch.hackThreads > 0) {
-        ns.run(hackScript, batch.hackThreads, target.name);
-      }
-      if (batch.growThreads > 0) {
-        ns.run(growScript, batch.growThreads, target.name);
-      }
-      if (batch.weakenThreads > 0) {
-        ns.run(weakenScript, batch.weakenThreads, target.name);
-      }
-
-      /** Wait until the batch is finished to start the next patch.
-       * If no patch could be started the script will try again after 200ms.
-       */
-      sleepTime = ns.getWeakenTime(target.name) + 400;
-    }
-
-    /** Print information to the log window */
-    logPrintVar(ns, "Money on Target", target.moneyPercent);
-    logPrintVar(ns, "Load on Host", host.load);
-    logPrintVar(ns, "Sleep Time", sleepTime);
-    batch.print(ns);
 
     await ns.sleep(sleepTime);
   }
