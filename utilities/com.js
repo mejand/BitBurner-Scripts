@@ -27,3 +27,20 @@ export function getNetworkMap(ns) {
 
   return servers;
 }
+
+/**
+ * Define a list of unlocked servers for other functions to use.
+ * @param {import("..").NS} ns
+ * @param {MyServer[]} servers - All unlocked servers.
+ */
+export async function setUnlockedServers(ns, servers) {
+  /** Clear the file before writing to it */
+  ns.clear("/servers/UnlockedServers.txt");
+  for (let server of servers) {
+    /** Add the server to the list of unlocked servers if root access is enabled */
+    if (server.server.hasAdminRights) {
+      /** save the server to file */
+      await ns.write("/servers/UnlockedServers.txt", server.name + "\r\n", "a");
+    }
+  }
+}
