@@ -54,17 +54,17 @@ export async function main(ns) {
    * @type {string[]}
    */
   var scripts = [
-    "spider.js",
-    "unlock.js",
-    "hacknet.js",
-    "server_purchase.js",
-    "local_batch_control.js",
-    "hack.js",
-    "grow.js",
-    "weaken.js",
-    "utilities.js",
-    "hack_debug.js",
-    "find_target.js",
+    "/bots/singleGrow.js",
+    "/bots/singleHack.js",
+    "/bots/singleWeaken.js",
+    "/controllers/singleBatch.js",
+    "/support/spider.js",
+    "/support/unlock.js",
+    "/utilities/batch.js",
+    "/utilities/com.js",
+    "/utilities/log.js",
+    "/utilities/server.js",
+    "/utilities/time.js",
   ];
 
   // download the necessary scripts from the git repository to get newest versions.
@@ -80,27 +80,17 @@ export async function main(ns) {
   // start running the scripts if all were downloaded successfully.
   if (success) {
     // call the spider script to populate the network map
-    ns.run("spider.js", 1, false);
+    ns.run("/support/spider.js", 1);
     ns.tprint("#### Network Mapped ####");
     await ns.sleep(wait_time);
 
     // start the unlock script with a 10 second period and debugging off
-    ns.run("unlock.js", 1, 10000, false);
+    ns.run("/support/unlock.js", 1, 10000);
     ns.tprint("#### Server Unlocking Started ####");
     await ns.sleep(wait_time);
 
-    // start the hacknet control script with a 5 second period, a 50% budget and debugging off
-    ns.run("hacknet.js", 1, 5000, 0.5, false);
-    ns.tprint("#### Hacknet Upgrading Started ####");
-    await ns.sleep(wait_time);
-
-    // start the server purchase script with a 10 second period and debugging off
-    ns.run("server_purchase.js", 1, 10000, 0.75, true);
-    ns.tprint("#### Server Purchasing Started ####");
-    await ns.sleep(wait_time);
-
     // start the centralized hacking control script
-    ns.run("local_batch_control.js", 1, false);
+    ns.run("/controllers/singleBatch.js", 1);
     ns.tprint("#### Local Hack Control Started ####");
     await ns.sleep(wait_time);
   } else {
