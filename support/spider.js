@@ -6,15 +6,6 @@ import { setNetworkMap } from "../utilities/com.js";
  */
 export async function main(ns) {
   /**
-   * Enable debug logging.
-   * @type {boolean}
-   */
-  var debug = true;
-  if (ns.args.length > 0) {
-    debug = ns.args[0];
-  }
-
-  /**
    * The names of all servers that have already been analyzed.
    * @type {string[]}
    */
