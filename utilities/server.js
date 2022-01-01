@@ -198,24 +198,31 @@ export class MyServer {
      * The score of the server (higher is better).
      * @type {number}
      */
-    var score = 0;
+    var score = Infinity;
+    /**
+     * The player at his current hack level.
+     * @type {import("..").Player}
+     */
+    var player = ns.getPlayer();
 
-    /** Check if the player has access to Formulas.exe */
-    if (ns.fileExists("Formulas.exe", "home")) {
-      /**
-       * A server object that is set to min difficulty to get the weaken time
-       * for farming mode.
-       * @type {import("..").Server}
-       */
-      let server = ns.getServer(this.name);
-      server.hackDifficulty = server.minDifficulty;
+    /** Check if the target can be hacked at all */
+    if (this.server.requiredHackingSkill <= player.hacking) {
+      /** Check if the player has access to Formulas.exe */
+      if (ns.fileExists("Formulas.exe", "home")) {
+        /**
+         * A server object that is set to min difficulty to get the weaken time
+         * for farming mode.
+         * @type {import("..").Server}
+         */
+        let server = ns.getServer(this.name);
+        server.hackDifficulty = server.minDifficulty;
 
-      score =
-        server.moneyMax /
-        ns.formulas.hacking.weakenTime(server, ns.getPlayer());
-    } else {
-      /** If the player does not have access to Formulas.exe a simplified score is used */
-      score = this.server.moneyMax / this.server.minDifficulty;
+        score =
+          server.moneyMax / ns.formulas.hacking.weakenTime(server, player);
+      } else {
+        /** If the player does not have access to Formulas.exe a simplified score is used */
+        score = this.server.moneyMax / this.server.minDifficulty;
+      }
     }
 
     return score;
