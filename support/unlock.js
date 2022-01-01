@@ -23,14 +23,6 @@ export async function main(ns) {
     period = ns.args[0];
   }
   /**
-   * Enable debug logging.
-   * @type {boolean}
-   */
-  var debug = true;
-  if (ns.args.length > 1 && typeof ns.args[1] == "boolean") {
-    debug = ns.args[1];
-  }
-  /**
    * All current unlock servers.
    * @type {MyServer[]}
    */
