@@ -3,6 +3,7 @@ import { MyServer } from "./server.js";
 /**
  * Get a list of all servers in the network.
  * @param {import("..").NS} ns
+ * @returns {MyServer[]} A list of all servers in the network.
  */
 export function getNetworkMap(ns) {
   /**
@@ -56,4 +57,28 @@ export async function setTarget(ns, server) {
     ns.clearPort(1);
     await ns.writePort(1, server.name);
   }
+}
+
+/**
+ * Get the most profitable hack target.
+ * @param {import("..").NS} ns
+ * @returns {MyServer||null} The most profitable hack target.
+ */
+export function getTarget(ns) {
+  /**
+   * The name read from the port.
+   * @type {string}
+   */
+  var name = ns.peek(1);
+  /**
+   * The server object corresponding to the name on the port.
+   * @type {MyServer||null}
+   */
+  var server = null;
+
+  if (name && name != "NULL PORT DATA") {
+    server = new MyServer(ns, name);
+  }
+
+  return server;
 }
