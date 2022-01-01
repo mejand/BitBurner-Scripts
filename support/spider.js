@@ -43,5 +43,5 @@ export async function main(ns) {
   }
 
   /** Save the network map */
-  setNetworkMap(ns, networkMap);
+  await setNetworkMap(ns, networkMap);
 }
