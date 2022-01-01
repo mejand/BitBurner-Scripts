@@ -99,6 +99,8 @@ export async function main(ns) {
     } else {
       /** Attempt to update the mapped servers */
       servers = getNetworkMap(ns);
+
+      logPrintVar(ns, "No Server Map", "-");
     }
 
     await ns.sleep(period);
