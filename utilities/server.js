@@ -32,7 +32,7 @@ export class MyServer {
      * The amount of RAM currently available on the server.
      * @type {number}
      */
-    this.ramAvailable = server.ramMax - server.ramUsed;
+    this.ramAvailable = this.server.ramMax - this.server.ramUsed;
     /**
      * The number of threads currently available on the server.
      * @type {number}
@@ -42,17 +42,18 @@ export class MyServer {
      * The maximum number of threads available on the server.
      * @type {number}
      */
-    this.threadsMax = Math.floor(server.ramMax / scriptRam);
+    this.threadsMax = Math.floor(this.server.ramMax / scriptRam);
     /**
      * The percentage of the maximum money currently on the server.
      * @type {number}
      */
-    this.moneyPercent = (server.moneyAvailable / server.moneyMax) * 100;
+    this.moneyPercent =
+      (this.server.moneyAvailable / this.server.moneyMax) * 100;
     /**
      * The difference between current and minimum security.
      * @type {number}
      */
-    this.deltaSecurity = server.hackDifficulty - server.minDifficulty;
+    this.deltaSecurity = this.server.hackDifficulty - this.server.minDifficulty;
     /**
      * The current loading of the server.
      */
@@ -95,7 +96,7 @@ export class MyServer {
      * The number of CPU cores available on the server.
      * @type {number}
      */
-    this.cores = server.cpuCores;
+    this.cores = this.server.cpuCores;
   }
 
   /**
@@ -108,11 +109,12 @@ export class MyServer {
      * @type {import("..").NS}
      */
     this.server = ns.getServer(this.name);
-    this.ramAvailable = server.ramMax - server.ramUsed;
+    this.ramAvailable = this.server.ramMax - this.server.ramUsed;
     this.threadsAvailable = Math.floor(this.ramAvailable / this.scriptRam);
-    this.threadsMax = Math.floor(server.ramMax / this.scriptRam);
-    this.moneyPercent = (server.moneyAvailable / server.moneyMax) * 100;
-    this.deltaSecurity = server.hackDifficulty - server.minDifficulty;
+    this.threadsMax = Math.floor(this.server.ramMax / this.scriptRam);
+    this.moneyPercent =
+      (this.server.moneyAvailable / this.server.moneyMax) * 100;
+    this.deltaSecurity = this.server.hackDifficulty - this.server.minDifficulty;
     this.load = (this.threadsAvailable / this.threadsMax) * 100;
     this.hackTime = ns.getHackTime(this.name);
     this.growTime = ns.getGrowTime(this.name);
@@ -120,6 +122,6 @@ export class MyServer {
     this.farming =
       this.moneyPercent < this.moneyFactor ||
       this.deltaSecurity > this.securityOffset;
-    this.cores = server.cpuCores;
+    this.cores = this.server.cpuCores;
   }
 }
