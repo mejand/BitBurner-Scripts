@@ -19,6 +19,8 @@ export function logPrintVar(ns, varName, varValue) {
     text += ns.sprintf("= %21s", varValue);
   } else if (typeof varValue == "number") {
     text += ns.sprintf("= %21.2f", varValue);
+  } else if (typeof varValue == "boolean") {
+    text += ns.sprintf("= %21t", varValue);
   } else {
     text += "=    Format Not Defined";
   }
