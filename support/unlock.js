@@ -4,6 +4,7 @@ import {
   setTarget,
   setUnlockedServers,
 } from "../utilities/com.js";
+import { logPrintVar } from "../utilities/log.js";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
@@ -53,6 +54,8 @@ export async function main(ns) {
   while (true) {
     ns.clearLog();
 
+    logPrintVar(ns, "Server", "Has Root Access");
+
     /** Reset the unlocked servers */
     unlockedServers = [];
 
@@ -84,6 +87,8 @@ export async function main(ns) {
             target = server;
           }
         }
+
+        logPrintVar(ns, server.name, server.server.hasAdminRights);
       }
 
       /** Save the unlocked servers for other functions */
