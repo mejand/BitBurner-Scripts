@@ -35,6 +35,22 @@ export function getNetworkMap(ns) {
 }
 
 /**
+ * Define all servers in the network for use by other functions.
+ * @param {import("..").NS} ns
+ * @param {string[]} servers - The names of all servers in the network.
+ */
+export async function setNetworkMap(ns, servers) {
+  /** Clear the file before writing to it */
+  ns.clear("/servers/MappedServers.txt");
+
+  /** Write all names to file */
+  for (let server of servers) {
+    /** save the server to file */
+    await ns.write("/servers/MappedServers.txt", server + "\r\n", "a");
+  }
+}
+
+/**
  * Define a list of unlocked servers for other functions to use.
  * @param {import("..").NS} ns
  * @param {MyServer[]} servers - All unlocked servers.
