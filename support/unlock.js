@@ -83,6 +83,10 @@ export async function main(ns) {
         logPrintVar(ns, server.name, server.server.hasAdminRights);
       }
 
+      if (target) {
+        logPrintVar(ns, "Target", target.name);
+      }
+
       /** Save the unlocked servers for other functions */
       await setUnlockedServers(ns, unlockedServers);
 
