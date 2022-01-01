@@ -104,10 +104,6 @@ export class MyServer {
    * @param {import("..").NS} ns
    */
   update(ns) {
-    /**
-     * The server object provided by the game.
-     * @type {import("..").NS}
-     */
     this.server = ns.getServer(this.name);
     this.ramAvailable = this.server.maxRam - this.server.ramUsed;
     this.threadsAvailable = Math.floor(this.ramAvailable / this.scriptRam);
