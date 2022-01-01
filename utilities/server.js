@@ -172,4 +172,23 @@ export class MyServer {
 
     return this.server.hasAdminRights;
   }
+
+  /**
+   * Copy all .lit and .txt files from the server to home.
+   * @param {import("..").NS} ns
+   */
+  copyFilesToHome(ns) {
+    /**
+     * The names of all files on the server.
+     * @type {string[]}
+     */
+    var filesToCopy = ns.ls(this.name, ".lit");
+    filesToCopy = filesToCopy.concat(ns.ls(this.name, ".txt"));
+
+    if (filesToCopy) {
+      for (let file of filesToCopy) {
+        await ns.scp(file, this.name, "home");
+      }
+    }
+  }
 }
