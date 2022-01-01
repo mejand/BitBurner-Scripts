@@ -57,7 +57,7 @@ export class MyServer {
     /**
      * The current loading of the server.
      */
-    this.load = (this.threadsAvailable / this.threadsMax) * 100;
+    this.load = 100 - (this.threadsAvailable / this.threadsMax) * 100;
     /**
      * The time it takes to hack the server.
      * @type {number}
@@ -115,7 +115,7 @@ export class MyServer {
     this.moneyPercent =
       (this.server.moneyAvailable / this.server.moneyMax) * 100;
     this.deltaSecurity = this.server.hackDifficulty - this.server.minDifficulty;
-    this.load = (this.threadsAvailable / this.threadsMax) * 100;
+    this.load = 100 - (this.threadsAvailable / this.threadsMax) * 100;
     this.hackTime = ns.getHackTime(this.name);
     this.growTime = ns.getGrowTime(this.name);
     this.weakenTime = ns.getWeakenTime(this.name);
