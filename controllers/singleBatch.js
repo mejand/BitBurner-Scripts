@@ -95,7 +95,7 @@ export async function main(ns) {
     sleepTime = 150;
 
     if (target.farming) {
-      batch = getFarmingBatch(ns, target, host);
+      batch = getFarmingBatch(ns, target.server, host.server);
     } else {
       batch = getPreparationBatch(
         ns,
