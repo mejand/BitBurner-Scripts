@@ -120,7 +120,7 @@ export async function main(ns) {
       /** Wait until the batch is finished to start the next patch.
        * If no patch could be started the script will try again after 200ms.
        */
-      sleepTime = ns.getWeakenTime(target.hostname) + 400;
+      sleepTime = ns.getWeakenTime(target.name) + 400;
     }
 
     /** Print information to the log window */
