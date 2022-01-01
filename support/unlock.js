@@ -54,8 +54,6 @@ export async function main(ns) {
   while (true) {
     ns.clearLog();
 
-    logPrintVar(ns, "Server", "Has Root Access");
-
     /** Reset the unlocked servers */
     unlockedServers = [];
 
@@ -65,6 +63,8 @@ export async function main(ns) {
 
     /** Only continue if there are any mapped servers */
     if (servers) {
+      logPrintVar(ns, "Server", "Has Root Access");
+
       /** loop through all servers in the network and check if they are unlocked */
       for (let server of servers) {
         /** Update the server objects to reflect their current state */
