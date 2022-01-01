@@ -124,4 +124,52 @@ export class MyServer {
       this.server.minDifficulty + this.securityOffset;
     this.cores = this.server.cpuCores;
   }
+
+  /**
+   * Try to gain root access to the server.
+   * @param {import("..").NS} ns
+   * @returns {boolean} True if the unlock was successful.
+   */
+  getRootAccess(ns) {
+    /** open all possible ports if root access is not available */
+    if (!this.server.hasAdminRights) {
+      /**
+       * The number of ports that have been opened.
+       * @type {number}
+       */
+      let openPorts = 0;
+
+      if (ns.fileExists("BruteSSH.exe", "home")) {
+        ns.brutessh(this.name);
+        openPorts++;
+      }
+      if (ns.fileExists("FTPCrack.exe", "home")) {
+        ns.ftpcrack(this.name);
+        openPorts++;
+      }
+      if (ns.fileExists("relaySMTP.exe", "home")) {
+        ns.relaysmtp(this.name);
+        openPorts++;
+      }
+      if (ns.fileExists("HTTPWorm.exe", "home")) {
+        ns.httpworm(this.name);
+        openPorts++;
+      }
+      if (ns.fileExists("SQLInject.exe", "home")) {
+        ns.sqlinject(this.name);
+        openPorts++;
+      }
+
+      /** check if enough ports could be opened */
+      if (openPorts >= this.server.numOpenPortsRequired) {
+        /** get root access */
+        ns.nuke(this.name);
+
+        /** update the root access flag */
+        this.server.hasAdminRights = true;
+      }
+    }
+
+    return this.server.hasAdminRights;
+  }
 }
