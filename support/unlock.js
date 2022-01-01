@@ -3,7 +3,7 @@ import {
   getNetworkMap,
   setTarget,
   setUnlockedServers,
-} from "..//utilities/com.js";
+} from "../utilities/com.js";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
