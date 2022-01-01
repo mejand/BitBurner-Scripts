@@ -198,7 +198,7 @@ export class MyServer {
      * The score of the server (higher is better).
      * @type {number}
      */
-    var score = Infinity;
+    var score = 0;
     /**
      * The player at his current hack level.
      * @type {import("..").Player}
