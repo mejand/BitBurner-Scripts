@@ -1,5 +1,9 @@
 import { MyServer } from "../utilities/server.js";
-import { getNetworkMap, setUnlockedServers } from "..//utilities/com.js";
+import {
+  getNetworkMap,
+  setTarget,
+  setUnlockedServers,
+} from "..//utilities/com.js";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
@@ -82,6 +86,9 @@ export async function main(ns) {
 
     /** Save the unlocked servers for other functions */
     await setUnlockedServers(ns, unlockedServers);
+
+    /** Save the target for other functions */
+    await setTarget(ns, target);
 
     await ns.sleep(period);
   }
