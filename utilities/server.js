@@ -121,7 +121,7 @@ export class MyServer {
     this.weakenTime = ns.getWeakenTime(this.name);
     this.farming =
       this.moneyPercent < this.moneyFactor ||
-      this.server.minDifficulty + this.securityOffset;
+      this.deltaSecurity > this.server.minDifficulty + this.securityOffset;
     this.cores = this.server.cpuCores;
   }
 
