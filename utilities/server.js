@@ -191,4 +191,37 @@ export class MyServer {
       }
     }
   }
+
+  /**
+   * Calculate a score value for the server to determine its attractiveness
+   * asa a hack target.
+   * @param {import("..").NS} ns
+   */
+  calcScore(ns) {
+    /**
+     * The score of the server (higher is better).
+     * @type {number}
+     */
+    var score = 0;
+
+    /** Check if the player has access to Formulas.exe */
+    if (ns.fileExists("Formulas.exe", "home")) {
+      /**
+       * A server object that is set to min difficulty to get the weaken time
+       * for farming mode.
+       * @type {import("..").Server}
+       */
+      let server = ns.getServer(this.name);
+      server.hackDifficulty = server.minDifficulty;
+
+      score =
+        server.moneyMax /
+        ns.formulas.hacking.weakenTime(server, ns.getPlayer());
+    } else {
+      /** If the player does not have access to Formulas.exe a simplified score is used */
+      score = this.server.moneyMax / this.server.minDifficulty;
+    }
+
+    return score;
+  }
 }

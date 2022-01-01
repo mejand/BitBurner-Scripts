@@ -35,12 +35,26 @@ export async function main(ns) {
    * @type {MyServer[]}
    */
   var servers = getNetworkMap(ns);
+  /**
+   * The highest observed score in any unlocked server.
+   * @type {number}
+   */
+  var maxScore = 0;
+  /**
+   * The most profitable hack target.
+   * @type {MyServer}
+   */
+  var target = null;
 
   while (true) {
     ns.clearLog();
 
     /** Reset the unlocked servers */
     unlockedServers = [];
+
+    /** Reset the target */
+    maxScore = 0;
+    target = null;
 
     /** loop through all servers in the network and check if they are unlocked */
     for (let server of servers) {
@@ -53,6 +67,16 @@ export async function main(ns) {
         server.copyFilesToHome(ns);
         /** Add the server to the unlocked servers */
         unlockedServers.push(server);
+        /**
+         * The score of the current server.
+         * @type {number}
+         */
+        let score = server.calcScore(ns);
+        /** Update the target if appropriate */
+        if (score > maxScore) {
+          maxScore = score;
+          target = server;
+        }
       }
     }
 
