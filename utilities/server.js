@@ -32,7 +32,7 @@ export class MyServer {
      * The amount of RAM currently available on the server.
      * @type {number}
      */
-    this.ramAvailable = this.server.ramMax - this.server.ramUsed;
+    this.ramAvailable = this.server.maxRam - this.server.ramUsed;
     /**
      * The number of threads currently available on the server.
      * @type {number}
@@ -42,7 +42,7 @@ export class MyServer {
      * The maximum number of threads available on the server.
      * @type {number}
      */
-    this.threadsMax = Math.floor(this.server.ramMax / scriptRam);
+    this.threadsMax = Math.floor(this.server.maxRam / scriptRam);
     /**
      * The percentage of the maximum money currently on the server.
      * @type {number}
@@ -109,9 +109,9 @@ export class MyServer {
      * @type {import("..").NS}
      */
     this.server = ns.getServer(this.name);
-    this.ramAvailable = this.server.ramMax - this.server.ramUsed;
+    this.ramAvailable = this.server.maxRam - this.server.ramUsed;
     this.threadsAvailable = Math.floor(this.ramAvailable / this.scriptRam);
-    this.threadsMax = Math.floor(this.server.ramMax / this.scriptRam);
+    this.threadsMax = Math.floor(this.server.maxRam / this.scriptRam);
     this.moneyPercent =
       (this.server.moneyAvailable / this.server.moneyMax) * 100;
     this.deltaSecurity = this.server.hackDifficulty - this.server.minDifficulty;
