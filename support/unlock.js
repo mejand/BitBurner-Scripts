@@ -60,35 +60,41 @@ export async function main(ns) {
     maxScore = 0;
     target = null;
 
-    /** loop through all servers in the network and check if they are unlocked */
-    for (let server of servers) {
-      /** Update the server objects to reflect their current state */
-      server.update(ns);
+    /** Only continue if there are any mapped servers */
+    if (servers) {
+      /** loop through all servers in the network and check if they are unlocked */
+      for (let server of servers) {
+        /** Update the server objects to reflect their current state */
+        server.update(ns);
 
-      /** Try and unlock the server (nothing will happen if it is already unlocked) */
-      if (server.getRootAccess(ns)) {
-        /** Copy all text files on the server to home */
-        server.copyFilesToHome(ns);
-        /** Add the server to the unlocked servers */
-        unlockedServers.push(server);
-        /**
-         * The score of the current server.
-         * @type {number}
-         */
-        let score = server.calcScore(ns);
-        /** Update the target if appropriate */
-        if (score > maxScore) {
-          maxScore = score;
-          target = server;
+        /** Try and unlock the server (nothing will happen if it is already unlocked) */
+        if (server.getRootAccess(ns)) {
+          /** Copy all text files on the server to home */
+          server.copyFilesToHome(ns);
+          /** Add the server to the unlocked servers */
+          unlockedServers.push(server);
+          /**
+           * The score of the current server.
+           * @type {number}
+           */
+          let score = server.calcScore(ns);
+          /** Update the target if appropriate */
+          if (score > maxScore) {
+            maxScore = score;
+            target = server;
+          }
         }
       }
+
+      /** Save the unlocked servers for other functions */
+      await setUnlockedServers(ns, unlockedServers);
+
+      /** Save the target for other functions */
+      await setTarget(ns, target);
+    } else {
+      /** Attempt to update the mapped servers */
+      servers = getNetworkMap(ns);
     }
-
-    /** Save the unlocked servers for other functions */
-    await setUnlockedServers(ns, unlockedServers);
-
-    /** Save the target for other functions */
-    await setTarget(ns, target);
 
     await ns.sleep(period);
   }
