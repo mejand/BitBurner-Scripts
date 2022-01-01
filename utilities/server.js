@@ -173,7 +173,7 @@ export class MyServer {
    * Copy all .lit and .txt files from the server to home.
    * @param {import("..").NS} ns
    */
-  copyFilesToHome(ns) {
+  async copyFilesToHome(ns) {
     /**
      * The names of all files on the server.
      * @type {string[]}

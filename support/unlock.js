@@ -70,7 +70,7 @@ export async function main(ns) {
         /** Try and unlock the server (nothing will happen if it is already unlocked) */
         if (server.getRootAccess(ns)) {
           /** Copy all text files on the server to home */
-          server.copyFilesToHome(ns);
+          await server.copyFilesToHome(ns);
           /** Add the server to the unlocked servers */
           unlockedServers.push(server);
           /**
