@@ -1,4 +1,5 @@
 import { getTimeInRaster } from "./time.js";
+import { logPrintVar } from "./log.js";
 
 /**
  * The instructions needed to run a hack, grow, weaken cycle against a target server.
