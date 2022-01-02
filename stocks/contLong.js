@@ -1,31 +1,10 @@
-/** Define global constants for stock handling */
-/**
- * Minimum fraction of assets to keep as cash in hand.
- * @type {number}
- */
-var fracL = 0.1;
-/**
- * Maximum fraction of assets to keep as cash in hand.
- * @type {number}
- */
-var fracH = 0.2;
-/**
- * Buy or sell commission.
- * @type {number}
- */
-var commission = 100000;
-/**
- * The number of cycles between executions of the script.
- * Each cycle is 5 seconds long.
- */
-var numCycles = 2;
-
+import { Stock } from "../utilities/stock.js";
 /**
  * Update the information of the stock objects and calculate the total
  * assets available to the player (cash + current value of stocks).
  * @param {NS} ns
- * @param {Object[]} stocks - An array containing all stocks that are traded on the market.
- * @param {Object[]} myStocks - An array containing all stocks in the players posession.
+ * @param {Stock[]} stocks - An array containing all stocks that are traded on the market.
+ * @param {Stock[]} myStocks - An array containing all stocks in the players posession.
  */
 function refresh(ns, stocks, myStocks) {
   let corpus = ns.getServerMoneyAvailable("home");
@@ -47,30 +26,23 @@ function refresh(ns, stocks, myStocks) {
   return corpus;
 }
 
-function buy(ns, stock, numShares) {
-  if (ns.stock.buy(stock.sym, numShares)) {
-    ns.print(`Bought ${stock.sym} for ${format(numShares * stock.price)}`);
-  }
-}
-
-function sell(ns, stock, numShares) {
-  let profit = numShares * (stock.price - stock.buyPrice) - 2 * commission;
-  ns.print(`Sold ${stock.sym} for profit of ${format(profit)}`);
-  ns.stock.sell(stock.sym, numShares);
-}
-
-function format(num) {
-  let symbols = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc"];
-  let i = 0;
-  for (; num >= 1000 && i < symbols.length; i++) num /= 1000;
-  return (
-    (Math.sign(num) < 0 ? "-$" + (-num).toFixed(3) : "$" + num.toFixed(3)) +
-    symbols[i]
-  );
-}
-
 /** @param {NS} ns **/
 export async function main(ns) {
+  /**
+   * Minimum fraction of assets to keep as cash in hand.
+   * @type {number}
+   */
+  var fracL = 0.1;
+  /**
+   * Maximum fraction of assets to keep as cash in hand.
+   * @type {number}
+   */
+  var fracH = 0.2;
+  /**
+   * The number of cycles between executions of the script.
+   * Each cycle is 5 seconds long.
+   */
+  var numCycles = 2;
   //Initialise
   ns.disableLog("ALL");
   let stocks = [];
