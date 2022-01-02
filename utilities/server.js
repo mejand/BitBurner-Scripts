@@ -174,17 +174,19 @@ export class MyServer {
    * @param {import("..").NS} ns
    */
   async copyFilesToHome(ns) {
-    /**
-     * The names of all files on the server.
-     * @type {string[]}
-     */
-    var filesToCopy = ns.ls(this.name, ".lit");
-    filesToCopy = filesToCopy.concat(ns.ls(this.name, ".txt"));
+    if (this.name != "home") {
+      /**
+       * The names of all files on the server.
+       * @type {string[]}
+       */
+      let filesToCopy = ns.ls(this.name, ".lit");
+      filesToCopy = filesToCopy.concat(ns.ls(this.name, ".txt"));
 
-    if (filesToCopy) {
-      for (let file of filesToCopy) {
-        let filepath = "/stolen/" + file;
-        await ns.scp(filepath, this.name, "home");
+      if (filesToCopy) {
+        for (let file of filesToCopy) {
+          let filepath = "/stolen/" + file;
+          await ns.scp(filepath, this.name, "home");
+        }
       }
     }
   }
