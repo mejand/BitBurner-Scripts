@@ -183,7 +183,8 @@ export class MyServer {
 
     if (filesToCopy) {
       for (let file of filesToCopy) {
-        await ns.scp(file, this.name, "home");
+        let filepath = "/stolen/" + file;
+        await ns.scp(filepath, this.name, "home");
       }
     }
   }
