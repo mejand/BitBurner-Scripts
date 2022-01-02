@@ -1,4 +1,9 @@
-function format(num) {
+/**
+ * Format an amount of money for better readability.
+ * @param {number} num - The amount of money that shall be formatted.
+ * @returns {string} The formatted amount of money.
+ */
+function formatMoney(num) {
   let symbols = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc"];
   let i = 0;
   for (; num >= 1000 && i < symbols.length; i++) num /= 1000;
@@ -106,7 +111,7 @@ export class Stock {
     if (numShares <= this.sharesAvailable) {
       let price = ns.stock.buy(this.sym, numShares);
       if (price) {
-        ns.print(`Bought ${this.sym} for ${format(numShares * price)}`);
+        ns.print(`Bought ${this.sym} for ${formatMoney(numShares * price)}`);
       } else {
         ns.print(`Failed to buy ${numShares} of ${this.sym}`);
       }
@@ -128,7 +133,7 @@ export class Stock {
        */
       let profit =
         numShares * (this.price - this.buyPrice) - 2 * Stock.commission;
-      ns.print(`Sold ${this.sym} for profit of ${format(profit)}`);
+      ns.print(`Sold ${this.sym} for profit of ${formatMoney(profit)}`);
       ns.stock.sell(this.sym, numShares);
     }
   }
