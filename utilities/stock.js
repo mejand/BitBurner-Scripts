@@ -107,14 +107,19 @@ export class Stock {
    * @param {number} numShares - The numbe rof shares that shall be sold.
    */
   buy(ns, numShares) {
-    /** Only buy shares if there are any available */
-    if (numShares <= this.sharesAvailable) {
-      let price = ns.stock.buy(this.sym, numShares);
-      if (price) {
-        ns.print(`Bought ${this.sym} for ${formatMoney(numShares * price)}`);
-      } else {
-        ns.print(`Failed to buy ${numShares} of ${this.sym}`);
-      }
+    /**
+     * The actual number of shares that will be bought. If more shares are
+     * requested than available the number will be limited to what
+     * is available.
+     * @type {number}
+     */
+    var num = Math.min(numShares, this.sharesAvailable);
+
+    let price = ns.stock.buy(this.sym, num);
+    if (price) {
+      ns.print(`Bought ${this.sym} for ${formatMoney(num * price)}`);
+    } else {
+      ns.print(`Failed to buy ${num} of ${this.sym}`);
     }
   }
   /**
@@ -123,18 +128,23 @@ export class Stock {
    * @param {number} numShares - The number of shares that shall be sold.
    */
   sell(ns, numShares) {
-    /** Only attempt the sale if the player owns the shares */
-    if (numShares <= this.shares) {
-      /**
-       * The amount of money the player earns when selling the stock.
-       * The original price for buying the stock and the commission
-       * for buying and selling are already subtracted.
-       * @type {number}
-       */
-      let profit =
-        numShares * (this.price - this.buyPrice) - 2 * Stock.commission;
-      ns.print(`Sold ${this.sym} for profit of ${formatMoney(profit)}`);
-      ns.stock.sell(this.sym, numShares);
-    }
+    /**
+     * The actual number of shares that will be bought. If more shares are
+     * requested than owned the number will be limited to what
+     * is owned.
+     * @type {number}
+     */
+    var num = Math.min(numShares, this.shares);
+    /**
+     * The amount of money the player earns when selling the stock.
+     * The original price for buying the stock and the commission
+     * for buying and selling are already subtracted.
+     * @type {number}
+     */
+    var profit = num * (this.price - this.buyPrice) - 2 * Stock.commission;
+
+    ns.stock.sell(this.sym, num);
+
+    ns.print(`Sold ${this.sym} for profit of ${formatMoney(profit)}`);
   }
 }
