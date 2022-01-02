@@ -5,24 +5,33 @@ import { Stock } from "../utilities/stock.js";
  * @param {NS} ns
  * @param {Stock[]} stocks - An array containing all stocks that are traded on the market.
  * @param {Stock[]} myStocks - An array containing all stocks in the players posession.
+ * @returns {number} - The value of all assests the player owns (cash plus current value of
+ * shares).
  */
 function refresh(ns, stocks, myStocks) {
+  /**
+   * The value of all assests the player owns (cash plus current value of
+   * shares).
+   * @type {number}
+   */
   let corpus = ns.getServerMoneyAvailable("home");
-  myStocks.length = 0;
-  for (let i = 0; i < stocks.length; i++) {
-    let sym = stocks[i].sym;
-    stocks[i].price = ns.stock.getPrice(sym);
-    stocks[i].shares = ns.stock.getPosition(sym)[0];
-    stocks[i].buyPrice = ns.stock.getPosition(sym)[1];
-    stocks[i].vol = ns.stock.getVolatility(sym);
-    stocks[i].prob = 2 * (ns.stock.getForecast(sym) - 0.5);
-    stocks[i].expRet = (stocks[i].vol * stocks[i].prob) / 2;
-    corpus += stocks[i].price * stocks[i].shares;
-    if (stocks[i].shares > 0) myStocks.push(stocks[i]);
+
+  /** Reset the owned stocks before updating them */
+  myStocks = [];
+
+  for (let stock of stocks) {
+    /** Get the current data */
+    stock.update(ns);
+    /** Add the stock to the owned array if necessary */
+    if (stock.shares > 0) {
+      myStocks.push(stocks[i]);
+    }
   }
+  /** Sort the stocks buy expected returns (highest first) */
   stocks.sort(function (a, b) {
     return b.expRet - a.expRet;
   });
+  /** Return the total value of player assets */
   return corpus;
 }
 
