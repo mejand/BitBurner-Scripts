@@ -13,6 +13,12 @@ function format(num) {
  */
 export class Stock {
   /**
+   * The amount of money that has to paid whenever stocks
+   * is bought or sold.
+   * @type {number}
+   */
+  static commission = 100000;
+  /**
    * Create an instance of a tradeable stock.
    * @param {import("..").NS} ns
    * @param {string} sym - The symbol of the stock.
@@ -100,10 +106,30 @@ export class Stock {
     if (numShares <= this.sharesAvailable) {
       let price = ns.stock.buy(this.sym, numShares);
       if (price) {
-        ns.print("Bought ${this.sym} for ${format(numShares * price)}");
+        ns.print(`Bought ${this.sym} for ${format(numShares * price)}`);
       } else {
-        ns.print("Failed to buy ${numShares} of ${this.sym}");
+        ns.print(`Failed to buy ${numShares} of ${this.sym}`);
       }
+    }
+  }
+  /**
+   * Sell a number of shares.
+   * @param {import("..").NS} ns
+   * @param {number} numShares - The number of shares that shall be sold.
+   */
+  sell(ns, numShares) {
+    /** Only attempt the sale if the player owns the shares */
+    if (numShares <= this.shares) {
+      /**
+       * The amount of money the player earns when selling the stock.
+       * The original price for buying the stock and the commission
+       * for buying and selling are already subtracted.
+       * @type {number}
+       */
+      let profit =
+        numShares * (this.price - this.buyPrice) - 2 * Stock.commission;
+      ns.print(`Sold ${this.sym} for profit of ${format(profit)}`);
+      ns.stock.sell(this.sym, numShares);
     }
   }
 }
