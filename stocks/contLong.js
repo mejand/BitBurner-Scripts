@@ -29,7 +29,7 @@ function refresh(ns, stocks, myStocks) {
   }
   /** Sort the stocks buy expected returns (highest first) */
   stocks.sort(function (a, b) {
-    return b.expRet - a.expRet;
+    return b.expectedReturn - a.expectedReturn;
   });
   /** Return the total value of player assets */
   return corpus;
@@ -52,40 +52,66 @@ export async function main(ns) {
    * Each cycle is 5 seconds long.
    */
   var numCycles = 2;
-  //Initialise
+  /**
+   * All tradeable stocks.
+   * @type {Stock[]}
+   */
+  var stocks = [];
+  /**
+   * All stocks the player owns shares in.
+   * @type {Stock[]}
+   */
+  var myStocks = [];
+  /**
+   * The value of all assests the player owns (cash plus current value of
+   * shares).
+   * @type {number}
+   */
+  var corpus = 0;
+
   ns.disableLog("ALL");
-  let stocks = [];
-  let myStocks = [];
-  let corpus = 0;
-  for (let i = 0; i < ns.stock.getSymbols().length; i++)
-    stocks.push({ sym: ns.stock.getSymbols()[i] });
+
+  /** Get all stocks that can be traded */
+  for (let sym of ns.stock.getSymbols()) {
+    stocks.push(new Stock(ns, sym));
+  }
+
   while (true) {
+    /** Update the data */
     corpus = refresh(ns, stocks, myStocks);
-    //Sell underperforming shares
-    for (let i = 0; i < myStocks.length; i++) {
-      if (stocks[0].expRet > myStocks[i].expRet) {
-        sell(ns, myStocks[i], myStocks[i].shares);
+
+    /** Sell underperforming shares */
+    for (let myStock of myStocks) {
+      if (stocks[0].expectedReturn > myStock.expectedReturn) {
+        myStock.sell(ns, myStock.shares);
         corpus -= commission;
       }
     }
-    //Sell shares if not enough cash in hand
-    for (let i = 0; i < myStocks.length; i++) {
+
+    /** Sell shares if not enough cash in hand */
+    for (let myStock of myStocks) {
       if (ns.getServerMoneyAvailable("home") < fracL * corpus) {
         let cashNeeded =
           corpus * fracH - ns.getServerMoneyAvailable("home") + commission;
-        let numShares = Math.floor(cashNeeded / myStocks[i].price);
-        sell(ns, myStocks[i], numShares);
+        let numShares = Math.floor(cashNeeded / myStock.price);
+        myStock.sell(ns, numShares);
         corpus -= commission;
       }
     }
-    //Buy shares with cash remaining in hand
+
+    /** Buy shares with cash remaining in hand */
     let cashToSpend = ns.getServerMoneyAvailable("home") - fracH * corpus;
     let numShares = Math.floor((cashToSpend - commission) / stocks[0].price);
-    if (numShares > ns.stock.getMaxShares(stocks[0].sym))
-      numShares = ns.stock.getMaxShares(stocks[0].sym);
+    numShares = Math.min(numShares, stocks[0].sharesAvailable);
 
-    if (numShares * stocks[0].expRet * stocks[0].price * numCycles > commission)
-      buy(ns, stocks[0], numShares);
+    /** Only buy if the price can be recovered within the next cycles */
+    if (
+      numShares * stocks[0].expectedReturn * stocks[0].price * numCycles >
+      commission
+    ) {
+      stocks[0].buy(ns, numShares);
+    }
+
     await ns.sleep(5 * 1000 * numCycles + 200);
   }
 }
