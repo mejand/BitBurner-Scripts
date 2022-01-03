@@ -122,7 +122,11 @@ export async function main(ns) {
 
     /** Get the current data */
     host.update(ns);
-    target.update(ns);
+    if (debug) {
+      target.update(ns);
+    } else {
+      target = getTarget(ns);
+    }
     now = ns.getTimeSinceLastAug();
 
     /** Calculate the threads needed */
