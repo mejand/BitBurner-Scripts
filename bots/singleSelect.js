@@ -1,10 +1,10 @@
+import { getTimeInRaster } from "../utilities/time.js";
 import {
-  getTimeInRaster,
   logPrintVar,
   ActionText,
   tPrintScript,
   logPrintFloat,
-} from "./utilities.js";
+} from "../utilities/log.js";
 
 /**
  * Run a single hack, grow or weaken operation and print the result for debugging.
