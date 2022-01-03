@@ -17,7 +17,7 @@ function refresh(ns, stocks, myStocks) {
   let corpus = ns.getServerMoneyAvailable("home");
 
   /** Reset the owned stocks before updating them */
-  myStocks = [];
+  myStocks.length = 0;
 
   for (let stock of stocks) {
     /** Get the current data */
