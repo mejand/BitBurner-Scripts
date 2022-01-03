@@ -4,13 +4,25 @@
  * @returns {string} The formatted amount of money.
  */
 function formatMoney(num) {
-  let symbols = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc"];
-  let i = 0;
-  for (; num >= 1000 && i < symbols.length; i++) num /= 1000;
-  return (
-    (Math.sign(num) < 0 ? "-$" + (-num).toFixed(3) : "$" + num.toFixed(3)) +
-    symbols[i]
-  );
+  var symbols = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc"];
+  var i = 0;
+  var result = "";
+  var a = Math.abs(num);
+
+  while (a >= 1000 && i < symbols.length) {
+    a /= 1000;
+  }
+
+  if (Math.sign(num)) {
+    result = "$";
+  } else {
+    result = "-$";
+  }
+
+  result += a.toFixed(3);
+  result += symbols[i];
+
+  return result;
 }
 
 /**
