@@ -84,7 +84,7 @@ export async function main(ns) {
     for (let myStock of myStocks) {
       if (stocks[0].expectedReturn > myStock.expectedReturn) {
         myStock.sell(ns, myStock.shares);
-        corpus -= commission;
+        corpus -= Stock.commission;
       }
     }
 
@@ -92,22 +92,26 @@ export async function main(ns) {
     for (let myStock of myStocks) {
       if (ns.getServerMoneyAvailable("home") < fracL * corpus) {
         let cashNeeded =
-          corpus * fracH - ns.getServerMoneyAvailable("home") + commission;
+          corpus * fracH -
+          ns.getServerMoneyAvailable("home") +
+          Stock.commission;
         let numShares = Math.floor(cashNeeded / myStock.price);
         myStock.sell(ns, numShares);
-        corpus -= commission;
+        corpus -= Stock.commission;
       }
     }
 
     /** Buy shares with cash remaining in hand */
     let cashToSpend = ns.getServerMoneyAvailable("home") - fracH * corpus;
-    let numShares = Math.floor((cashToSpend - commission) / stocks[0].price);
+    let numShares = Math.floor(
+      (cashToSpend - Stock.commission) / stocks[0].price
+    );
     numShares = Math.min(numShares, stocks[0].sharesAvailable);
 
     /** Only buy if the price can be recovered within the next cycles */
     if (
       numShares * stocks[0].expectedReturn * stocks[0].price * numCycles >
-      commission
+      Stock.commission
     ) {
       stocks[0].buy(ns, numShares);
     }
