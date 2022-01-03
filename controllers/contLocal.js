@@ -18,7 +18,7 @@ export async function main(ns) {
    * The name of the target server.
    * @type {string}
    */
-  var targetName = "n00dles";
+  var targetName = "None";
   if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
     targetName = ns.args[0];
   }
@@ -122,7 +122,7 @@ export async function main(ns) {
 
     /** Get the current data */
     host.update(ns);
-    if (debug) {
+    if (targetName != "None") {
       target.update(ns);
     } else {
       target = getTarget(ns);
