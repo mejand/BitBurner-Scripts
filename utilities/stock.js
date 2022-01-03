@@ -90,15 +90,15 @@ export class Stock {
      * The position of the stock.
      * @type {number[]}
      */
-    let position = ns.stock.getPosition(sym);
+    let position = ns.stock.getPosition(this.sym);
 
-    this.price = ns.stock.getPrice(sym);
+    this.price = ns.stock.getPrice(this.sym);
     this.shares = position[0];
-    this.sharesMax = ns.stock.getMaxShares(sym);
+    this.sharesMax = ns.stock.getMaxShares(this.sym);
     this.sharesAvailable = this.sharesMax - this.shares;
     this.buyPrice = position[1];
-    this.volatility = ns.stock.getVolatility(sym);
-    this.probability = 2 * (ns.stock.getForecast(sym) - 0.5);
+    this.volatility = ns.stock.getVolatility(this.sym);
+    this.probability = 2 * (ns.stock.getForecast(this.sym) - 0.5);
     this.expectedReturn = this.volatility * this.probability * 0.5;
   }
   /**
