@@ -24,7 +24,7 @@ function refresh(ns, stocks, myStocks) {
     stock.update(ns);
     /** Add the stock to the owned array if necessary */
     if (stock.shares > 0) {
-      myStocks.push(stocks[i]);
+      myStocks.push(stock);
     }
   }
   /** Sort the stocks buy expected returns (highest first) */
