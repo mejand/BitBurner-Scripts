@@ -14,6 +14,22 @@ import { getTimeInRaster } from "../utilities/time.js";
  */
 export async function main(ns) {
   ns.disableLog("ALL");
+  /**
+   * The name of the target server.
+   * @type {string}
+   */
+  var targetName = "n00dles";
+  if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
+    targetName = ns.args[0];
+  }
+  /**
+   * Enable debug features.
+   * @type {boolean}
+   */
+  var debug = false;
+  if (ns.args.length > 1 && typeof (ns.args[1] == "boolean")) {
+    debug = ns.args[1];
+  }
   var hackScript = "/bots/singleHack.js";
   var growScript = "/bots/singleGrow.js";
   var weakenScript = "/bots/singleWeaken.js";
@@ -23,7 +39,7 @@ export async function main(ns) {
     ns.getScriptRam(weakenScript)
   );
   var host = new MyServer(ns, ns.getHostname(), scriptRam);
-  var target = new MyServer(ns, "iron-gym");
+  var target = new MyServer(ns, targetName);
   var batch = new Batch(target.name);
   var timePerAction = 400;
   var period = 3 * timePerAction;
@@ -36,7 +52,9 @@ export async function main(ns) {
   var growCount = 0;
   var weakenCount = 0;
 
-  ns.tail();
+  if (debug) {
+    ns.tail();
+  }
 
   while (true) {
     ns.clearLog();
@@ -44,7 +62,6 @@ export async function main(ns) {
     /** Get the current data */
     host.update(ns);
     target.update(ns);
-    //target = getTarget(ns);
     now = ns.getTimeSinceLastAug();
 
     /** Calculate the threads needed */
