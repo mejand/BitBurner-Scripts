@@ -90,7 +90,7 @@ export class MyServer {
      * @type {boolean}
      */
     this.farming =
-      this.moneyPercent > this.moneyFactor ||
+      this.moneyPercent > this.moneyFactor &&
       this.deltaSecurity < this.securityOffset;
     /**
      * The number of CPU cores available on the server.
@@ -116,7 +116,7 @@ export class MyServer {
     this.growTime = ns.getGrowTime(this.name);
     this.weakenTime = ns.getWeakenTime(this.name);
     this.farming =
-      this.moneyPercent > this.moneyFactor ||
+      this.moneyPercent > this.moneyFactor &&
       this.deltaSecurity < this.securityOffset;
     this.cores = this.server.cpuCores;
   }
