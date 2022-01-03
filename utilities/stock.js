@@ -11,6 +11,7 @@ function formatMoney(num) {
 
   while (a >= 1000 && i < symbols.length) {
     a /= 1000;
+    i++;
   }
 
   if (Math.sign(num)) {
