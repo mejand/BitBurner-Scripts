@@ -1,6 +1,6 @@
 /**
  * Start a single grow action against the specified target.
- * @param {import("../..").NS } ns
+ * @param {import("..").NS } ns
  */
 export async function main(ns) {
   /**

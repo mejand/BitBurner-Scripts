@@ -7,7 +7,7 @@ import { MyServer } from "./server.js";
 export class SingleBatch {
   /**
    * Create an instance of a batch.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    * @param {string} targetName - The name of the target server.
    * @param {number} id - Optional: a unique ID for the batch.
    */
@@ -91,7 +91,7 @@ export class SingleBatch {
 
   /**
    * Print a summary of the batch to the log.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    */
   print(ns) {
     var text = "+---------+------------+------------+------------+\n";
@@ -114,7 +114,7 @@ export class SingleBatch {
 
   /**
    * Execute the batch on the defined host servers.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    * @param {MyServer[]} hosts - An array of available host servers.
    * For optimal performance it should be sorted so the servers with
    * the most available ram come first.
@@ -224,7 +224,7 @@ export class SingleBatch {
 /**
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
  * @param {MyServer} hostServer - Optional: the host server.
  * @returns {SingleBatch} The number of threads needed to grow the target to max money.
@@ -295,7 +295,7 @@ export function getFarmingBatch(ns, targetServer, hostServer = null) {
 /**
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
  * @param {MyServer} hostServer - Optional: the host server.
  * @returns {SingleBatch} The number of threads needed to grow the target to max money.

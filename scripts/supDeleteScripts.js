@@ -1,6 +1,6 @@
 /**
  * Handle the start up of control scripts on the home server at the beginning of a run.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  */
 export async function main(ns) {
   /**

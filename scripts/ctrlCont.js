@@ -9,7 +9,7 @@ import { logPrintVar } from "../utilities/log.js";
 
 /**
  * Continously start hack, grow and weaken scripts.
- * @param {import("../..").NS } ns
+ * @param {import("..").NS } ns
  */
 export async function main(ns) {
   ns.disableLog("ALL");
