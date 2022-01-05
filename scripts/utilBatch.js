@@ -347,17 +347,6 @@ export function getPreparationBatch(ns, targetServer, id, hostServer = null) {
   /** Calculate how many threads are needed to reach min security */
   result.weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
 
-  /** Limit the number of threads to what is available */
-  result.weakenThreads = Math.min(
-    result.weakenThreads,
-    hostServer.threadsAvailable
-  );
-
-  result.growThreads = Math.min(
-    result.growThreads,
-    hostServer.threadsAvailable - result.weakenThreads
-  );
-
   /** Print information to log screen */
   logPrintVar(ns, "Mode", "Preparation");
   logPrintVar(ns, "Delta Security", deltaSecurity);
