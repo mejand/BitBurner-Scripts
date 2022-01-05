@@ -39,6 +39,11 @@ export async function main(ns) {
    * @type {number}
    */
   var id = 0;
+  /**
+   * The total amount of RAM available to execute a new batch on.
+   * @type {number}
+   */
+  var ramAvailable = 0;
 
   while (true) {
     ns.clearLog();
@@ -51,19 +56,33 @@ export async function main(ns) {
 
     /** Update the batch information if there is a target and hosts */
     if (target && hosts) {
+      /** Calculate the available RAM on all hosts */
+      ramAvailable = 0;
+      for (let host of hosts) {
+        ramAvailable += host.ramAvailable;
+      }
+
       /** Print information to the log window */
       logPrintLine(ns);
       logPrintVar(ns, "Target", target.name);
       logPrintVar(ns, "Money on Target", target.moneyPercent);
+      logPrintVar(ns, "Delta Security", target.deltaSecurity);
+      logPrintLine(ns);
 
       /** Update the batch information (thread counts) */
       if (target.farming) {
         batch = getFarmingBatch(ns, target, id);
+        logPrintVar(ns, "Mode", "Farming");
       } else {
         batch = getPreparationBatch(ns, target, id);
+        logPrintVar(ns, "Mode", "Preparation");
       }
 
-      id++;
+      /** Scale the batch to the available RAM */
+      batch.scale(ramAvailable);
+
+      /** Print the final resulting batch information */
+      batch.print(ns);
 
       /** Start the batch */
       batch.execute(ns, hosts);
@@ -76,9 +95,11 @@ export async function main(ns) {
       /** Print information to the log window */
       logPrintLine(ns);
       logPrintVar(ns, "Available Hosts", hosts.length);
+      logPrintVar(ns, "Available RAM", ramAvailable);
       logPrintVar(ns, "Sleep Time", sleepTime);
       logPrintLine(ns);
-      batch.print(ns);
+
+      id++;
     }
 
     await ns.sleep(sleepTime);

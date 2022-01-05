@@ -1,4 +1,3 @@
-import { logPrintVar } from "./utilLog.js";
 import { MyServer } from "./utilServer.js";
 
 /**
@@ -301,11 +300,6 @@ export function getFarmingBatch(ns, targetServer, id, hostServer = null) {
   /** Calculate the number of threads needed to compensate the hack and grow actions */
   result.weakenThreads = Math.ceil((deltaSecurity / weakenReduction) * 1.3);
 
-  /** Print information to log window */
-  logPrintVar(ns, "Mode", "Farming");
-  logPrintVar(ns, "Delta Security", deltaSecurity);
-  logPrintVar(ns, "Grow Factor", growFactor);
-
   return result;
 }
 
@@ -362,11 +356,6 @@ export function getPreparationBatch(ns, targetServer, id, hostServer = null) {
 
   /** Calculate how many threads are needed to reach min security */
   result.weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
-
-  /** Print information to log screen */
-  logPrintVar(ns, "Mode", "Preparation");
-  logPrintVar(ns, "Delta Security", deltaSecurity);
-  logPrintVar(ns, "Grow Factor", growFactor);
 
   return result;
 }
