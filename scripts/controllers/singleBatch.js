@@ -94,21 +94,14 @@ export async function main(ns) {
       }
 
       /** Start the batch if there are enough threads available */
-      if (batch.totalThreads <= host.threadsAvailable) {
-        if (batch.hackThreads > 0) {
-          ns.run(hackScript, batch.hackThreads, target.name);
-        }
-        if (batch.growThreads > 0) {
-          ns.run(growScript, batch.growThreads, target.name);
-        }
-        if (batch.weakenThreads > 0) {
-          ns.run(weakenScript, batch.weakenThreads, target.name);
-        }
+      if (batch.totalRam <= host.ramAvailable) {
+        let hosts = [host];
+        batch.execute(ns, hosts);
 
         /** Wait until the batch is finished to start the next patch.
          * If no patch could be started the script will try again after 200ms.
          */
-        sleepTime = ns.getWeakenTime(target.name) + 400;
+        sleepTime = target.weakenTime + 400;
       }
 
       /** Print information to the log window */
