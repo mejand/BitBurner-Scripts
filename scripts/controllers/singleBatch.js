@@ -1,4 +1,4 @@
-import { logPrintVar } from "../utilities/log.js";
+import { logPrintVar, logPrintLine } from "../utilities/log.js";
 import {
   SingleBatch,
   getFarmingBatch,
@@ -35,9 +35,6 @@ export async function main(ns) {
    */
   var batch = null;
 
-  /** Open the log window */
-  ns.tail();
-
   while (true) {
     ns.clearLog();
     /** Update the server objects */
@@ -49,6 +46,12 @@ export async function main(ns) {
 
     /** Update the batch information if there is a target and hosts */
     if (target && hosts) {
+      /** Print information to the log window */
+      logPrintLine(ns);
+      logPrintVar(ns, "Target", target.name);
+      logPrintVar(ns, "Money on Target", target.moneyPercent);
+
+      /** Update the batch information (thread counts) */
       if (target.farming) {
         batch = getFarmingBatch(ns, target);
       } else {
@@ -64,8 +67,8 @@ export async function main(ns) {
       sleepTime = target.weakenTime + 400;
 
       /** Print information to the log window */
-      logPrintVar(ns, "Money on Target", target.moneyPercent);
       logPrintVar(ns, "Sleep Time", sleepTime);
+      logPrintLine(ns);
       batch.print(ns);
     }
 

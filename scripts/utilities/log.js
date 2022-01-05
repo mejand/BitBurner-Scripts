@@ -1,4 +1,12 @@
 /**
+ * Print a horizintal line in the log window to separate blocks of information.
+ * @param {import("../..").NS} ns
+ */
+export function logPrintLine(ns) {
+  ns.print("+------------------------------------------------+");
+}
+
+/**
  * Print a named variable to the log window with a unified format.
  * @param {import("../..").NS} ns
  * @param {string} varName - The name of the variable.
@@ -9,7 +17,7 @@ export function logPrintVar(ns, varName, varValue) {
    * The text that will be printed to the debug log.
    * @type {string}
    */
-  var text = "# ";
+  var text = "| ";
 
   /** Add the name of the variable to the left */
   text += ns.sprintf("%-21s =", varName);
@@ -26,7 +34,7 @@ export function logPrintVar(ns, varName, varValue) {
   }
 
   /** Add a # to the end to complete the look */
-  text += " #";
+  text += " |";
 
   ns.print(text);
 }
@@ -42,7 +50,7 @@ export function logPrintFloat(ns, varName, varValue) {
    * The text that will be printed to the debug log.
    * @type {string}
    */
-  var text = "# ";
+  var text = "| ";
 
   /** Add the name of the variable to the left */
   text += ns.sprintf("%-21s =", varName);
@@ -51,7 +59,7 @@ export function logPrintFloat(ns, varName, varValue) {
   text += ns.sprintf("= %21.6f", varValue);
 
   /** Add a # to the end to complete the look */
-  text += " #";
+  text += " |";
 
   ns.print(text);
 }

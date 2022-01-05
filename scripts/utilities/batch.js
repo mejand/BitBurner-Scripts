@@ -94,19 +94,21 @@ export class SingleBatch {
    * @param {import("../..").NS} ns
    */
   print(ns) {
-    var text = "############## Hack ####### Grow ###### Weaken ###\n";
+    var text = "+---------+------------+------------+------------+\n";
+    text += "|         |    Hack    |    Grow    |   Weaken   |\n";
     text += ns.sprintf(
-      "# Threads # %10i # %10i # %10i #\n",
+      "| Threads | %10i | %10i | %10i |\n",
       this.hackThreads,
       this.growThreads,
       this.weakenThreads
     );
     text += ns.sprintf(
-      "#   RAM   # %10i # %10i # %10i #\n",
+      "| RAM     | %10i | %10i | %10i |\n",
       this.hackRam * this.hackThreads,
       this.growRam * this.growThreads,
       this.weakenRam * this.weakenThreads
     );
+    text += "+---------+------------+------------+------------+";
     ns.print(text);
   }
 
