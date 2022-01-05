@@ -5,7 +5,7 @@ import {
   getPreparationBatch,
 } from "../utilities/batch.js";
 import { MyServer } from "../utilities/server.js";
-import { getTarget } from "../utilities/com.js";
+import { getTarget, getAvailableServers } from "../utilities/com.js";
 
 /**
  * Handle a single batch at a time on the local host server.
@@ -59,10 +59,10 @@ export async function main(ns) {
    */
   var target = getTarget(ns);
   /**
-   * The server object of the host the script is running on.
-   * @type {MyServer}
+   * The server objects that are available for tasking.
+   * @type {MyServer[]}
    */
-  var host = new MyServer(ns, hostName, scriptRam);
+  var hosts = getAvailableServers(ns);
   /**
    * The time in milliseconds the script shall wait before attempting
    * to start the next batch.
@@ -82,27 +82,26 @@ export async function main(ns) {
     ns.clearLog();
     /** Update the server objects */
     target = getTarget(ns);
-    host.update(ns);
+    hosts = getAvailableServers(ns);
 
     /** Reset the sleep time to ensure there are no unecessary wait times */
     sleepTime = 150;
-    if (target) {
+
+    /** Update the batch information if there is a target and hosts */
+    if (target && hosts) {
       if (target.farming) {
-        batch = getFarmingBatch(ns, target, host);
+        batch = getFarmingBatch(ns, target);
       } else {
-        batch = getPreparationBatch(ns, target, host);
+        batch = getPreparationBatch(ns, target);
       }
 
-      /** Start the batch if there are enough threads available */
-      if (batch.totalRam <= host.ramAvailable) {
-        let hosts = [host];
-        batch.execute(ns, hosts);
+      /** Start the batch */
+      batch.execute(ns, hosts);
 
-        /** Wait until the batch is finished to start the next patch.
-         * If no patch could be started the script will try again after 200ms.
-         */
-        sleepTime = target.weakenTime + 400;
-      }
+      /** Wait until the batch is finished to start the next patch.
+       * If no patch could be started the script will try again after 200ms.
+       */
+      sleepTime = target.weakenTime + 400;
 
       /** Print information to the log window */
       logPrintVar(ns, "Money on Target", target.moneyPercent);
