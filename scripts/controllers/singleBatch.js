@@ -14,46 +14,6 @@ import { getTarget, getAvailableServers } from "../utilities/com.js";
 export async function main(ns) {
   ns.disableLog("ALL");
   /**
-   * The name of the host server the script runs on.
-   * @type {string}
-   */
-  var hostName = ns.getHostname();
-  /**
-   * The name of the hack script used in this controller.
-   * @type {string}
-   */
-  var hackScript = "/bots/singleHack.js";
-  /**
-   * The name of the grow script used in this controller.
-   * @type {string}
-   */
-  var growScript = "/bots/singleGrow.js";
-  /**
-   * The name of the hack script used in this controller.
-   * @type {string}
-   */
-  var weakenScript = "/bots/singleWeaken.js";
-  /**
-   * The RAM needed to run the hack script.
-   * @type {number}
-   */
-  var hackRam = ns.getScriptRam(hackScript, hostName);
-  /**
-   * The RAM needed to run the grow script.
-   * @type {number}
-   */
-  var growRam = ns.getScriptRam(growScript, hostName);
-  /**
-   * The RAM needed to run the weaken script.
-   * @type {number}
-   */
-  var weakenRam = ns.getScriptRam(weakenScript, hostName);
-  /**
-   * The RAM needed to run any of the bot scripts.
-   * @type {number}
-   */
-  var scriptRam = Math.max(hackRam, growRam, weakenRam);
-  /**
    * The server object of the target.
    * @type {MyServer}
    */
@@ -105,7 +65,6 @@ export async function main(ns) {
 
       /** Print information to the log window */
       logPrintVar(ns, "Money on Target", target.moneyPercent);
-      logPrintVar(ns, "Load on Host", host.load);
       logPrintVar(ns, "Sleep Time", sleepTime);
       batch.print(ns);
     }
