@@ -226,15 +226,16 @@ export class SingleBatch {
  * The finish times are not calculated (use updateFinishTimes() to update them).
  * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
+ * @param {number} id - The id for the batch.
  * @param {MyServer} hostServer - Optional: the host server.
  * @returns {SingleBatch} The number of threads needed to grow the target to max money.
  */
-export function getFarmingBatch(ns, targetServer, hostServer = null) {
+export function getFarmingBatch(ns, targetServer, id, hostServer = null) {
   /**
    * The batch object holding the result.
    * @type {SingleBatch}
    */
-  var result = new SingleBatch(targetServer.name);
+  var result = new SingleBatch(ns, targetServer.name, id);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
@@ -297,15 +298,16 @@ export function getFarmingBatch(ns, targetServer, hostServer = null) {
  * The finish times are not calculated (use updateFinishTimes() to update them).
  * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
+ * @param {number} id - The id for the batch.
  * @param {MyServer} hostServer - Optional: the host server.
  * @returns {SingleBatch} The number of threads needed to grow the target to max money.
  */
-export function getPreparationBatch(ns, targetServer, hostServer = null) {
+export function getPreparationBatch(ns, targetServer, id, hostServer = null) {
   /**
    * The batch object holding the result.
    * @type {SingleBatch}
    */
-  var result = new SingleBatch(targetServer.name);
+  var result = new SingleBatch(ns, targetServer.name, id);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
