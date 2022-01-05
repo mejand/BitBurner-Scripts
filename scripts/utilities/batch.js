@@ -7,9 +7,10 @@ import { MyServer } from "./server.js";
 export class SingleBatch {
   /**
    * Create an instance of a batch.
+   * @param {import("../..").NS} ns
    * @param {string} targetName - The name of the target server.
    */
-  constructor(targetName) {
+  constructor(ns, targetName) {
     /**
      * The name of the target server.
      * @type {string}
@@ -30,6 +31,36 @@ export class SingleBatch {
      * @type {number}
      */
     this.weakenThreads = 0;
+    /**
+     * The name of the hack script.
+     * @type {string}
+     */
+    this.hackScript = "/bots/singleHack.js";
+    /**
+     * The name of the grow script.
+     * @type {string}
+     */
+    this.growScript = "/bots/singleGrow.js";
+    /**
+     * The name of the weaken script.
+     * @type {string}
+     */
+    this.weakenScript = "/bots/singleWeaken.js";
+    /**
+     * The ram needed to run the hack script.
+     * @type {number}
+     */
+    this.hackRam = ns.getScriptRam(this.hackScript);
+    /**
+     * The ram needed to run the grow script.
+     * @type {number}
+     */
+    this.growRam = ns.getScriptRam(this.growScript);
+    /**
+     * The ram needed to run the weaken script.
+     * @type {number}
+     */
+    this.weakenRam = ns.getScriptRam(this.weakenScript);
   }
 
   /**
@@ -38,6 +69,18 @@ export class SingleBatch {
    */
   get totalThreads() {
     return this.hackThreads + this.growThreads + this.weakenThreads;
+  }
+
+  /**
+   * The total of RAM needed to run this batch.
+   * @type {number}
+   */
+  get totalRam() {
+    return (
+      this.hackRam * this.hackThreads +
+      this.growRam * this.growThreads +
+      this.weakenRam * this.weakenThreads
+    );
   }
 
   /**
@@ -51,6 +94,12 @@ export class SingleBatch {
       this.hackThreads,
       this.growThreads,
       this.weakenThreads
+    );
+    text += ns.sprintf(
+      "#   RAM   # %10i # %10i # %10i #\n",
+      this.hackRam * this.hackThreads,
+      this.growRam * this.growThreads,
+      this.weakenRam * this.weakenThreads
     );
   }
 }
