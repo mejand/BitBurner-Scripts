@@ -1,6 +1,6 @@
 import { MyServer } from "./utilServer.js";
 import { getNetworkMap, setTarget, setUnlockedServers } from "./utilCom.js";
-import { logPrintVar } from "./utilLog.js";
+import { logPrintVar, logPrintLine } from "./utilLog.js";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
@@ -51,8 +51,6 @@ export async function main(ns) {
 
     /** Only continue if there are any mapped servers */
     if (servers) {
-      logPrintVar(ns, "Server", "Has Root Access");
-
       /** loop through all servers in the network and check if they are unlocked */
       for (let server of servers) {
         /** Update the server objects to reflect their current state */
@@ -77,12 +75,16 @@ export async function main(ns) {
             target = server;
           }
         }
-
-        logPrintVar(ns, server.name, server.server.hasAdminRights);
       }
 
+      logPrintLine(ns);
+      logPrintVar(ns, "Unlocked Servers", unlockedServers.length);
+      logPrintVar(ns, "Total Servers", servers.length);
+      logPrintLine(ns);
       if (target) {
+        logPrintLine(ns);
         logPrintVar(ns, "Target", target.name);
+        logPrintLine(ns);
       }
 
       /** Save the unlocked servers for other functions */
@@ -94,7 +96,9 @@ export async function main(ns) {
       /** Attempt to update the mapped servers */
       servers = getNetworkMap(ns);
 
+      logPrintLine(ns);
       logPrintVar(ns, "No Server Map", "-");
+      logPrintLine(ns);
     }
 
     await ns.sleep(period);
