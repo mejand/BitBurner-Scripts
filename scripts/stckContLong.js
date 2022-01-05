@@ -1,4 +1,5 @@
 import { Stock } from "./utilStock.js";
+
 /**
  * Update the information of the stock objects and calculate the total
  * assets available to the player (cash + current value of stocks).
