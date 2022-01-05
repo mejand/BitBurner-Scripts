@@ -9,13 +9,19 @@ export class SingleBatch {
    * Create an instance of a batch.
    * @param {import("../..").NS} ns
    * @param {string} targetName - The name of the target server.
+   * @param {number} id - Optional: a unique ID for the batch.
    */
-  constructor(ns, targetName) {
+  constructor(ns, targetName, id = 0) {
     /**
      * The name of the target server.
      * @type {string}
      */
     this.targetName = targetName;
+    /**
+     * A unique ID for this batch.
+     * @type {number}
+     */
+    this.id = id;
     /**
      * The number of threads dedicated to hacking.
      * @type {number}
@@ -102,6 +108,114 @@ export class SingleBatch {
       this.weakenRam * this.weakenThreads
     );
     ns.print(text);
+  }
+
+  /**
+   * Execute the batch on the defined host servers.
+   * @param {import("../..").NS} ns
+   * @param {MyServer[]} hosts - An array of available host servers.
+   * For optimal performance it should be sorted so the servers with
+   * the most available ram come first.
+   */
+  execute(ns, hosts) {
+    /**
+     * The actual number of hack threads that will be executed on
+     * a given host server.
+     * @type {number}
+     */
+    var hackThreadsActual = 0;
+    /**
+     * The actual number of grow threads that will be executed on
+     * a given host server.
+     * @type {number}
+     */
+    var growThreadsActual = 0;
+    /**
+     * The actual number of weaken threads that will be executed on
+     * a given host server.
+     * @type {number}
+     */
+    var weakenThreadsActual = 0;
+    /**
+     * The counter used to loop through host servers.
+     * @type {number}
+     */
+    var i = 0;
+
+    /** Loop through host servers as long as there are threads left to start */
+    while (this.totalThreads > 0 && i < hosts.length) {
+      /** Calculate how many weaken threads can be started on this host */
+      weakenThreadsActual = Math.min(
+        this.weakenThreads,
+        Math.floor(hosts[i].ramAvailable / this.weakenRam)
+      );
+      /** Start the weaken script if at least one thread can be executed */
+      if (weakenThreadsActual > 0) {
+        let result = ns.exec(
+          this.weakenScript,
+          hosts[i].name,
+          weakenThreadsActual,
+          this.targetName,
+          this.id
+        );
+        /**
+         * Update the number of threads left to start and the free ram on the host
+         * if the script was started successfully.
+         */
+        if (result > 0) {
+          this.weakenThreads -= weakenThreadsActual;
+          hosts[i].ramAvailable -= weakenThreadsActual * this.weakenRam;
+        }
+      }
+      /** Calculate how many grow threads can be started on this host */
+      growThreadsActual = Math.min(
+        this.growThreads,
+        Math.floor(hosts[i].ramAvailable / this.growRam)
+      );
+      /** Start the grow script if at least one thread can be executed */
+      if (growThreadsActual > 0) {
+        let result = ns.exec(
+          this.growScript,
+          hosts[i].name,
+          growThreadsActual,
+          this.targetName,
+          this.id
+        );
+        /**
+         * Update the number of threads left to start and the free ram on the host
+         * if the script was started successfully.
+         */
+        if (result > 0) {
+          this.growThreads -= growThreadsActual;
+          hosts[i].ramAvailable -= growThreadsActual * this.growRam;
+        }
+      }
+      /** Calculate how many hack threads can be started on this host */
+      hackThreadsActual = Math.min(
+        this.hackThreads,
+        Math.floor(hosts[i].ramAvailable / this.hackRam)
+      );
+      /** Start the hack script if at least one thread can be executed */
+      if (hackThreadsActual > 0) {
+        let result = ns.exec(
+          this.hackScript,
+          hosts[i].name,
+          hackThreadsActual,
+          this.targetName,
+          this.id
+        );
+        /**
+         * Update the number of threads left to start and the free ram on the host
+         * if the script was started successfully.
+         */
+        if (result > 0) {
+          this.hackThreads -= hackThreadsActual;
+          hosts[i].ramAvailable -= hackThreadsActual * this.hackRam;
+        }
+      }
+      /** Increment the counter to check the next host */
+      i++;
+    }
   }
 }
 
