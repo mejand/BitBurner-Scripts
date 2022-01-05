@@ -2,7 +2,7 @@ import { Stock } from "../utilities/stock.js";
 /**
  * Update the information of the stock objects and calculate the total
  * assets available to the player (cash + current value of stocks).
- * @param {NS} ns
+ * @param {("../..").} ns
  * @param {Stock[]} stocks - An array containing all stocks that are traded on the market.
  * @param {Stock[]} myStocks - An array containing all stocks in the players posession.
  * @returns {number} - The value of all assests the player owns (cash plus current value of

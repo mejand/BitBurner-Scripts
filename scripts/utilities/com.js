@@ -2,7 +2,7 @@ import { MyServer } from "./server.js";
 
 /**
  * Get a list of all servers in the network.
- * @param {import("..").NS} ns
+ * @param {import("../..").NS} ns
  * @returns {MyServer[]} A list of all servers in the network.
  */
 export function getNetworkMap(ns) {
@@ -36,7 +36,7 @@ export function getNetworkMap(ns) {
 
 /**
  * Define all servers in the network for use by other functions.
- * @param {import("..").NS} ns
+ * @param {import("../..").NS} ns
  * @param {string[]} servers - The names of all servers in the network.
  */
 export async function setNetworkMap(ns, servers) {
@@ -52,7 +52,7 @@ export async function setNetworkMap(ns, servers) {
 
 /**
  * Define a list of unlocked servers for other functions to use.
- * @param {import("..").NS} ns
+ * @param {import("../..").NS} ns
  * @param {MyServer[]} servers - All unlocked servers.
  */
 export async function setUnlockedServers(ns, servers) {
@@ -69,7 +69,7 @@ export async function setUnlockedServers(ns, servers) {
 
 /**
  * Define the most profitable hack target for use by other functions.
- * @param {import("..").NS} ns
+ * @param {import("../..").NS} ns
  * @param {MyServer} server - The target server.
  */
 export async function setTarget(ns, server) {
@@ -82,7 +82,7 @@ export async function setTarget(ns, server) {
 
 /**
  * Get the most profitable hack target.
- * @param {import("..").NS} ns
+ * @param {import("../..").NS} ns
  * @returns {MyServer||null} The most profitable hack target.
  */
 export function getTarget(ns) {

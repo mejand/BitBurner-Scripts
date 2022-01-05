@@ -4,7 +4,7 @@
 export class MyServer {
   /**
    * Create a custom server object for the given server name.
-   * @param {import("..").NS} ns
+   * @param {import("../..").NS} ns
    * @param {string} name - The name of the server.
    * @param {number} scriptRam - The amount of RAM needed to run any bot script.
    * @param {number} moneyFactor - If the available money is below this fraction of the
@@ -15,7 +15,7 @@ export class MyServer {
   constructor(ns, name, scriptRam = 2, moneyFactor = 0.9, securityOffset = 1) {
     /**
      * The server object provided by the game.
-     * @type {import("..").Server}
+     * @type {import("../..").Server}
      */
     this.server = ns.getServer(name);
     /**
@@ -101,7 +101,7 @@ export class MyServer {
 
   /**
    * Update the server information.
-   * @param {import("..").NS} ns
+   * @param {import("../..").NS} ns
    */
   update(ns) {
     this.server = ns.getServer(this.name);
@@ -123,7 +123,7 @@ export class MyServer {
 
   /**
    * Try to gain root access to the server.
-   * @param {import("..").NS} ns
+   * @param {import("../..").NS} ns
    * @returns {boolean} True if the unlock was successful.
    */
   getRootAccess(ns) {
@@ -171,7 +171,7 @@ export class MyServer {
 
   /**
    * Copy all .lit and .txt files from the server to home.
-   * @param {import("..").NS} ns
+   * @param {import("../..").NS} ns
    */
   async copyFilesToHome(ns) {
     if (this.name != "home") {
@@ -194,7 +194,7 @@ export class MyServer {
   /**
    * Calculate a score value for the server to determine its attractiveness
    * asa a hack target.
-   * @param {import("..").NS} ns
+   * @param {import("../..").NS} ns
    */
   calcScore(ns) {
     /**
@@ -204,7 +204,7 @@ export class MyServer {
     var score = 0;
     /**
      * The player at his current hack level.
-     * @type {import("..").Player}
+     * @type {import("../..").Player}
      */
     var player = ns.getPlayer();
 
@@ -215,7 +215,7 @@ export class MyServer {
         /**
          * A server object that is set to min difficulty to get the weaken time
          * for farming mode.
-         * @type {import("..").Server}
+         * @type {import("../..").Server}
          */
         let server = ns.getServer(this.name);
         server.hackDifficulty = server.minDifficulty;
