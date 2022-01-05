@@ -88,14 +88,9 @@ export async function main(ns) {
     sleepTime = 150;
     if (target) {
       if (target.farming) {
-        batch = getFarmingBatch(ns, target.server, host.server);
+        batch = getFarmingBatch(ns, target, host);
       } else {
-        batch = getPreparationBatch(
-          ns,
-          target.server,
-          host.server,
-          host.threadsAvailable
-        );
+        batch = getPreparationBatch(ns, target, host);
       }
 
       /** Start the batch if there are enough threads available */

@@ -131,14 +131,9 @@ export async function main(ns) {
 
     /** Calculate the threads needed */
     if (target.farming) {
-      batch = getFarmingBatch(ns, target.server, host.server);
+      batch = getFarmingBatch(ns, target, host);
     } else {
-      batch = getPreparationBatch(
-        ns,
-        target.server,
-        host.server,
-        host.threadsAvailable
-      );
+      batch = getPreparationBatch(ns, target, host);
     }
 
     /**

@@ -147,15 +147,9 @@ export function getFarmingBatch(ns, targetServer, hostServer) {
  * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
  * @param {MyServer} hostServer - The host server.
- * @param {number} threadsAvailable - The number of threads currently available.
  * @returns {Batch} The number of threads needed to grow the target to max money.
  */
-export function getPreparationBatch(
-  ns,
-  targetServer,
-  hostServer,
-  threadsAvailable
-) {
+export function getPreparationBatch(ns, targetServer, hostServer) {
   /**
    * The batch object holding the result.
    * @type {Batch}
@@ -190,11 +184,14 @@ export function getPreparationBatch(
   result.weakenThreads = Math.ceil(deltaSecurity / weakenReduction);
 
   /** Limit the number of threads to what is available */
-  result.weakenThreads = Math.min(result.weakenThreads, threadsAvailable);
+  result.weakenThreads = Math.min(
+    result.weakenThreads,
+    hostServer.threadsAvailable
+  );
 
   result.growThreads = Math.min(
     result.growThreads,
-    threadsAvailable - result.weakenThreads
+    hostServer.threadsAvailable - result.weakenThreads
   );
 
   /** Print information to log screen */
