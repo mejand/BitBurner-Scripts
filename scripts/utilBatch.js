@@ -219,6 +219,22 @@ export class SingleBatch {
       i++;
     }
   }
+
+  /**
+   * Scale the batch to use a maximum amount of RAM.
+   * @param {number} ramAvailable - The maximum amount of RAM that shall be used by the batch.
+   */
+  scale(ramAvailable) {
+    /**
+     * The scaling factor the thread counts have to be multiplied with.
+     * @type {number}
+     */
+    var factor = Math.min(1.0, ramAvailable / this.totalRam);
+
+    this.hackThreads = Math.floor(this.hackThreads * factor);
+    this.growThreads = Math.floor(this.growThreads * factor);
+    this.weakenThreads = Math.floor(this.weakenThreads * factor);
+  }
 }
 
 /**
