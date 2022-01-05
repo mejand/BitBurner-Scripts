@@ -14,13 +14,13 @@ export async function main(ns) {
   ns.tprint("####       Network Mapped       ####");
   await ns.sleep(wait_time);
 
-  // start the unlock script with a 10 second period and debugging off
+  // start the unlock script with a 10 second period
   ns.run("supUnlock.js", 1, 10000);
   ns.tprint("####  Server Unlocking Started  ####");
   await ns.sleep(wait_time);
 
-  // start the hacknet script with a 1 second period and 50 budget
-  ns.run("supHacknet.js", 1, 1000, 0.5, false);
+  // start the hacknet script with a 1 second period and 50% budget
+  ns.run("supHacknet.js", 1, 1000, 0.5);
   ns.tprint("#### Hacknet Management Started ####");
   await ns.sleep(wait_time);
 
