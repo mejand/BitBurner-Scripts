@@ -6,7 +6,6 @@ import {
 } from "../utilities/batch.js";
 import { getTarget } from "../utilities/com.js";
 import { logPrintVar } from "../utilities/log.js";
-import { getTimeInRaster } from "../utilities/time.js";
 
 /**
  * Continously start hack, grow and weaken scripts.
@@ -88,14 +87,12 @@ export async function main(ns) {
    * The time stamp after which hacking can be started.
    * @type {number}
    */
-  var hackStartTime =
-    now + period + getTimeInRaster(target.weakenTime - target.hackTime);
+  var hackStartTime = now + period + target.weakenTime - target.hackTime;
   /**
    * The time stamp after which growing can be started.
    * @type {number}
    */
-  var growStartTime =
-    now + period + getTimeInRaster(target.weakenTime - target.growTime);
+  var growStartTime = now + period + target.weakenTime - target.growTime;
   /**
    * The number of hack actions that have been triggered.
    * @type {number}
@@ -143,8 +140,7 @@ export async function main(ns) {
     if (batch.totalThreads <= host.threadsAvailable) {
       /** Start a hack action if it will finish within it's allotted time window */
       if (batch.hackThreads > 0 && now > hackStartTime) {
-        let hackRelativeFinish =
-          getTimeInRaster(now + target.hackTime) % period;
+        let hackRelativeFinish = now + (target.hackTime % period);
         if (hackRelativeFinish == 0) {
           ns.run(hackScript, batch.hackThreads, target.name, hackCount);
           hackCount++;
@@ -152,8 +148,7 @@ export async function main(ns) {
       }
       /** Start a grow action if it will finish within it's allotted time window */
       if (batch.growThreads > 0 && now > growStartTime) {
-        let growRelativeFinish =
-          getTimeInRaster(now + target.growTime) % period;
+        let growRelativeFinish = now + (target.growTime % period);
         if (growRelativeFinish == timePerAction) {
           ns.run(growScript, batch.growThreads, target.name, growCount);
           growCount++;
@@ -161,8 +156,7 @@ export async function main(ns) {
       }
       /** Start a weaken action if it will finish within it's allotted time window */
       if (batch.weakenThreads > 0) {
-        let weakenRelativeFinish =
-          getTimeInRaster(now + target.weakenTime) % period;
+        let weakenRelativeFinish = now + (target.weakenTime % period);
         if (weakenRelativeFinish == timePerAction * 2) {
           ns.run(weakenScript, batch.weakenThreads, target.name, weakenCount);
           weakenCount++;

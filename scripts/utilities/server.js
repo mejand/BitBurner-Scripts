@@ -45,17 +45,17 @@ export class MyServer {
      */
     this.load = 100 - (this.threadsAvailable / this.threadsMax) * 100;
     /**
-     * The time it takes to hack the server.
+     * The time it takes to hack the server converted to the 200ms raster.
      * @type {number}
      */
     this.hackTime = getTimeInRaster(ns.getHackTime(this.name));
     /**
-     * The time it takes to grow the server.
+     * The time it takes to grow the server converted to the 200ms raster.
      * @type {number}
      */
     this.growTime = getTimeInRaster(ns.getGrowTime(this.name));
     /**
-     * The time it takes to weaken the server.
+     * The time it takes to weaken the server converted to the 200ms raster.
      * @type {number}
      */
     this.weakenTime = getTimeInRaster(ns.getWeakenTime(this.name));
