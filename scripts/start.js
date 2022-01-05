@@ -8,6 +8,7 @@ export async function main(ns) {
    * @type {number}
    */
   var wait_time = 400;
+
   // call the spider script to populate the network map
   ns.run("/support/spider.js", 1);
   ns.tprint("####       Network Mapped       ####");
@@ -28,7 +29,9 @@ export async function main(ns) {
   ns.tprint("#### Local Hack Control Started ####");
   await ns.sleep(wait_time);
 
-  // start the centralized hacking control script
-  ns.run("/stocks/contLong.js", 1);
-  ns.tprint("####   Stock Control Started    ####");
+  if (ns.getServerMaxRam("home") >= 128) {
+    // start the centralized hacking control script
+    ns.run("/stocks/contLong.js", 1);
+    ns.tprint("####   Stock Control Started    ####");
+  }
 }
