@@ -68,6 +68,47 @@ export async function setUnlockedServers(ns, servers) {
 }
 
 /**
+ * Get a list of all unlocked servers that have free RAM.
+ * @param {import("../..").NS} ns
+ * @returns {MyServer[]} A list of all unlocked servers ready for tasking,
+ * sorted by available RAM (highest comes first).
+ */
+export function getAvailableServers(ns) {
+  /**
+   * The rows of network_map.txt
+   * @type {string[]}
+   */
+  var rows = null;
+  /**
+   * The server objects that are in the network.
+   * @type {MyServer[]}
+   */
+  var servers = [];
+
+  if (ns.fileExists("/servers/UnlockedServers.txt")) {
+    /** Read the contents of the file */
+    rows = ns.read("/servers/UnlockedServers.txt").split("\r\n");
+
+    /** loop through all server names from the file and add them the array */
+    for (let row of rows) {
+      /** Ignore last blank row */
+      if (row) {
+        let server = new MyServer(ns, row);
+        /** Add the server name to the list if there is ram available */
+        if (server.ramAvailable > 0) {
+          servers.push(server);
+        }
+      }
+    }
+  }
+
+  /** Sort the servers by RAM available */
+  servers.sort((a, b) => b.ramAvailable - a.ramAvailable);
+
+  return servers;
+}
+
+/**
  * Define the most profitable hack target for use by other functions.
  * @param {import("../..").NS} ns
  * @param {MyServer} server - The target server.
