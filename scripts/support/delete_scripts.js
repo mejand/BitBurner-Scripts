@@ -12,11 +12,6 @@ export async function main(ns) {
     debug = ns.args[0];
   }
   /**
-   * The wait time between each step in the start up sequence.
-   * @type {number}
-   */
-  var wait_time = 400;
-  /**
    * All files present on the host server.
    * @type {string[]}
    */
@@ -24,7 +19,7 @@ export async function main(ns) {
 
   // loop through the files and delete everything except the start up scripts
   for (let file of files) {
-    if (file != "start.js" && file != "automation_start.js") {
+    if (file != "/support/delete_scripts.js") {
       // try to kill the script to clear the memory on the home server
       ns.scriptKill(file, "home");
 
