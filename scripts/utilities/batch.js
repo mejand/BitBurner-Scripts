@@ -1,5 +1,6 @@
 import { getTimeInRaster } from "./time.js";
 import { logPrintVar } from "./log.js";
+import { MyServer } from "./server.js";
 
 /**
  * The instructions needed to run a hack, grow, weaken cycle against a target server.
@@ -82,8 +83,8 @@ export class Batch {
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
  * @param {import("..").NS} ns
- * @param {import("..").Server} targetServer - The target server.
- * @param {import("..").Server} hostServer - The host server.
+ * @param {MyServer} targetServer - The target server.
+ * @param {MyServer} hostServer - The host server.
  * @returns {Batch} The number of threads needed to grow the target to max money.
  */
 export function getFarmingBatch(ns, targetServer, hostServer) {
@@ -91,7 +92,7 @@ export function getFarmingBatch(ns, targetServer, hostServer) {
    * The batch object holding the result.
    * @type {Batch}
    */
-  var result = new Batch(targetServer.hostname);
+  var result = new Batch(targetServer.name);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
@@ -101,25 +102,25 @@ export function getFarmingBatch(ns, targetServer, hostServer) {
    * The security score that will be removed by one thread of the weaken script.
    * @type {number}
    */
-  var weakenReduction = ns.weakenAnalyze(1, hostServer.cpuCores);
+  var weakenReduction = ns.weakenAnalyze(1, hostServer.cores);
   /**
    * The security score that needs to be removed to reach min security.
    * @type {number}
    */
-  var deltaSecurity = targetServer.hackDifficulty - targetServer.minDifficulty;
+  var deltaSecurity = targetServer.deltaSecurity;
 
   /** Calculate the hack threads needed to steal half the money on the target server */
-  result.hackThreads = Math.floor(0.5 / ns.hackAnalyze(targetServer.hostname));
+  result.hackThreads = Math.floor(0.5 / ns.hackAnalyze(targetServer.name));
 
   /** Calculate the percentage the target needs to be grown to compensate the hacking */
   growFactor =
-    1.0 / (1.0 - result.hackThreads * ns.hackAnalyze(targetServer.hostname));
+    1.0 / (1.0 - result.hackThreads * ns.hackAnalyze(targetServer.name));
 
   /** Calculate the number of threads needed to compensate the stolen money */
   result.growThreads = ns.growthAnalyze(
-    targetServer.hostname,
+    targetServer.name,
     growFactor,
-    hostServer.cpuCores
+    hostServer.cores
   );
 
   /** Convert growth threads to integer and add safety margin */
@@ -144,8 +145,8 @@ export function getFarmingBatch(ns, targetServer, hostServer) {
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
  * @param {import("..").NS} ns
- * @param {import("..").Server} targetServer - The target server.
- * @param {import("..").Server} hostServer - The host server.
+ * @param {MyServer} targetServer - The target server.
+ * @param {MyServer} hostServer - The host server.
  * @param {number} threadsAvailable - The number of threads currently available.
  * @returns {Batch} The number of threads needed to grow the target to max money.
  */
@@ -159,26 +160,27 @@ export function getPreparationBatch(
    * The batch object holding the result.
    * @type {Batch}
    */
-  var result = new Batch(targetServer.hostname);
+  var result = new Batch(targetServer.name);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
    */
-  var growFactor = targetServer.moneyMax / targetServer.moneyAvailable;
+  var growFactor =
+    targetServer.server.moneyMax / targetServer.server.moneyAvailable;
   /**
    * The security score that will be removed by one thread of the weaken script.
    * @type {number}
    */
-  var weakenReduction = ns.weakenAnalyze(1, hostServer.cpuCores);
+  var weakenReduction = ns.weakenAnalyze(1, hostServer.cores);
   /**
    * The security score that needs to be removed to reach min security.
    * @type {number}
    */
-  var deltaSecurity = targetServer.hackDifficulty - targetServer.minDifficulty;
+  var deltaSecurity = targetServer.deltaSecurity;
 
   /** Calculate how many threads are needed to grow the target to max money */
   result.growThreads = Math.ceil(
-    ns.growthAnalyze(targetServer.hostname, growFactor, hostServer.cpuCores)
+    ns.growthAnalyze(targetServer.name, growFactor, hostServer.cores)
   );
 
   /** Calculate the security impact of the grow operation */
@@ -210,7 +212,7 @@ export function getPreparationBatch(
  * @param {number} timeNow - The current time stamp.
  * @param {number} period - The time between executions of the controller.
  * @param {number} timePerAction - The time that is reserved for each action.
- * @param {import("..").Server} targetServer - The server that is targeted.
+ * @param {MyServer} targetServer - The server that is targeted.
  */
 export function updateFinishTimes(
   ns,
@@ -224,7 +226,7 @@ export function updateFinishTimes(
    * The time it takes to run the weaken command.
    * @type {number}
    */
-  var weakenDuration = getTimeInRaster(ns.getWeakenTime(targetServer.hostname));
+  var weakenDuration = getTimeInRaster(targetServer.weakenTime);
   /**
    * The point in time at which the batch of scripts will finish, if started now.
    * @type {number}
