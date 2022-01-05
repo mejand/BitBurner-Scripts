@@ -58,10 +58,19 @@ export async function main(ns) {
 
         /** Try and unlock the server (nothing will happen if it is already unlocked) */
         if (server.getRootAccess(ns)) {
-          /** Copy all text files on the server to home */
-          await server.copyFilesToHome(ns);
           /** Copy the simple bot scripts to the unlocked server */
-          await server.copyFilesFromHome(ns);
+          if (server.name != "home") {
+            /**
+             * The names of all files on the server.
+             * @type {string[]}
+             */
+            let filesToCopy = [
+              "botsSingleGrow.js",
+              "botsSingleHack.js",
+              "botsSingleWeaken.js",
+            ];
+            await ns.scp(filesToCopy, "home", server.name);
+          }
           /** Add the server to the unlocked servers */
           unlockedServers.push(server);
           /**

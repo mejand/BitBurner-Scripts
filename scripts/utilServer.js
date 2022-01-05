@@ -154,47 +154,6 @@ export class MyServer {
   }
 
   /**
-   * Copy all .lit and .txt files from the server to home.
-   * @param {import("..").NS} ns
-   */
-  async copyFilesToHome(ns) {
-    if (this.name != "home") {
-      /**
-       * The names of all files on the server.
-       * @type {string[]}
-       */
-      let filesToCopy = ns.ls(this.name, ".lit");
-      filesToCopy = filesToCopy.concat(ns.ls(this.name, ".txt"));
-
-      if (filesToCopy) {
-        for (let file of filesToCopy) {
-          await ns.scp(file, this.name, "home");
-        }
-      }
-    }
-  }
-
-  /**
-   * Copy the basic hack, grow and weaken scripts to the new server.
-   * @param {import("..").NS} ns
-   */
-  async copyFilesFromHome(ns) {
-    if (this.name != "home") {
-      /**
-       * The names of all files on the server.
-       * @type {string[]}
-       */
-      let filesToCopy = [
-        "botsSingleGrow.js",
-        "botsSingleHack.js",
-        "botsSingleWeaken.js",
-      ];
-
-      await ns.scp(filesToCopy, "home", this.name);
-    }
-  }
-
-  /**
    * Calculate a score value for the server to determine its attractiveness
    * asa a hack target.
    * @param {import("..").NS} ns
