@@ -1,15 +1,11 @@
-import { MyServer } from "../utilities/server.js";
-import {
-  getNetworkMap,
-  setTarget,
-  setUnlockedServers,
-} from "../utilities/com.js";
-import { logPrintVar } from "../utilities/log.js";
+import { MyServer } from "./utilServer.js";
+import { getNetworkMap, setTarget, setUnlockedServers } from "./utilCom.js";
+import { logPrintVar } from "./utilLog.js";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
  * Identify the best target and save it to file.
- * @param {import("../..").NS } ns
+ * @param {import("..").NS } ns
  */
 export async function main(ns) {
   ns.disableLog("ALL");

@@ -1,6 +1,6 @@
 /**
  * Handle the automatic upgrading of hacknet nodes.
- * @param {import("../..").NS } ns
+ * @param {import("..").NS } ns
  */
 export async function main(ns) {
   /**

@@ -19,7 +19,7 @@ export async function main(ns) {
 
   // loop through the files and delete everything except the start up scripts
   for (let file of files) {
-    if (file != "/support/delete_scripts.js") {
+    if (file != "supDeleteScripts.js") {
       // try to kill the script to clear the memory on the home server
       ns.scriptKill(file, "home");
 

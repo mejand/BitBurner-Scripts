@@ -1,8 +1,8 @@
-import { setNetworkMap } from "../utilities/com.js";
+import { setNetworkMap } from "./utilCom.js";
 
 /**
  * Find all servers in the network and write them to a file for use in other scripts. Needs to be called only once per run.
- * @param {import("../..").NS } ns
+ * @param {import("..").NS } ns
  */
 export async function main(ns) {
   /**

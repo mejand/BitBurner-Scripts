@@ -1,5 +1,5 @@
-import { logPrintVar } from "./log.js";
-import { MyServer } from "./server.js";
+import { logPrintVar } from "./utilLog.js";
+import { MyServer } from "./utilServer.js";
 
 /**
  * The instructions needed to run a hack, grow, weaken cycle against a target server.
@@ -41,17 +41,17 @@ export class SingleBatch {
      * The name of the hack script.
      * @type {string}
      */
-    this.hackScript = "/bots/singleHack.js";
+    this.hackScript = "botsSingleHack.js";
     /**
      * The name of the grow script.
      * @type {string}
      */
-    this.growScript = "/bots/singleGrow.js";
+    this.growScript = "botsSingleGrow.js";
     /**
      * The name of the weaken script.
      * @type {string}
      */
-    this.weakenScript = "/bots/singleWeaken.js";
+    this.weakenScript = "botsSingleWeaken.js";
     /**
      * The ram needed to run the hack script.
      * @type {number}

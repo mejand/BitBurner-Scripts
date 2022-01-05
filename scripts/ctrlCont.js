@@ -1,11 +1,11 @@
-import { MyServer } from "../utilities/server.js";
+import { MyServer } from "./utilServer.js";
 import {
   SingleBatch,
   getFarmingBatch,
   getPreparationBatch,
-} from "../utilities/batch.js";
-import { getTarget } from "../utilities/com.js";
-import { logPrintVar } from "../utilities/log.js";
+} from "./utilBatch.js";
+import { getTarget } from "./utilCom.js";
+import { logPrintVar } from "./utilLog.js";
 
 /**
  * Continously start hack, grow and weaken scripts.

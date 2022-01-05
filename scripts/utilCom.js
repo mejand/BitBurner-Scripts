@@ -1,8 +1,8 @@
-import { MyServer } from "./server.js";
+import { MyServer } from "./utilServer.js";
 
 /**
  * Get a list of all servers in the network.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @returns {MyServer[]} A list of all servers in the network.
  */
 export function getNetworkMap(ns) {
@@ -36,7 +36,7 @@ export function getNetworkMap(ns) {
 
 /**
  * Define all servers in the network for use by other functions.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {string[]} servers - The names of all servers in the network.
  */
 export async function setNetworkMap(ns, servers) {
@@ -52,7 +52,7 @@ export async function setNetworkMap(ns, servers) {
 
 /**
  * Define a list of unlocked servers for other functions to use.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {MyServer[]} servers - All unlocked servers.
  */
 export async function setUnlockedServers(ns, servers) {
@@ -69,7 +69,7 @@ export async function setUnlockedServers(ns, servers) {
 
 /**
  * Get a list of all unlocked servers that have free RAM.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @returns {MyServer[]} A list of all unlocked servers ready for tasking,
  * sorted by available RAM (highest comes first).
  */
@@ -110,7 +110,7 @@ export function getAvailableServers(ns) {
 
 /**
  * Define the most profitable hack target for use by other functions.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {MyServer} server - The target server.
  */
 export async function setTarget(ns, server) {
@@ -123,8 +123,8 @@ export async function setTarget(ns, server) {
 
 /**
  * Get the most profitable hack target.
- * @param {import("../..").NS} ns
- * @returns {MyServer||null} The most profitable hack target.
+ * @param {import("..").NS} ns
+ * @returns {MyServer | null} The most profitable hack target.
  */
 export function getTarget(ns) {
   /**
@@ -134,7 +134,7 @@ export function getTarget(ns) {
   var name = ns.peek(1);
   /**
    * The server object corresponding to the name on the port.
-   * @type {MyServer||null}
+   * @type {MyServer | null}
    */
   var server = null;
 

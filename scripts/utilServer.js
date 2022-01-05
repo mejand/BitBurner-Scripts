@@ -1,4 +1,4 @@
-import { getTimeInRaster } from "./time.js";
+import { getTimeInRaster } from "./utilTime.js";
 
 /**
  * A custom server object providing commonly used information.
@@ -6,7 +6,7 @@ import { getTimeInRaster } from "./time.js";
 export class MyServer {
   /**
    * Create a custom server object for the given server name.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    * @param {string} name - The name of the server.
    * @param {number} moneyFactor - If the available money is below this fraction of the
    * available money preparation is recommended before farming.
@@ -87,7 +87,7 @@ export class MyServer {
 
   /**
    * Update the server information.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    */
   update(ns) {
     this.server = ns.getServer(this.name);
@@ -107,7 +107,7 @@ export class MyServer {
 
   /**
    * Try to gain root access to the server.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    * @returns {boolean} True if the unlock was successful.
    */
   getRootAccess(ns) {
@@ -155,7 +155,7 @@ export class MyServer {
 
   /**
    * Copy all .lit and .txt files from the server to home.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    */
   async copyFilesToHome(ns) {
     if (this.name != "home") {
@@ -176,7 +176,7 @@ export class MyServer {
 
   /**
    * Copy the basic hack, grow and weaken scripts to the new server.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    */
   async copyFilesFromHome(ns) {
     if (this.name != "home") {
@@ -197,7 +197,7 @@ export class MyServer {
   /**
    * Calculate a score value for the server to determine its attractiveness
    * asa a hack target.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    */
   calcScore(ns) {
     /**

@@ -1,6 +1,6 @@
 /**
  * Handle the automatic buying of serversNames.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  */
 export async function main(ns) {
   /**
@@ -98,24 +98,16 @@ export async function main(ns) {
        * The name of the new server that was purchased this cycle.
        * @type {string}
        */
-      var newServerName = ns.purchaseServer(
-        "basic-hack-server",
-        maxAffordableRam
-      );
+      var newServerName = ns.purchaseServer("owned-server", maxAffordableRam);
 
       // copy the hacking scripts to the new server
-      await ns.scp("weaken.js", "home", newServerName);
-      await ns.scp("grow.js", "home", newServerName);
-      await ns.scp("hack.js", "home", newServerName);
-
-      // copy the local controller to the new server and start it
-      await ns.scp("local_batch_control.js", "home", newServerName);
-      await ns.scp("utilities.js", "home", newServerName);
-      ns.exec("local_batch_control.js", newServerName, 1, false);
+      await ns.scp("botsSingleGrow.js", "home", newServerName);
+      await ns.scp("botsSingleHack.js", "home", newServerName);
+      await ns.scp("botsSingleWeaken.js", "home", newServerName);
 
       // print the name for debugging purposes
       if (debug) {
-        ns.tprint("bought " + newServerName + " - " + maxAffordableRam + "GB");
+        ns.print("bought " + newServerName + " - " + maxAffordableRam + "GB");
       }
     }
 
@@ -126,7 +118,7 @@ export async function main(ns) {
 
 /**
  * Get the maximum amount of RAM that can be purchased for a given price.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {number} money - The maximum money available for purchase of RAM.
  * @returns {number} The maximum amount RAM that can be purchased.
  */
@@ -184,9 +176,9 @@ function getMaxAffordableRam(ns, money) {
 
 /**
  * Get the server with the lowest RAM.
- * @param {import("../..").NS} ns
+ * @param {import("..").NS} ns
  * @param {string[]} serversNames - The names of the servers from which to select.
- * @returns {import("../..").Server}
+ * @returns {import("..").Server}
  */
 function getMinRamServer(ns, serversNames) {
   /**

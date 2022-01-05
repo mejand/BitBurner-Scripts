@@ -96,7 +96,7 @@ export class Stock {
   }
   /**
    * Update the data of the stock.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    */
   update(ns) {
     /**
@@ -116,7 +116,7 @@ export class Stock {
   }
   /**
    * Sell a defined number of shares.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    * @param {number} numShares - The numbe rof shares that shall be sold.
    */
   buy(ns, numShares) {
@@ -137,7 +137,7 @@ export class Stock {
   }
   /**
    * Sell a number of shares.
-   * @param {import("../..").NS} ns
+   * @param {import("..").NS} ns
    * @param {number} numShares - The number of shares that shall be sold.
    */
   sell(ns, numShares) {

@@ -1,8 +1,8 @@
-import { Stock } from "../utilities/stock.js";
+import { Stock } from "./utilStock.js";
 /**
  * Update the information of the stock objects and calculate the total
  * assets available to the player (cash + current value of stocks).
- * @param {("../..").} ns
+ * @param {import("..").NS} ns
  * @param {Stock[]} stocks - An array containing all stocks that are traded on the market.
  * @param {Stock[]} myStocks - An array containing all stocks in the players posession.
  * @returns {number} - The value of all assests the player owns (cash plus current value of
@@ -35,7 +35,10 @@ function refresh(ns, stocks, myStocks) {
   return corpus;
 }
 
-/** @param {NS} ns **/
+/**
+ * Buy and sell stocks to gain money.
+ * @param {import("..").NS} ns
+ */
 export async function main(ns) {
   /**
    * Minimum fraction of assets to keep as cash in hand.
