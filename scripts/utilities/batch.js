@@ -5,7 +5,7 @@ import { MyServer } from "./server.js";
 /**
  * The instructions needed to run a hack, grow, weaken cycle against a target server.
  */
-export class Batch {
+export class SingleBatch {
   /**
    * Create an instance of a batch.
    * @param {string} targetName - The name of the target server.
@@ -31,21 +31,6 @@ export class Batch {
      * @type {number}
      */
     this.weakenThreads = 0;
-    /**
-     * The time at which the hack operation shall be finished.
-     * @type {number}
-     */
-    this.hackFinish = 0;
-    /**
-     * The time at which the grow operation shall be finished.
-     * @type {number}
-     */
-    this.growFinish = 0;
-    /**
-     * The time at which the weaken operation shall be finished.
-     * @type {number}
-     */
-    this.weakenFinish = 0;
   }
 
   /**
@@ -68,14 +53,6 @@ export class Batch {
       this.growThreads,
       this.weakenThreads
     );
-    text += ns.sprintf(
-      "# Time    # %10i # %10i # %10i #\n",
-      this.hackFinish,
-      this.growFinish,
-      this.weakenFinish
-    );
-    text += "##################################################";
-    ns.print(text);
   }
 }
 
@@ -85,14 +62,14 @@ export class Batch {
  * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
  * @param {MyServer} hostServer - The host server.
- * @returns {Batch} The number of threads needed to grow the target to max money.
+ * @returns {SingleBatch} The number of threads needed to grow the target to max money.
  */
 export function getFarmingBatch(ns, targetServer, hostServer) {
   /**
    * The batch object holding the result.
-   * @type {Batch}
+   * @type {SingleBatch}
    */
-  var result = new Batch(targetServer.name);
+  var result = new SingleBatch(targetServer.name);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
@@ -147,14 +124,14 @@ export function getFarmingBatch(ns, targetServer, hostServer) {
  * @param {import("..").NS} ns
  * @param {MyServer} targetServer - The target server.
  * @param {MyServer} hostServer - The host server.
- * @returns {Batch} The number of threads needed to grow the target to max money.
+ * @returns {SingleBatch} The number of threads needed to grow the target to max money.
  */
 export function getPreparationBatch(ns, targetServer, hostServer) {
   /**
    * The batch object holding the result.
-   * @type {Batch}
+   * @type {SingleBatch}
    */
-  var result = new Batch(targetServer.name);
+  var result = new SingleBatch(targetServer.name);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {number}
@@ -200,101 +177,4 @@ export function getPreparationBatch(ns, targetServer, hostServer) {
   logPrintVar(ns, "Grow Factor", growFactor);
 
   return result;
-}
-
-/**
- * Update the finish times of a batch.
- * @param {import("..").NS} ns
- * @param {Batch} batch - The batch object that shall be updated.
- * @param {number} timeNow - The current time stamp.
- * @param {number} period - The time between executions of the controller.
- * @param {number} timePerAction - The time that is reserved for each action.
- * @param {MyServer} targetServer - The server that is targeted.
- */
-export function updateFinishTimes(
-  ns,
-  batch,
-  timeNow,
-  period,
-  timePerAction,
-  targetServer
-) {
-  /**
-   * The time it takes to run the weaken command.
-   * @type {number}
-   */
-  var weakenDuration = getTimeInRaster(targetServer.weakenTime);
-  /**
-   * The point in time at which the batch of scripts will finish, if started now.
-   * @type {number}
-   */
-  var weakenTime = timeNow + weakenDuration;
-  /**
-   * The time by which the start of the batch has to be delayed to ensure
-   * that it finishes at x seconds and 600ms. A safety margin of 1 period
-   * is included.
-   * @type {number}
-   */
-  var weakenDelay = 3 * timePerAction - (weakenTime % period) + period;
-
-  /**
-   * The delay caan not be negative -> if the batch finishes too late it has to be
-   * shifted to the next second.
-   */
-  if (weakenDelay < 0) {
-    weakenDelay = period + weakenDelay;
-  }
-
-  batch.weakenFinish = timeNow + weakenDelay + weakenDuration;
-
-  batch.growFinish = batch.weakenFinish - timePerAction;
-
-  batch.hackFinish = batch.weakenFinish - 2 * timePerAction;
-
-  logPrintVar(ns, "Execution Time", weakenTime);
-}
-
-/**
- * Run a batch on the local host.
- * @param {import("..").NS} ns
- * @param {Batch} batch - The batch that shall be executed.
- * @param {number} id - A number used to make up a unique id for the scripts so
- * they can run in parallel.
- * @param {string} hackScript - The name of the hack script.
- * @param {string} growScript - The name of the grow script.
- * @param {string} weakenScript - The name of the weaken script.
- */
-export function runBatch(ns, batch, id, hackScript, growScript, weakenScript) {
-  if (batch.hackThreads > 0) {
-    ns.run(
-      hackScript,
-      batch.hackThreads,
-      batch.targetName,
-      batch.hackFinish,
-      id,
-      0
-    );
-  }
-
-  if (batch.growThreads > 0) {
-    ns.run(
-      growScript,
-      batch.growThreads,
-      batch.targetName,
-      batch.growFinish,
-      id,
-      1
-    );
-  }
-
-  if (batch.weakenThreads > 0) {
-    ns.run(
-      weakenScript,
-      batch.weakenThreads,
-      batch.targetName,
-      batch.weakenFinish,
-      id,
-      2
-    );
-  }
 }

@@ -1,6 +1,6 @@
 import { logPrintVar } from "../utilities/log.js";
 import {
-  Batch,
+  SingleBatch,
   getFarmingBatch,
   getPreparationBatch,
 } from "../utilities/batch.js";
@@ -71,7 +71,7 @@ export async function main(ns) {
   var sleepTime = 150;
   /**
    * The batch object that will be started by this cotnroler.
-   * @type {Batch}
+   * @type {SingleBatch}
    */
   var batch = null;
 

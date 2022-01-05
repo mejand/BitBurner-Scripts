@@ -1,6 +1,6 @@
 import { MyServer } from "../utilities/server.js";
 import {
-  Batch,
+  SingleBatch,
   getFarmingBatch,
   getPreparationBatch,
 } from "../utilities/batch.js";
@@ -66,9 +66,9 @@ export async function main(ns) {
   var target = new MyServer(ns, targetName);
   /**
    * An object holding the thread counts for hack, grow and weaken.
-   * @type {Batch}
+   * @type {SingleBatch}
    */
-  var batch = new Batch(target.name);
+  var batch = new SingleBatch(target.name);
   /**
    * The time window that shall be defined for each action.
    * @type {number}
