@@ -1,8 +1,12 @@
+import { logPrintLine, logPrintVar } from "./utilLog.js";
+
 /**
  * Handle the automatic upgrading of hacknet nodes.
  * @param {import("..").NS } ns
  */
 export async function main(ns) {
+  ns.disableLog("ALL");
+
   /**
    * The time between the upgrade of hacknet nodes.
    * @param {number}
@@ -11,7 +15,6 @@ export async function main(ns) {
   if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
     period = ns.args[0];
   }
-
   /**
    * The fraction of the earnings of hacknet nodes that shall be used for upgrades.
    * @type {number}
@@ -20,28 +23,18 @@ export async function main(ns) {
   if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
     moneyFactor = ns.args[1];
   }
-
-  /**
-   * Enable debug logging.
-   * @type {boolean}
-   */
-  var debug = true;
-  if (ns.args.length > 2 && typeof (ns.args[2] == "boolean")) {
-    debug = ns.args[2];
-  }
-
   /**
    * The budget available for upgrades.
    * @type {number}
    */
-  var maxMoney = ns.getServerMoneyAvailable("home");
+  var budget = ns.getServerMoneyAvailable("home");
 
   /**adjust the money factor for the period of the script production is given in $/s
    * -> if the period is longer than 1 second then more than one second of production
    * has to be considered */
   moneyFactor = moneyFactor * (period / 1000);
 
-  // start the loop to periodically upgrade the hacknet servers
+  /** Start the loop to periodically upgrade the hacknet servers */
   while (true) {
     /**
      * All possible upgrade options currently available.
@@ -49,13 +42,13 @@ export async function main(ns) {
      */
     let options = [];
 
-    // add an object for purchasing a new node
+    /** Add an object for purchasing a new node */
     options.push(new Upgrade(ns.hacknet.getPurchaseNodeCost(), 0, -1));
 
-    // loop through all nodes and gather the different upgrade options
+    /** Loop through all nodes and gather the different upgrade options */
     for (var i = 0; i < ns.hacknet.numNodes(); i++) {
-      // add the servers production to the available budget
-      maxMoney += ns.hacknet.getNodeStats(i).production * moneyFactor;
+      /** Add the servers production to the available budget */
+      budget += ns.hacknet.getNodeStats(i).production * moneyFactor;
 
       /**
        * The cost for an upgrade option (is Infinity if the option is maxed out).
@@ -85,7 +78,6 @@ export async function main(ns) {
      * @type {Upgrade}
      */
     let result = null;
-
     /**
      * The cost of the currently cheapest upgrade.
      * @type {number}
@@ -101,7 +93,7 @@ export async function main(ns) {
     }
 
     // execute the option if one was chosen and it is within the budget
-    if (result && result.cost <= maxMoney) {
+    if (result && result.cost <= budget) {
       // decide which type of action was selected
       // buy node:    type 0
       // buy level: 	type 1
@@ -123,16 +115,18 @@ export async function main(ns) {
         default:
           break;
       }
-      if (debug) {
-        ns.tprint("manage_hacknet:" + JSON.stringify(result));
-      }
       // reset the maximum money when an upgrade was bought
-      maxMoney = 0;
+      budget = 0;
     }
 
-    if (debug) {
-      ns.tprint("maxMoney: " + maxMoney);
-    }
+    ns.clearLog();
+    logPrintLine(ns);
+    logPrintVar(ns, "Budget", budget);
+    logPrintLine(ns);
+    logPrintVar(ns, "Result Server", result.server);
+    logPrintVar(ns, "Result Type", result.type);
+    logPrintVar(ns, "Result Cost", result.cost);
+    logPrintLine(ns);
 
     await ns.sleep(period);
   }
