@@ -66,6 +66,8 @@ export async function main(ns) {
         if (server.getRootAccess(ns)) {
           /** Copy all text files on the server to home */
           await server.copyFilesToHome(ns);
+          /** Copy the simple bot scripts to the unlocked server */
+          await server.copyFilesFromHome(ns);
           /** Add the server to the unlocked servers */
           unlockedServers.push(server);
           /**

@@ -175,6 +175,26 @@ export class MyServer {
   }
 
   /**
+   * Copy the basic hack, grow and weaken scripts to the new server.
+   * @param {import("../..").NS} ns
+   */
+  async copyFilesFromHome(ns) {
+    if (this.name != "home") {
+      /**
+       * The names of all files on the server.
+       * @type {string[]}
+       */
+      let filesToCopy = [
+        "/bots/singleGrow.js",
+        "/bots/singleHack.js",
+        "/bots/singleWeaken.js",
+      ];
+
+      await ns.scp(filesToCopy, "home", this.name);
+    }
+  }
+
+  /**
    * Calculate a score value for the server to determine its attractiveness
    * asa a hack target.
    * @param {import("../..").NS} ns
