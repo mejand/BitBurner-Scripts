@@ -34,6 +34,11 @@ export async function main(ns) {
    * @type {SingleBatch}
    */
   var batch = null;
+  /**
+   * The ID of the current batch.
+   * @type {number}
+   */
+  var id = 0;
 
   while (true) {
     ns.clearLog();
@@ -53,10 +58,12 @@ export async function main(ns) {
 
       /** Update the batch information (thread counts) */
       if (target.farming) {
-        batch = getFarmingBatch(ns, target);
+        batch = getFarmingBatch(ns, target, id);
       } else {
-        batch = getPreparationBatch(ns, target);
+        batch = getPreparationBatch(ns, target, id);
       }
+
+      id++;
 
       /** Start the batch */
       batch.execute(ns, hosts);
@@ -68,6 +75,7 @@ export async function main(ns) {
 
       /** Print information to the log window */
       logPrintLine(ns);
+      logPrintVar(ns, "Available Hosts", hosts.length);
       logPrintVar(ns, "Sleep Time", sleepTime);
       logPrintLine(ns);
       batch.print(ns);
