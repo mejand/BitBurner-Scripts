@@ -24,14 +24,14 @@ export async function main(ns) {
   ns.tprint("#### Hacknet Management Started ####");
   await ns.sleep(wait_time);
 
-  // start the centralized hacking control script
-  ns.run("/controllers/singleBatch.js", 1);
-  ns.tprint("#### Local Hack Control Started ####");
-  await ns.sleep(wait_time);
-
   if (ns.getServerMaxRam("home") >= 128) {
     // start the centralized hacking control script
     ns.run("/stocks/contLong.js", 1);
     ns.tprint("####   Stock Control Started    ####");
+    await ns.sleep(wait_time);
   }
+
+  // start the centralized hacking control script
+  ns.run("/controllers/singleBatch.js", 1);
+  ns.tprint("#### Local Hack Control Started ####");
 }
