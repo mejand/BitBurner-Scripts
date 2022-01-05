@@ -22,14 +22,6 @@ export async function main(ns) {
     targetName = ns.args[0];
   }
   /**
-   * Enable debug features.
-   * @type {boolean}
-   */
-  var debug = false;
-  if (ns.args.length > 1 && typeof (ns.args[1] == "boolean")) {
-    debug = ns.args[1];
-  }
-  /**
    * The name of the script used for hacking.
    * @type {string}
    */
@@ -108,11 +100,6 @@ export async function main(ns) {
    * @type {number}
    */
   var weakenCount = 0;
-
-  if (debug) {
-    /** Open the log window in debug mode */
-    ns.tail();
-  }
 
   while (true) {
     ns.clearLog();
