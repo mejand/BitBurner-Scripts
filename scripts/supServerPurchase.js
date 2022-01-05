@@ -84,11 +84,18 @@ export async function main(ns) {
        * @type {string}
        */
       let newServerName = ns.purchaseServer("owned-server", maxAffordableRam);
+      /**
+       * The names of all files on the server.
+       * @type {string[]}
+       */
+      let filesToCopy = [
+        "botsSingleGrow.js",
+        "botsSingleHack.js",
+        "botsSingleWeaken.js",
+      ];
 
       /** Copy the hacking scripts to the new server */
-      await ns.scp("botsSingleGrow.js", "home", newServerName);
-      await ns.scp("botsSingleHack.js", "home", newServerName);
-      await ns.scp("botsSingleWeaken.js", "home", newServerName);
+      await ns.scp(filesToCopy, "home", newServerName);
 
       /** Print the name for debugging purposes */
       logPrintLine(ns);

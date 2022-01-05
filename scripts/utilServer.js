@@ -185,9 +185,9 @@ export class MyServer {
        * @type {string[]}
        */
       let filesToCopy = [
-        "/bots/singleGrow.js",
-        "/bots/singleHack.js",
-        "/bots/singleWeaken.js",
+        "botsSingleGrow.js",
+        "botsSingleHack.js",
+        "botsSingleWeaken.js",
       ];
 
       await ns.scp(filesToCopy, "home", this.name);
