@@ -16,7 +16,7 @@ export class MyServer {
   constructor(ns, name, moneyFactor = 0.9, securityOffset = 1) {
     /**
      * The server object provided by the game.
-     * @type {import("../..").Server}
+     * @type {import("..").Server}
      */
     this.server = ns.getServer(name);
     /**
