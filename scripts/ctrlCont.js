@@ -5,7 +5,7 @@ import {
   getPreparationBatch,
 } from "./utilBatch.js";
 import { getTarget } from "./utilCom.js";
-import { logPrintVar } from "./utilLog.js";
+import { logPrintVar, logPrintLine } from "./utilLog.js";
 
 /**
  * Continously start hack, grow and weaken scripts.
@@ -126,6 +126,13 @@ export async function main(ns) {
     }
     now = ns.getTimeSinceLastAug();
 
+    /** Print the current status of the target to the log window */
+    logPrintLine(ns);
+    logPrintVar(ns, "Target", target.name);
+    logPrintVar(ns, "Money", target.moneyPercent);
+    logPrintVar(ns, "Security", target.deltaSecurity);
+    logPrintLine(ns);
+
     /** Calculate the threads needed */
     if (target.farming) {
       batch = getFarmingBatch(ns, target, host);
@@ -164,14 +171,15 @@ export async function main(ns) {
       }
     }
 
-    /** Print the current status to the log window */
-    logPrintVar(ns, "Target", target.name);
-    logPrintVar(ns, "Money", target.moneyPercent);
-    logPrintVar(ns, "Security", target.deltaSecurity);
+    /** Print the current status of the host to the log window */
+    logPrintLine(ns);
+    logPrintVar(ns, "Host", host.name);
     logPrintVar(ns, "Load", host.load);
+    logPrintLine(ns);
     logPrintVar(ns, "Hack Count", hackCount);
     logPrintVar(ns, "Grow Count", growCount);
     logPrintVar(ns, "Weaken Count", weakenCount);
+    logPrintLine(ns);
 
     await ns.sleep(150);
   }
