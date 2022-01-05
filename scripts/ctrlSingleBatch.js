@@ -67,6 +67,7 @@ export async function main(ns) {
       sleepTime = target.weakenTime + 400;
 
       /** Print information to the log window */
+      logPrintLine(ns);
       logPrintVar(ns, "Sleep Time", sleepTime);
       logPrintLine(ns);
       batch.print(ns);
