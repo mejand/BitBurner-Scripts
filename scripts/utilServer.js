@@ -1,5 +1,4 @@
 import { getTimeInRaster } from "./utilTime.js";
-import { SingleBatch, getFarmingBatch } from "./utilBatch.js";
 
 /**
  * A custom server object providing commonly used information.
@@ -182,22 +181,14 @@ export class MyServer {
       let minSecTarget = new MyServer(ns, this.name);
       minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
 
-      /**
-       * Te batch that would be necessary to completely hack the target.
-       * @type {SingleBatch}
-       */
-      let batch = getFarmingBatch(ns, minSecTarget, 0);
-
-      if (batch.totalRam <= ramAvailable) {
-        /** Check if the player has access to Formulas.exe */
-        if (ns.fileExists("Formulas.exe", "home")) {
-          score =
-            minSecTarget.server.moneyMax /
-            ns.formulas.hacking.weakenTime(minSecTarget.server, player);
-        } else {
-          /** If the player does not have access to Formulas.exe a simplified score is used */
-          score = this.server.moneyMax / this.server.minDifficulty;
-        }
+      /** Check if the player has access to Formulas.exe */
+      if (ns.fileExists("Formulas.exe", "home")) {
+        score =
+          minSecTarget.server.moneyMax /
+          ns.formulas.hacking.weakenTime(minSecTarget.server, player);
+      } else {
+        /** If the player does not have access to Formulas.exe a simplified score is used */
+        score = this.server.moneyMax / this.server.minDifficulty;
       }
     }
 
