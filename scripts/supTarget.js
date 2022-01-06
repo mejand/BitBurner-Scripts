@@ -44,6 +44,11 @@ export async function main(ns) {
    * @type {number}
    */
   var maxScore = 0;
+  /**
+   * The score of the currently investigated server.
+   * @type {number}
+   */
+  var score = 0;
 
   while (true) {
     /** Update the network map if it has not been read successfully yet */
@@ -65,11 +70,7 @@ export async function main(ns) {
       /** Update the status of the target bevore it is examined */
       potentialTargets[i].update(ns);
 
-      /**
-       * The score of the currently investigated server.
-       * @type {number}
-       */
-      let score = potentialTargets[i].calcScore(ns);
+      score = potentialTargets[i].calcScore(ns);
 
       /** Update the target if the score is greater than that of the last target */
       if (score > maxScore) {
@@ -92,6 +93,9 @@ export async function main(ns) {
     logPrintLine(ns);
     logPrintVar(ns, "Target", targetName);
     logPrintVar(ns, "Max Score", maxScore);
+    logPrintLine(ns);
+    logPrintVar(ns, "Last Investigated", potentialTargets[i - 1].name);
+    logPrintVar(ns, "Score", score);
     logPrintLine(ns);
     logPrintVar(ns, "Number of Targets", potentialTargets.length);
     logPrintVar(ns, "Number of Hosts", availableHosts.length);
