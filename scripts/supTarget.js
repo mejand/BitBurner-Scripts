@@ -26,6 +26,11 @@ export async function main(ns) {
    */
   var potentialTargets = getNetworkMap(ns);
   /**
+   * All viable target servers.
+   * @type {MyServer[]}
+   */
+  var vialbleTargets = [];
+  /**
    * All available host servers.
    * @type {MyServer[]}
    */
@@ -61,71 +66,77 @@ export async function main(ns) {
    */
   var minSecBatch = null;
 
-  while (true) {
-    /** Update the network map if it has not been read successfully yet */
-    if (!potentialTargets) {
-      potentialTargets = getNetworkMap(ns);
+  /** Select the viable targets from all potential ones */
+  for (let server of potentialTargets) {
+    if (server.name != "home" && server.server.moneyMax > 0) {
+      vialbleTargets.push(server);
     }
+  }
 
-    /** Update the list of available servers */
-    availableHosts = getAvailableServers(ns);
+  if (vialbleTargets) {
+    while (true) {
+      /** Update the list of available servers */
+      availableHosts = getAvailableServers(ns);
 
-    /** Calculate the amount of RAM theoretically available */
-    ramMaxAvailable = 0;
-    for (let host of availableHosts) {
-      ramMaxAvailable += host.server.maxRam;
-    }
-
-    /** find a new target if possible */
-    if (potentialTargets && ramMaxAvailable > 0) {
-      if (
-        potentialTargets[i] != "home" &&
-        potentialTargets[i].server.moneyMax
-      ) {
-        /** Update the status of the target bevore it is examined */
-        potentialTargets[i].update(ns);
-        /** Calculate the score of the investigated server */
-        score = potentialTargets[i].calcScore(ns);
-        /** Get a representation of the server that has minimum security */
-        minSecTarget = new MyServer(ns, potentialTargets[i].name);
-        minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
-        /** Get the batch that would be needed to farm the server at minimum security */
-        minSecBatch = getFarmingBatch(ns, minSecTarget);
-        /**
-         * Update the target if the score is greater than that of the last target and
-         * there is enough free RAM to take advantage.
-         */
-        if (score > maxScore && minSecBatch.totalRam <= ramMaxAvailable) {
-          target = potentialTargets[i];
-          maxScore = score;
-        }
+      /** Calculate the amount of RAM theoretically available */
+      ramMaxAvailable = 0;
+      for (let host of availableHosts) {
+        ramMaxAvailable += host.server.maxRam;
       }
+
+      /** Update the status of the target bevore it is examined */
+      vialbleTargets[i].update(ns);
+
+      /** Calculate the score of the investigated server */
+      score = vialbleTargets[i].calcScore(ns);
+
+      /** Get a representation of the server that has minimum security */
+      minSecTarget = new MyServer(ns, vialbleTargets[i].name);
+      minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
+
+      /** Get the batch that would be needed to farm the server at minimum security */
+      minSecBatch = getFarmingBatch(ns, minSecTarget);
+
+      /**
+       * Update the target if the score is greater than that of the last target and
+       * there is enough free RAM to take advantage.
+       */
+      if (score > maxScore && minSecBatch.totalRam <= ramMaxAvailable) {
+        target = vialbleTargets[i];
+        maxScore = score;
+      }
+
+      let targetName = await setTarget(ns, target);
+
+      /** Print information to the debug window and set the target for other scripts */
+      ns.clearLog();
+      logPrintLine(ns);
+      logPrintVar(ns, "Target", targetName);
+      logPrintVar(ns, "Max Score", maxScore);
+      logPrintVar(ns, "RAM available", ramMaxAvailable);
+      logPrintLine(ns);
+      logPrintVar(ns, "Last Investigated", vialbleTargets[i].name);
+      logPrintVar(ns, "Score", score);
+      logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
+      logPrintLine(ns);
+      logPrintVar(ns, "Number of Targets", vialbleTargets.length);
+      logPrintVar(ns, "Number of Hosts", availableHosts.length);
+      logPrintLine(ns);
+
+      /** Increment the counter to look at the next potential target */
+      if (i < vialbleTargets.length - 1) {
+        i++;
+      } else {
+        i = 0;
+      }
+
+      await ns.sleep(1000);
     }
-
-    let targetName = await setTarget(ns, target);
-
-    /** Print information to the debug window and set the target for other scripts */
+  } else {
+    /** Print an error message if no viable target was found (maybe Spider has not run yet) */
     ns.clearLog();
     logPrintLine(ns);
-    logPrintVar(ns, "Target", targetName);
-    logPrintVar(ns, "Max Score", maxScore);
-    logPrintVar(ns, "RAM available", ramMaxAvailable);
+    logPrintVar(ns, "Error", "No Viable Targets");
     logPrintLine(ns);
-    logPrintVar(ns, "Last Investigated", potentialTargets[i].name);
-    logPrintVar(ns, "Score", score);
-    logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
-    logPrintLine(ns);
-    logPrintVar(ns, "Number of Targets", potentialTargets.length);
-    logPrintVar(ns, "Number of Hosts", availableHosts.length);
-    logPrintLine(ns);
-
-    /** Increment the counter to look at the next potential target */
-    if (i < potentialTargets.length - 1) {
-      i++;
-    } else {
-      i = 0;
-    }
-
-    await ns.sleep(1000);
   }
 }
