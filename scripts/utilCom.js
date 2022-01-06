@@ -78,7 +78,7 @@ export function getAvailableServers(ns) {
    * The rows of network_map.txt
    * @type {string[]}
    */
-  var rows = null;
+  var serverNames = null;
   /**
    * The server objects that are in the network.
    * @type {MyServer[]}
@@ -87,13 +87,15 @@ export function getAvailableServers(ns) {
 
   if (ns.fileExists("/servers/UnlockedServers.txt")) {
     /** Read the contents of the file */
-    rows = ns.read("/servers/UnlockedServers.txt").split("\r\n");
+    serverNames = ns.read("/servers/UnlockedServers.txt").split("\r\n");
+    /** Add the servers purchased by the player */
+    serverNames.concat(ns.getPurchasedServers());
 
     /** loop through all server names from the file and add them the array */
-    for (let row of rows) {
+    for (let serverName of serverNames) {
       /** Ignore last blank row */
-      if (row) {
-        let server = new MyServer(ns, row);
+      if (serverName) {
+        let server = new MyServer(ns, serverName);
         /** Add the server name to the list if there is ram available */
         if (server.ramAvailable > 0) {
           servers.push(server);
