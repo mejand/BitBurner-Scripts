@@ -1,42 +1,57 @@
+import { logPrintLine, logPrintVar } from "./utilLog.js";
 /**
  * Download the startup script from github and run it.
  * @param {import("..").NS } ns
  */
 export async function main(ns) {
+  ns.disableLog("ALL");
   /**
    * The wait time between each step in the start up sequence.
    * @type {number}
    */
-  var wait_time = 400;
+  var waitTime = 400;
+  /**
+   * The name of the host server this script runs on.
+   * @type {string}
+   */
+  var host = ns.getHostname();
+  /**
+   * The amount of RAM availabe on the host server.
+   * @type {number}
+   */
+  var ramAvailable = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
+  /**
+   * All scripts that shall be started.
+   * @type {string[]}
+   */
+  var scripts = [
+    "supSpider.js",
+    "supUnlock.js",
+    "supTarget.js",
+    "supHacknet.js",
+    "ctrlSingleBatch.js",
+  ];
 
-  /** Call the spider script to populate the network map */
-  ns.run("supSpider.js", 1);
-  ns.tprint("####       Network Mapped       ####");
-  await ns.sleep(wait_time);
+  ns.tail();
+  logPrintLine(ns);
 
-  /** Start the unlock script with a 10 second period */
-  ns.run("supUnlock.js", 1, 10000);
-  ns.tprint("####  Server Unlocking Started  ####");
-  await ns.sleep(wait_time);
-
-  /** Start the target finding script */
-  ns.run("supTarget.js", 1);
-  ns.tprint("####  Target Finding Started  ####");
-  await ns.sleep(wait_time);
-
-  /** Start the hacknet script with a 1 second period and 50% budget */
-  ns.run("supHacknet.js", 1, 1000, 0.5);
-  ns.tprint("#### Hacknet Management Started ####");
-  await ns.sleep(wait_time);
-
-  if (ns.getServerMaxRam("home") >= 128) {
-    /** Start the centralized hacking control script */
-    ns.run("stckContLong.js", 1);
-    ns.tprint("####   Stock Control Started    ####");
-    await ns.sleep(wait_time);
+  /** Attempt to start each script in turn */
+  for (let script of scripts) {
+    /** Only attempt to start the script if the file is on the host */
+    if (ns.fileExists(script)) {
+      ramAvailable = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
+      /** Only attempt to start the script if there is enough free RAM */
+      if (ramAvailable >= ns.getScriptRam(script)) {
+        let text = script + " - ID";
+        logPrintVar(ns, text, ns.run(script, 1));
+      } else {
+        logPrintVar(ns, script, "Insufficient RAM");
+      }
+    } else {
+      let text = "File not on " + host;
+      logPrintVar(ns, script, text);
+    }
+    /** Wait before trying to run the next scipt */
+    await ns.sleep(waitTime);
   }
-
-  /** Start the centralized hacking control script */
-  ns.run("ctrlSingleBatch.js", 1);
-  ns.tprint("#### Local Hack Control Started ####");
 }
