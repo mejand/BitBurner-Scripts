@@ -1,4 +1,5 @@
 import { MyServer } from "./utilServer.js";
+import { SingleBatch, getFarmingBatch } from "./utilBatch.js";
 import { getNetworkMap, getAvailableServers } from "./utilCom.js";
 import { setTarget } from "./utilCom.js";
 import { logPrintLine, logPrintVar } from "./utilLog.js";
@@ -49,6 +50,16 @@ export async function main(ns) {
    * @type {number}
    */
   var score = 0;
+  /**
+   * The target with minimal security level.
+   * @type {MyServer}
+   */
+  var minSecTarget = null;
+  /**
+   * The batch needed to hack the target at minimum security.
+   * @type {SingleBatch}
+   */
+  var minSecBatch = null;
 
   while (true) {
     /** Update the network map if it has not been read successfully yet */
@@ -72,8 +83,16 @@ export async function main(ns) {
 
       score = potentialTargets[i].calcScore(ns);
 
-      /** Update the target if the score is greater than that of the last target */
-      if (score > maxScore) {
+      minSecTarget = new MyServer(ns, potentialTargets[i].name);
+      minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
+
+      minSecBatch = getFarmingBatch(ns, minSecTarget);
+
+      /**
+       * Update the target if the score is greater than that of the last target and
+       * there is enough free RAM to take advantage.
+       */
+      if (score > maxScore && minSecBatch.totalRam <= ramMaxAvailable) {
         target = potentialTargets[i];
         maxScore = score;
       }
@@ -86,9 +105,11 @@ export async function main(ns) {
     logPrintLine(ns);
     logPrintVar(ns, "Target", targetName);
     logPrintVar(ns, "Max Score", maxScore);
+    logPrintVar(ns, "RAM available", ramMaxAvailable);
     logPrintLine(ns);
     logPrintVar(ns, "Last Investigated", potentialTargets[i].name);
     logPrintVar(ns, "Score", score);
+    logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
     logPrintLine(ns);
     logPrintVar(ns, "Number of Targets", potentialTargets.length);
     logPrintVar(ns, "Number of Hosts", availableHosts.length);
