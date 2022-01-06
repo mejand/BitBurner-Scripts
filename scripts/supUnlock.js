@@ -1,10 +1,9 @@
 import { MyServer } from "./utilServer.js";
-import { getNetworkMap, setTarget, setUnlockedServers } from "./utilCom.js";
+import { getNetworkMap, setUnlockedServers } from "./utilCom.js";
 import { logPrintVar, logPrintLine } from "./utilLog.js";
 
 /**
  * Periodically try to gain root access to all servers in the server_map and save the servers with root access to file.
- * Identify the best target and save it to file.
  * @param {import("..").NS } ns
  */
 export async function main(ns) {
@@ -28,26 +27,12 @@ export async function main(ns) {
    * @type {MyServer[]}
    */
   var servers = getNetworkMap(ns);
-  /**
-   * The highest observed score in any unlocked server.
-   * @type {number}
-   */
-  var maxScore = 0;
-  /**
-   * The most profitable hack target.
-   * @type {MyServer}
-   */
-  var target = null;
 
   while (true) {
     ns.clearLog();
 
     /** Reset the unlocked servers */
     unlockedServers = [];
-
-    /** Reset the target */
-    maxScore = 0;
-    target = null;
 
     /** Only continue if there are any mapped servers */
     if (servers) {
@@ -73,16 +58,6 @@ export async function main(ns) {
           }
           /** Add the server to the unlocked servers */
           unlockedServers.push(server);
-          /**
-           * The score of the current server.
-           * @type {number}
-           */
-          let score = server.calcScore(ns);
-          /** Update the target if appropriate */
-          if (score > maxScore) {
-            maxScore = score;
-            target = server;
-          }
         }
       }
 
@@ -90,17 +65,9 @@ export async function main(ns) {
       logPrintVar(ns, "Unlocked Servers", unlockedServers.length);
       logPrintVar(ns, "Total Servers", servers.length);
       logPrintLine(ns);
-      if (target) {
-        logPrintLine(ns);
-        logPrintVar(ns, "Target", target.name);
-        logPrintLine(ns);
-      }
 
       /** Save the unlocked servers for other functions */
       await setUnlockedServers(ns, unlockedServers);
-
-      /** Save the target for other functions */
-      await setTarget(ns, target);
     } else {
       /** Attempt to update the mapped servers */
       servers = getNetworkMap(ns);
