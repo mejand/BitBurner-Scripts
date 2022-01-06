@@ -29,6 +29,7 @@ export async function main(ns) {
     "supUnlock.js",
     "supTarget.js",
     "supHacknet.js",
+    "supServerPurchase.js",
     "ctrlSingleBatch.js",
   ];
 
