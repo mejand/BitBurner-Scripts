@@ -86,7 +86,9 @@ export async function main(ns) {
     }
 
     let targetName = await setTarget(ns, target);
+
     /** Print information to the debug window and set the target for other scripts */
+    ns.clearLog();
     logPrintLine(ns);
     logPrintVar(ns, "Target", targetName);
     logPrintVar(ns, "Max Score", maxScore);
