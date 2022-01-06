@@ -77,13 +77,6 @@ export async function main(ns) {
         target = potentialTargets[i];
         maxScore = score;
       }
-
-      /** Increment the counter to look at the next potential target */
-      if (i < potentialTargets.length - 1) {
-        i++;
-      } else {
-        i = 0;
-      }
     }
 
     let targetName = await setTarget(ns, target);
@@ -94,12 +87,19 @@ export async function main(ns) {
     logPrintVar(ns, "Target", targetName);
     logPrintVar(ns, "Max Score", maxScore);
     logPrintLine(ns);
-    logPrintVar(ns, "Last Investigated", potentialTargets[i - 1].name);
+    logPrintVar(ns, "Last Investigated", potentialTargets[i].name);
     logPrintVar(ns, "Score", score);
     logPrintLine(ns);
     logPrintVar(ns, "Number of Targets", potentialTargets.length);
     logPrintVar(ns, "Number of Hosts", availableHosts.length);
     logPrintLine(ns);
+
+    /** Increment the counter to look at the next potential target */
+    if (i < potentialTargets.length - 1) {
+      i++;
+    } else {
+      i = 0;
+    }
 
     await ns.sleep(1000);
   }
