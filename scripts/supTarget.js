@@ -78,7 +78,7 @@ export async function main(ns) {
       }
 
       /** Increment the counter to look at the next potential target */
-      if (i < potentialTargets.length) {
+      if (i < potentialTargets.length - 1) {
         i++;
       } else {
         i = 0;
