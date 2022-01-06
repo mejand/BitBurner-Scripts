@@ -5,6 +5,7 @@ import { logPrintVar, logPrintLine } from "./utilLog.js";
  * @param {import("..").NS} ns
  */
 export async function main(ns) {
+  ns.disableLog("ALL");
   /**
    * The time between executions of the automatic buying.
    * @type {number}
@@ -46,8 +47,6 @@ export async function main(ns) {
    * @type {number}
    */
   var maxServerCount = ns.getPurchasedServerLimit();
-
-  ns.disableLog("ALL");
 
   /** Start the loop to periodically try to purchase a server */
   while (true) {
