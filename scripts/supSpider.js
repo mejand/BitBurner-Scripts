@@ -7,18 +7,23 @@ import { setNetworkMap } from "./utilCom.js";
  */
 export async function main(ns) {
   /**
+   * The names of all servers that have already been analyzed. Can contain purchased servers.
+   * @type {string[]}
+   */
+  var networkMapRaw = [ns.getHostname()];
+  /**
    * The names of all servers that have already been analyzed.
    * @type {string[]}
    */
-  var networkMap = [ns.getHostname()];
+  var networkMap = [];
 
   // For every server we've seen so far, do a scan
-  for (var i = 0; i < networkMap.length; i++) {
+  for (var i = 0; i < networkMapRaw.length; i++) {
     /**
      * The name of the server that is currently being analyzed.
      * @type {string}
      */
-    let serverName = networkMap[i];
+    let serverName = networkMapRaw[i];
     /**
      * The names of all servers connected to the server currently being analyzed.
      * @type {string[]}
@@ -28,15 +33,19 @@ export async function main(ns) {
     /** Loop through the connected servers and add any new servers */
     for (var j = 0; j < serversConnected.length; j++) {
       /** If this server isn't in the network map, add it */
-      if (networkMap.indexOf(serversConnected[j]) === -1) {
-        /** Ensure that purchased servers are not included */
-        if (!serversConnected[j].includes("owned-server")) {
-          networkMap.push(serversConnected[j]);
-        }
+      if (networkMapRaw.indexOf(serversConnected[j]) === -1) {
+        networkMapRaw.push(serversConnected[j]);
       }
     }
   }
 
-  /** Save the network map */
+  /** Remove the purchased servers from the list */
+  for (let name of networkMapRaw) {
+    if (!name.includes("owned-server")) {
+      networkMap.push(name);
+    }
+  }
+
+  /** Save the sanitized network map */
   await setNetworkMap(ns, networkMap);
 }
