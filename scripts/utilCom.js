@@ -136,7 +136,7 @@ export async function setTarget(ns, server) {
     targetName = server.name;
   }
   ns.clearPort(1);
-  await ns.writePort(1, "n00dles");
+  await ns.writePort(1, targetName);
   return targetName;
 }
 
