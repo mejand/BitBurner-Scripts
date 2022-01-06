@@ -42,8 +42,7 @@ export async function main(ns) {
       ramAvailable = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
       /** Only attempt to start the script if there is enough free RAM */
       if (ramAvailable >= ns.getScriptRam(script)) {
-        let text = script + " - ID";
-        logPrintVar(ns, text, ns.run(script, 1));
+        logPrintVar(ns, script, ns.run(script, 1));
       } else {
         logPrintVar(ns, script, "Insufficient RAM");
       }
@@ -54,4 +53,7 @@ export async function main(ns) {
     /** Wait before trying to run the next scipt */
     await ns.sleep(waitTime);
   }
+  logPrintLine(ns);
+  logPrintVar(ns, "Remaining RAM", ramAvailable);
+  logPrintLine(ns);
 }
