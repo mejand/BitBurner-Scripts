@@ -1,4 +1,5 @@
 import { getTimeInRaster } from "./utilTime.js";
+import { SingleBatch, getFarmingBatch } from "./utilBatch.js";
 
 /**
  * A custom server object providing commonly used information.
@@ -157,8 +158,9 @@ export class MyServer {
    * Calculate a score value for the server to determine its attractiveness
    * asa a hack target.
    * @param {import("..").NS} ns
+   * @param {number} ramAvailable - The amount of RAM available for hacking.
    */
-  calcScore(ns) {
+  calcScore(ns, ramAvailable) {
     /**
      * The score of the server (higher is better).
      * @type {number}
@@ -166,27 +168,36 @@ export class MyServer {
     var score = 0;
     /**
      * The player at his current hack level.
-     * @type {import("../..").Player}
+     * @type {import("..").Player}
      */
     var player = ns.getPlayer();
 
     /** Check if the target can be hacked at all */
     if (this.server.requiredHackingSkill <= player.hacking) {
-      /** Check if the player has access to Formulas.exe */
-      if (ns.fileExists("Formulas.exe", "home")) {
-        /**
-         * A server object that is set to min difficulty to get the weaken time
-         * for farming mode.
-         * @type {import("../..").Server}
-         */
-        let server = ns.getServer(this.name);
-        server.hackDifficulty = server.minDifficulty;
+      /**
+       * A server object that is set to min difficulty to get the weaken time
+       * for farming mode.
+       * @type {MyServer}
+       */
+      let minSecTarget = new MyServer(ns, this.name);
+      minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
 
-        score =
-          server.moneyMax / ns.formulas.hacking.weakenTime(server, player);
-      } else {
-        /** If the player does not have access to Formulas.exe a simplified score is used */
-        score = this.server.moneyMax / this.server.minDifficulty;
+      /**
+       * Te batch that would be necessary to completely hack the target.
+       * @type {SingleBatch}
+       */
+      let batch = getFarmingBatch(ns, minSecTarget, 0);
+
+      if (batch.totalRam <= ramAvailable) {
+        /** Check if the player has access to Formulas.exe */
+        if (ns.fileExists("Formulas.exe", "home")) {
+          score =
+            minSecTarget.server.moneyMax /
+            ns.formulas.hacking.weakenTime(minSecTarget.server, player);
+        } else {
+          /** If the player does not have access to Formulas.exe a simplified score is used */
+          score = this.server.moneyMax / this.server.minDifficulty;
+        }
       }
     }
 
