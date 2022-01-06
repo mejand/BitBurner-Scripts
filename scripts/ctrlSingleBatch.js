@@ -96,7 +96,7 @@ export async function main(ns) {
       logPrintLine(ns);
       logPrintVar(ns, "Available Hosts", hosts.length);
       logPrintVar(ns, "Available RAM", ramAvailable);
-      logPrintVar(ns, "Sleep Time", sleepTime);
+      logPrintVar(ns, "Sleep Time [s]", sleepTime / 1000);
       logPrintLine(ns);
 
       id++;
