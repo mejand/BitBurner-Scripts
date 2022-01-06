@@ -85,16 +85,10 @@ export async function main(ns) {
       }
     }
 
+    let targetName = await setTarget(ns, target);
     /** Print information to the debug window and set the target for other scripts */
     logPrintLine(ns);
-    if (target) {
-      logPrintVar(ns, "Target", target.name);
-      await setTarget(ns, target);
-    } else {
-      defaultTarget.update(ns);
-      logPrintVar(ns, "Target", defaultTarget.name);
-      await setTarget(ns, defaultTarget);
-    }
+    logPrintVar(ns, "Target", targetName);
     logPrintVar(ns, "Max Score", maxScore);
     logPrintLine(ns);
     logPrintVar(ns, "Number of Targets", potentialTargets.length);

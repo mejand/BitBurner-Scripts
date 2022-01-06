@@ -112,13 +112,16 @@ export function getAvailableServers(ns) {
  * Define the most profitable hack target for use by other functions.
  * @param {import("..").NS} ns
  * @param {MyServer} server - The target server.
+ * @returns {string} The name of the server that was acutally set as the target.
  */
 export async function setTarget(ns, server) {
-  /** Ensure that the input is not null */
+  var targetName = "n00dles";
   if (server) {
-    ns.clearPort(1);
-    await ns.writePort(1, server.name);
+    targetName = server.name;
   }
+  ns.clearPort(1);
+  await ns.writePort(1, "n00dles");
+  return targetName;
 }
 
 /**
