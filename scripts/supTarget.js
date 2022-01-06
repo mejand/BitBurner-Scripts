@@ -78,23 +78,24 @@ export async function main(ns) {
 
     /** find a new target if possible */
     if (potentialTargets && ramMaxAvailable > 0) {
-      /** Update the status of the target bevore it is examined */
-      potentialTargets[i].update(ns);
-
-      score = potentialTargets[i].calcScore(ns);
-
-      minSecTarget = new MyServer(ns, potentialTargets[i].name);
-      minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
-
-      minSecBatch = getFarmingBatch(ns, minSecTarget);
-
-      /**
-       * Update the target if the score is greater than that of the last target and
-       * there is enough free RAM to take advantage.
-       */
-      if (score > maxScore && minSecBatch.totalRam <= ramMaxAvailable) {
-        target = potentialTargets[i];
-        maxScore = score;
+      if (potentialTargets[i] != "home") {
+        /** Update the status of the target bevore it is examined */
+        potentialTargets[i].update(ns);
+        /** Calculate the score of the investigated server */
+        score = potentialTargets[i].calcScore(ns);
+        /** Get a representation of the server that has minimum security */
+        minSecTarget = new MyServer(ns, potentialTargets[i].name);
+        minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
+        /** Get the batch that would be needed to farm the server at minimum security */
+        minSecBatch = getFarmingBatch(ns, minSecTarget);
+        /**
+         * Update the target if the score is greater than that of the last target and
+         * there is enough free RAM to take advantage.
+         */
+        if (score > maxScore && minSecBatch.totalRam <= ramMaxAvailable) {
+          target = potentialTargets[i];
+          maxScore = score;
+        }
       }
     }
 
