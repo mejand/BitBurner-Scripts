@@ -78,7 +78,10 @@ export async function main(ns) {
 
     /** find a new target if possible */
     if (potentialTargets && ramMaxAvailable > 0) {
-      if (potentialTargets[i] != "home") {
+      if (
+        potentialTargets[i] != "home" &&
+        potentialTargets[i].server.moneyMax
+      ) {
         /** Update the status of the target bevore it is examined */
         potentialTargets[i].update(ns);
         /** Calculate the score of the investigated server */
