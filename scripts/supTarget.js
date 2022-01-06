@@ -11,11 +11,6 @@ import { logPrintLine, logPrintVar } from "./utilLog.js";
 export async function main(ns) {
   ns.disableLog("ALL");
   /**
-   * The default target that shall be used if no valid target can be found.
-   * @type {MyServer}
-   */
-  var defaultTarget = new MyServer(ns, "n00dles");
-  /**
    * The target server.
    * @type {MyServer}
    */
