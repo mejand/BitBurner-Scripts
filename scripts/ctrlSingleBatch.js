@@ -24,12 +24,6 @@ export async function main(ns) {
    */
   var hosts = getAvailableServers(ns);
   /**
-   * The time in milliseconds the script shall wait before attempting
-   * to start the next batch.
-   * @type {number}
-   */
-  var sleepTime = 150;
-  /**
    * The batch object that will be started by this cotnroler.
    * @type {SingleBatch}
    */
@@ -44,15 +38,26 @@ export async function main(ns) {
    * @type {number}
    */
   var ramAvailable = 0;
+  /**
+   * The current time stamp.
+   * @type {number}
+   */
+  var now = 0;
+  /**
+   * The time at which the next batch can be started.
+   * @type {number}
+   */
+  var nextBatch = 0;
 
   while (true) {
     ns.clearLog();
+
+    /** Get the current time */
+    now = ns.getTimeSinceLastAug();
+
     /** Update the server objects */
     target = getTarget(ns);
     hosts = getAvailableServers(ns);
-
-    /** Reset the sleep time to ensure there are no unecessary wait times */
-    sleepTime = 150;
 
     /** Update the batch information if there is a target and hosts */
     if (target && hosts) {
@@ -67,41 +72,45 @@ export async function main(ns) {
       logPrintVar(ns, "Target", target.name);
       logPrintVar(ns, "Money on Target", target.moneyPercent);
       logPrintVar(ns, "Delta Security", target.deltaSecurity);
+      logPrintVar(ns, "Success Chance", ns.hackAnalyzeChance(target.name));
       logPrintLine(ns);
 
-      /** Update the batch information (thread counts) */
-      if (target.farming) {
-        batch = getFarmingBatch(ns, target, id);
-        logPrintVar(ns, "Mode", "Farming");
-      } else {
-        batch = getPreparationBatch(ns, target, id);
-        logPrintVar(ns, "Mode", "Preparation");
+      /** Only start a new patch if the time is right */
+      if (now >= nextBatch) {
+        /** Update the batch information (thread counts) */
+        if (target.farming) {
+          batch = getFarmingBatch(ns, target, id);
+          logPrintVar(ns, "Mode", "Farming");
+        } else {
+          batch = getPreparationBatch(ns, target, id);
+          logPrintVar(ns, "Mode", "Preparation");
+        }
+
+        /** Scale the batch to the available RAM */
+        batch.scale(ramAvailable);
+
+        /** Print the final resulting batch information */
+        batch.print(ns);
+
+        /** Start the batch */
+        batch.execute(ns, hosts);
+
+        /** Wait until the batch is finished to start the next patch.
+         * If no patch could be started the script will try again after 400ms.
+         */
+        nextBatch = now + target.weakenTime + 400;
+
+        id++;
       }
-
-      /** Scale the batch to the available RAM */
-      batch.scale(ramAvailable);
-
-      /** Print the final resulting batch information */
-      batch.print(ns);
-
-      /** Start the batch */
-      batch.execute(ns, hosts);
-
-      /** Wait until the batch is finished to start the next patch.
-       * If no patch could be started the script will try again after 200ms.
-       */
-      sleepTime = target.weakenTime + 400;
 
       /** Print information to the log window */
       logPrintLine(ns);
       logPrintVar(ns, "Available Hosts", hosts.length);
       logPrintVar(ns, "Available RAM", ramAvailable);
-      logPrintVar(ns, "Sleep Time [s]", sleepTime / 1000);
+      logPrintVar(ns, "Sleep Time [s]", (nextBatch - now) / 1000);
       logPrintLine(ns);
-
-      id++;
     }
 
-    await ns.sleep(sleepTime);
+    await ns.sleep(400);
   }
 }
