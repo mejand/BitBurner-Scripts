@@ -157,9 +157,8 @@ export class MyServer {
    * Calculate a score value for the server to determine its attractiveness
    * asa a hack target.
    * @param {import("..").NS} ns
-   * @param {number} ramAvailable - The amount of RAM available for hacking.
    */
-  calcScore(ns, ramAvailable) {
+  calcScore(ns) {
     /**
      * The score of the server (higher is better).
      * @type {number}
