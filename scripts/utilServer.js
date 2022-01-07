@@ -185,9 +185,13 @@ export class MyServer {
         score =
           minSecTarget.server.moneyMax /
           ns.formulas.hacking.weakenTime(minSecTarget.server, player);
+        /** Consider the success chance of hacking */
+        score *= ns.formulas.hacking.hackChance(minSecTarget, player);
       } else {
         /** If the player does not have access to Formulas.exe a simplified score is used */
         score = this.server.moneyMax / this.server.minDifficulty;
+        /** Consider the success chance of hacking */
+        score *= ns.hackAnalyzeChance(this.name);
       }
     }
 
