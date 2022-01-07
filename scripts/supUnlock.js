@@ -13,7 +13,7 @@ export async function main(ns) {
    * The time between trying to unlock new servers.
    * @type {number}
    */
-  var period = 10000;
+  var period = 1000;
   if (ns.args.length > 0 && typeof ns.args[0] == "number") {
     period = ns.args[0];
   }
