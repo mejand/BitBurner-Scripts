@@ -14,6 +14,15 @@ import { getTarget, getAvailableServers } from "./utilCom.js";
 export async function main(ns) {
   ns.disableLog("ALL");
   /**
+   * The name of the target server. Will be null if the script was started
+   * without a target.
+   * @type {string}
+   */
+  var targetName = null;
+  if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
+    targetName = ns.args[0];
+  }
+  /**
    * The server object of the target.
    * @type {MyServer}
    */
@@ -54,6 +63,14 @@ export async function main(ns) {
    */
   var mode = "-";
 
+  /**
+   * Set the target to the specified server if the script
+   * was started with a specific target
+   */
+  if (targetName) {
+    target = new MyServer(ns, targetName);
+  }
+
   while (true) {
     ns.clearLog();
 
@@ -74,7 +91,11 @@ export async function main(ns) {
       /** Only start a new patch if the time is right */
       if (now >= nextBatch) {
         /** Get the currently best target */
-        target = getTarget(ns);
+        if (targetName) {
+          target.update(ns);
+        } else {
+          target = getTarget(ns);
+        }
         /** Update the batch information (thread counts) */
         if (target.farming) {
           batch = getFarmingBatch(ns, target, id);
