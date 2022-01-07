@@ -123,15 +123,13 @@ export async function main(ns) {
         /** Print information to the debug window and set the target for other scripts */
         ns.clearLog();
         logPrintLine(ns);
-        logPrintVar(ns, "Target", targetName);
-        logPrintVar(ns, "Already Targeted", isTargeted);
-        logPrintVar(ns, "RAM available", ramMaxAvailable);
-        logPrintLine(ns);
         logPrintVar(ns, "Last Investigated", vialbleTargets[i].name);
+        logPrintVar(ns, "Already Targeted", isTargeted);
         logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
         logPrintLine(ns);
         logPrintVar(ns, "Number of Targets", vialbleTargets.length);
         logPrintVar(ns, "Number of Hosts", availableHosts.length);
+        logPrintVar(ns, "RAM available", ramMaxAvailable);
         logPrintLine(ns);
 
         /** Increment the counter to look at the next potential target */
