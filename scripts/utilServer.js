@@ -43,7 +43,7 @@ export class MyServer {
     /**
      * The current loading of the server.
      */
-    this.load = 100 - (this.threadsAvailable / this.threadsMax) * 100;
+    this.load = 100 - (this.ramAvailable / this.server.maxRam) * 100;
     /**
      * The time it takes to hack the server converted to the 200ms raster.
      * @type {number}
@@ -100,7 +100,7 @@ export class MyServer {
     this.moneyPercent =
       (this.server.moneyAvailable / this.server.moneyMax) * 100;
     this.deltaSecurity = this.server.hackDifficulty - this.server.minDifficulty;
-    this.load = 100 - (this.threadsAvailable / this.threadsMax) * 100;
+    this.load = 100 - (this.ramAvailable / this.server.maxRam) * 100;
     this.hackTime = getTimeInRaster(ns.getHackTime(this.name));
     this.growTime = getTimeInRaster(ns.getGrowTime(this.name));
     this.weakenTime = getTimeInRaster(ns.getWeakenTime(this.name));
