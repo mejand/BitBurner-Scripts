@@ -1,7 +1,6 @@
 import { MyServer } from "./utilServer.js";
 import { SingleBatch, getFarmingBatch } from "./utilBatch.js";
 import { getNetworkMap, getAvailableServers } from "./utilCom.js";
-import { setTarget } from "./utilCom.js";
 import { logPrintLine, logPrintVar } from "./utilLog.js";
 
 /**
