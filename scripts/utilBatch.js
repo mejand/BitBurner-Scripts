@@ -355,7 +355,7 @@ export function getFarmingBatch(ns, targetServer, id, hostServer = null) {
   }
 
   /** Calculate the hack threads needed to steal half the money on the target server */
-  result.hackThreads = Math.floor(1.0 / ns.hackAnalyze(targetServer.name));
+  result.hackThreads = Math.floor(0.5 / ns.hackAnalyze(targetServer.name));
 
   /** Calculate the percentage the target needs to be grown to compensate the hacking */
   growFactor =
