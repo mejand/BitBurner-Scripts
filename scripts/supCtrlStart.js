@@ -125,7 +125,11 @@ export async function main(ns) {
         logPrintLine(ns);
         logPrintVar(ns, "Last Investigated", vialbleTargets[i].name);
         logPrintVar(ns, "Already Targeted", isTargeted);
-        logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
+        if (minSecBatch && minSecBatch.targetName == vialbleTargets[i].name) {
+          logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
+        } else {
+          logPrintVar(ns, "RAM needed", "-");
+        }
         logPrintLine(ns);
         logPrintVar(ns, "Number of Targets", vialbleTargets.length);
         logPrintVar(ns, "Number of Hosts", availableHosts.length);
