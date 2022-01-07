@@ -197,7 +197,7 @@ export class MyServer {
         /** If the player does not have access to Formulas.exe a simplified score is used */
         score = this.server.moneyMax / this.server.minDifficulty;
         /** Consider the success chance of hacking */
-        score *= ns.hackAnalyzeChance(this.name);
+        score *= this.successChance * 0.01;
       }
     }
 
