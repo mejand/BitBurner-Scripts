@@ -48,6 +48,11 @@ export async function main(ns) {
    * @type {number}
    */
   var nextBatch = 0;
+  /**
+   * The operating mode of the script for display in the log window.
+   * @type {string}
+   */
+  var mode = "-";
 
   while (true) {
     ns.clearLog();
@@ -72,10 +77,10 @@ export async function main(ns) {
         /** Update the batch information (thread counts) */
         if (target.farming) {
           batch = getFarmingBatch(ns, target, id);
-          logPrintVar(ns, "Mode", "Farming");
+          mode = "Farming";
         } else {
           batch = getPreparationBatch(ns, target, id);
-          logPrintVar(ns, "Mode", "Preparation");
+          mode = "Preparation";
         }
 
         /** Scale the batch to the available RAM */
@@ -99,6 +104,7 @@ export async function main(ns) {
       logPrintVar(ns, "Money on Target", target.moneyPercent);
       logPrintVar(ns, "Delta Security", target.deltaSecurity);
       logPrintVar(ns, "Success Chance", target.successChance);
+      logPrintVar(ns, "Mode", mode);
       logPrintLine(ns);
       batch.print(ns);
       logPrintLine(ns);
