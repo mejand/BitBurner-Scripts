@@ -30,7 +30,7 @@ export async function main(ns) {
     "supTarget.js",
     "supHacknet.js",
     "supServerPurchase.js",
-    "ctrlSingleBatch.js",
+    "supCtrlStart.js",
   ];
 
   ns.tail();
