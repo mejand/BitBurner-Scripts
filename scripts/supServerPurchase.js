@@ -10,7 +10,7 @@ export async function main(ns) {
    * The time between executions of the automatic buying.
    * @type {number}
    */
-  var period = 10000;
+  var period = 1000;
   if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
     period = ns.args[0];
   }
@@ -18,7 +18,7 @@ export async function main(ns) {
    * The fraction of the player's money that can be spent on buying serversNames.
    * @type {number}
    */
-  var maxMoneyFactor = 0.25;
+  var maxMoneyFactor = 0.75;
   if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
     maxMoney = ns.args[1];
   }
