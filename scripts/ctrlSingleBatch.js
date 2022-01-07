@@ -72,7 +72,7 @@ export async function main(ns) {
       logPrintVar(ns, "Target", target.name);
       logPrintVar(ns, "Money on Target", target.moneyPercent);
       logPrintVar(ns, "Delta Security", target.deltaSecurity);
-      logPrintVar(ns, "Success Chance", ns.hackAnalyzeChance(target.name));
+      logPrintVar(ns, "Success Chance", target.successChance);
       logPrintLine(ns);
 
       /** Only start a new patch if the time is right */

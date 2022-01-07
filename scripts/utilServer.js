@@ -83,6 +83,11 @@ export class MyServer {
      * @type {number}
      */
     this.cores = this.server.cpuCores;
+    /**
+     * The chance for hack to succeed in percent.
+     * @type {number}
+     */
+    this.successChance = ns.hackAnalyzeChance(this.name) * 100;
   }
 
   /**
@@ -103,6 +108,7 @@ export class MyServer {
       this.moneyPercent > this.moneyFactor &&
       this.deltaSecurity < this.securityOffset;
     this.cores = this.server.cpuCores;
+    this.successChance = ns.hackAnalyzeChance(this.name) * 100;
   }
 
   /**
