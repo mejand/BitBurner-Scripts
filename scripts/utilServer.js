@@ -177,7 +177,10 @@ export class MyServer {
     var player = ns.getPlayer();
 
     /** Check if the target can be hacked at all */
-    if (this.server.requiredHackingSkill <= player.hacking) {
+    if (
+      this.server.requiredHackingSkill <= player.hacking &&
+      ns.hackAnalyze(this.name) > 0
+    ) {
       /**
        * A server object that is set to min difficulty to get the weaken time
        * for farming mode.
