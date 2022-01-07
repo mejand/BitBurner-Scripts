@@ -61,7 +61,6 @@ export async function main(ns) {
     now = ns.getTimeSinceLastAug();
 
     /** Update the server objects */
-    target = getTarget(ns);
     hosts = getAvailableServers(ns);
 
     /** Update the batch information if there is a target and hosts */
@@ -74,6 +73,8 @@ export async function main(ns) {
 
       /** Only start a new patch if the time is right */
       if (now >= nextBatch) {
+        /** Get the currently best target */
+        target = getTarget(ns);
         /** Update the batch information (thread counts) */
         if (target.farming) {
           batch = getFarmingBatch(ns, target, id);
@@ -95,6 +96,8 @@ export async function main(ns) {
         nextBatch = now + target.weakenTime + 400;
 
         id++;
+      } else {
+        target.update(ns);
       }
 
       /** Print information to the log window */
