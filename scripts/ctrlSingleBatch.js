@@ -67,14 +67,6 @@ export async function main(ns) {
         ramAvailable += host.ramAvailable;
       }
 
-      /** Print information to the log window */
-      logPrintLine(ns);
-      logPrintVar(ns, "Target", target.name);
-      logPrintVar(ns, "Money on Target", target.moneyPercent);
-      logPrintVar(ns, "Delta Security", target.deltaSecurity);
-      logPrintVar(ns, "Success Chance", target.successChance);
-      logPrintLine(ns);
-
       /** Only start a new patch if the time is right */
       if (now >= nextBatch) {
         /** Update the batch information (thread counts) */
@@ -89,9 +81,6 @@ export async function main(ns) {
         /** Scale the batch to the available RAM */
         batch.scale(ramAvailable);
 
-        /** Print the final resulting batch information */
-        batch.print(ns);
-
         /** Start the batch */
         batch.execute(ns, hosts);
 
@@ -104,6 +93,14 @@ export async function main(ns) {
       }
 
       /** Print information to the log window */
+      /** Print information to the log window */
+      logPrintLine(ns);
+      logPrintVar(ns, "Target", target.name);
+      logPrintVar(ns, "Money on Target", target.moneyPercent);
+      logPrintVar(ns, "Delta Security", target.deltaSecurity);
+      logPrintVar(ns, "Success Chance", target.successChance);
+      logPrintLine(ns);
+      batch.print(ns);
       logPrintLine(ns);
       logPrintVar(ns, "Available Hosts", hosts.length);
       logPrintVar(ns, "Available RAM", ramAvailable);

@@ -164,7 +164,7 @@ export class SingleBatch {
    */
   print(ns) {
     var text = "+---------+------------+------------+------------+\n";
-    text += "|         |    Hack    |    Grow    |   Weaken   |\n";
+    text += "| Total   |    Hack    |    Grow    |   Weaken   |\n";
     text += ns.sprintf(
       "| Threads | %10i | %10i | %10i |\n",
       this._hackThreadsTotal,
@@ -176,6 +176,20 @@ export class SingleBatch {
       this.hackRam * this._hackThreadsTotal,
       this.growRam * this._growThreadsTotal,
       this.weakenRam * this._weakenThreadsTotal
+    );
+    text += "+---------+------------+------------+------------+\n";
+    text += "| Remaing |    Hack    |    Grow    |   Weaken   |\n";
+    text += ns.sprintf(
+      "| Threads | %10i | %10i | %10i |\n",
+      this._hackThreadsRemaining,
+      this._growThreadsRemaining,
+      this._weakenThreadsRemaining
+    );
+    text += ns.sprintf(
+      "| RAM     | %10.2f | %10.2f | %10.2f |\n",
+      this.hackRam * this._hackThreadsRemaining,
+      this.growRam * this._growThreadsRemaining,
+      this.weakenRam * this._weakenThreadsRemaining
     );
     text += "+---------+------------+------------+------------+";
     ns.print(text);
