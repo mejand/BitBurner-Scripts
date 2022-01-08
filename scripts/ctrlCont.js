@@ -25,7 +25,7 @@ export async function main(ns) {
    * The server this script is running on.
    * @type {MyServer}
    */
-  var host = new MyServer(ns, ns.getHostname(), scriptRam);
+  var host = new MyServer(ns, ns.getHostname());
   /**
    * The server that is targeted by this script.
    * @type {MyServer}
