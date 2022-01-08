@@ -35,7 +35,7 @@ export async function main(ns) {
    * An object holding the thread counts for hack, grow and weaken.
    * @type {SingleBatch}
    */
-  var batch = new SingleBatch(ns, target.name, 0);
+  var batch = null;
   /**
    * The time window that shall be defined for each action.
    * @type {number}
