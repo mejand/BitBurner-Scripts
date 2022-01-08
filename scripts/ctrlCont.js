@@ -109,7 +109,12 @@ export async function main(ns) {
       if (batch.hackThreads > 0 && now > hackStartTime) {
         let hackRelativeFinish = now + (target.hackTime % period);
         if (hackRelativeFinish == 0) {
-          ns.run(hackScript, batch.hackThreads, target.name, hackCount);
+          ns.run(
+            "botsSingleHack.js",
+            batch.hackThreads,
+            target.name,
+            hackCount
+          );
           hackCount++;
         }
       }
@@ -117,7 +122,12 @@ export async function main(ns) {
       if (batch.growThreads > 0 && now > growStartTime) {
         let growRelativeFinish = now + (target.growTime % period);
         if (growRelativeFinish == timePerAction) {
-          ns.run(growScript, batch.growThreads, target.name, growCount);
+          ns.run(
+            "botsSingleGrow.js",
+            batch.growThreads,
+            target.name,
+            growCount
+          );
           growCount++;
         }
       }
@@ -125,7 +135,12 @@ export async function main(ns) {
       if (batch.weakenThreads > 0) {
         let weakenRelativeFinish = now + (target.weakenTime % period);
         if (weakenRelativeFinish == timePerAction * 2) {
-          ns.run(weakenScript, batch.weakenThreads, target.name, weakenCount);
+          ns.run(
+            "botsSingleWeaken.js",
+            batch.weakenThreads,
+            target.name,
+            weakenCount
+          );
           weakenCount++;
         }
       }
