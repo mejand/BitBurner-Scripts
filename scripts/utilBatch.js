@@ -325,9 +325,16 @@ export class SingleBatch {
  * @param {MyServer} targetServer - The target server.
  * @param {number} id - The id for the batch.
  * @param {MyServer} hostServer - Optional: the host server.
+ * @param {number} hackFraction - Fraction of money that shall be stolen by hack.
  * @returns {SingleBatch} The number of threads needed to grow the target to max money.
  */
-export function getFarmingBatch(ns, targetServer, id, hostServer = null) {
+export function getFarmingBatch(
+  ns,
+  targetServer,
+  id,
+  hackFraction,
+  hostServer = null
+) {
   /**
    * The batch object holding the result.
    * @type {SingleBatch}
@@ -355,7 +362,9 @@ export function getFarmingBatch(ns, targetServer, id, hostServer = null) {
   }
 
   /** Calculate the hack threads needed to steal half the money on the target server */
-  result.hackThreads = Math.floor(0.5 / ns.hackAnalyze(targetServer.name));
+  result.hackThreads = Math.floor(
+    hackFraction / ns.hackAnalyze(targetServer.name)
+  );
 
   /** Calculate the percentage the target needs to be grown to compensate the hacking */
   growFactor =

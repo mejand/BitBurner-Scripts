@@ -100,7 +100,7 @@ export async function main(ns) {
 
     /** Calculate the threads needed */
     if (target.farming) {
-      batch = getFarmingBatch(ns, target, 0, host);
+      batch = getFarmingBatch(ns, target, 0, 0.1, host);
     } else {
       batch = getPreparationBatch(ns, target, 0, host);
     }

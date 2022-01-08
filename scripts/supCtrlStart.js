@@ -113,7 +113,7 @@ export async function main(ns) {
               minSecTarget.server.minDifficulty;
 
             /** Get the batch that would be needed to farm the server at minimum security */
-            minSecBatch = getFarmingBatch(ns, minSecTarget);
+            minSecBatch = getFarmingBatch(ns, minSecTarget, 0, 0.5);
 
             /** Target the server if the ram needed to hack it is less than half the available ram */
             if (minSecBatch.totalRam < ramMaxAvailable * 0.5) {

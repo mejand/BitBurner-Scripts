@@ -98,7 +98,7 @@ export async function main(ns) {
         }
         /** Update the batch information (thread counts) */
         if (target.farming) {
-          batch = getFarmingBatch(ns, target, id);
+          batch = getFarmingBatch(ns, target, id, 0.5);
           mode = "Farming";
         } else {
           batch = getPreparationBatch(ns, target, id);
