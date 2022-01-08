@@ -166,10 +166,10 @@ export async function main(ns) {
     logPrintVar(ns, "Grow Count", growCount);
     logPrintVar(ns, "Weaken Count", weakenCount);
     logPrintLine(ns);
-    logPrintVar(ns, "Hack Countdown", Math.max(0, hackStartTime - now));
-    logPrintVar(ns, "Grow Count", Math.max(0, growStartTime - now));
-    logPrintVar(ns, "Hack Time", target.hackTime);
-    logPrintVar(ns, "Grow Time", target.growTime);
+    logPrintVar(ns, "Hack Countdown", Math.max(0, hackStartTime - now) * 0.01);
+    logPrintVar(ns, "Grow Count", Math.max(0, growStartTime - now) * 0.01);
+    logPrintVar(ns, "Hack Time", target.hackTime * 0.01);
+    logPrintVar(ns, "Grow Time", target.growTime * 0.01);
     logPrintLine(ns);
 
     await ns.sleep(150);
