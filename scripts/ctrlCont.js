@@ -17,34 +17,10 @@ export async function main(ns) {
    * The name of the target server.
    * @type {string}
    */
-  var targetName = "None";
+  var targetName = null;
   if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
     targetName = ns.args[0];
   }
-  /**
-   * The name of the script used for hacking.
-   * @type {string}
-   */
-  var hackScript = "/bots/singleHack.js";
-  /**
-   * The name of the script used for growing.
-   * @type {string}
-   */
-  var growScript = "/bots/singleGrow.js";
-  /**
-   * The name of the script used for weakening.
-   * @type {string}
-   */
-  var weakenScript = "/bots/singleWeaken.js";
-  /**
-   * The ram needed to run any script.
-   * @type {number}
-   */
-  var scriptRam = Math.max(
-    ns.getScriptRam(hackScript),
-    ns.getScriptRam(growScript),
-    ns.getScriptRam(weakenScript)
-  );
   /**
    * The server this script is running on.
    * @type {MyServer}
@@ -54,7 +30,7 @@ export async function main(ns) {
    * The server that is targeted by this script.
    * @type {MyServer}
    */
-  var target = new MyServer(ns, targetName);
+  var target = getTarget(ns);
   /**
    * An object holding the thread counts for hack, grow and weaken.
    * @type {SingleBatch}
@@ -101,37 +77,34 @@ export async function main(ns) {
    */
   var weakenCount = 0;
 
+  if (targetName) {
+    target = new MyServer(ns, targetName);
+  }
+
   while (true) {
     ns.clearLog();
 
     /** Get the current data */
     host.update(ns);
-    if (targetName != "None") {
+    if (targetName) {
       target.update(ns);
     } else {
       target = getTarget(ns);
     }
     now = ns.getTimeSinceLastAug();
 
-    /** Print the current status of the target to the log window */
-    logPrintLine(ns);
-    logPrintVar(ns, "Target", target.name);
-    logPrintVar(ns, "Money", target.moneyPercent);
-    logPrintVar(ns, "Security", target.deltaSecurity);
-    logPrintLine(ns);
-
     /** Calculate the threads needed */
     if (target.farming) {
-      batch = getFarmingBatch(ns, target, host);
+      batch = getFarmingBatch(ns, target, 0, host);
     } else {
-      batch = getPreparationBatch(ns, target, host);
+      batch = getPreparationBatch(ns, target, 0, host);
     }
 
     /**
      * Only attempt to start an action if a full batch can be triggered.
      * The goal is to ensure that the requested actions can actually be started.
      */
-    if (batch.totalThreads <= host.threadsAvailable) {
+    if (batch.totalRam <= host.ramAvailable) {
       /** Start a hack action if it will finish within it's allotted time window */
       if (batch.hackThreads > 0 && now > hackStartTime) {
         let hackRelativeFinish = now + (target.hackTime % period);
@@ -159,6 +132,12 @@ export async function main(ns) {
     }
 
     /** Print the current status of the host to the log window */
+    logPrintLine(ns);
+    logPrintVar(ns, "Target", target.name);
+    logPrintVar(ns, "Money", target.moneyPercent);
+    logPrintVar(ns, "Security", target.deltaSecurity);
+    logPrintLine(ns);
+    batch.print(ns);
     logPrintLine(ns);
     logPrintVar(ns, "Host", host.name);
     logPrintVar(ns, "Load", host.load);
