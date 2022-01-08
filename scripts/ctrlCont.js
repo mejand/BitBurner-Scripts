@@ -55,12 +55,12 @@ export async function main(ns) {
    * The time stamp after which hacking can be started.
    * @type {number}
    */
-  var hackStartTime = now + period + target.weakenTime - target.hackTime;
+  var hackStartTime = now;
   /**
    * The time stamp after which growing can be started.
    * @type {number}
    */
-  var growStartTime = now + period + target.weakenTime - target.growTime;
+  var growStartTime = now;
   /**
    * The number of hack actions that have been triggered.
    * @type {number}
@@ -77,9 +77,14 @@ export async function main(ns) {
    */
   var weakenCount = 0;
 
+  /** Update the target if it was passed as an argument */
   if (targetName) {
     target = new MyServer(ns, targetName);
   }
+
+  /** Calculate the wait times based on the target */
+  hackStartTime = now + period + target.weakenTime - target.hackTime;
+  growStartTime = now + period + target.weakenTime - target.growTime;
 
   while (true) {
     ns.clearLog();
@@ -107,7 +112,7 @@ export async function main(ns) {
     if (batch.totalRam <= host.ramAvailable) {
       /** Start a hack action if it will finish within it's allotted time window */
       if (batch.hackThreads > 0 && now > hackStartTime) {
-        let hackRelativeFinish = now + (target.hackTime % period);
+        let hackRelativeFinish = target.hackTime % period;
         if (hackRelativeFinish == 0) {
           ns.run(
             "botsSingleHack.js",
@@ -120,7 +125,7 @@ export async function main(ns) {
       }
       /** Start a grow action if it will finish within it's allotted time window */
       if (batch.growThreads > 0 && now > growStartTime) {
-        let growRelativeFinish = now + (target.growTime % period);
+        let growRelativeFinish = target.growTime % period;
         if (growRelativeFinish == timePerAction) {
           ns.run(
             "botsSingleGrow.js",
@@ -133,7 +138,7 @@ export async function main(ns) {
       }
       /** Start a weaken action if it will finish within it's allotted time window */
       if (batch.weakenThreads > 0) {
-        let weakenRelativeFinish = now + (target.weakenTime % period);
+        let weakenRelativeFinish = target.weakenTime % period;
         if (weakenRelativeFinish == timePerAction * 2) {
           ns.run(
             "botsSingleWeaken.js",
