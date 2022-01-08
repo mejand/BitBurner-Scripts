@@ -25,7 +25,7 @@ export async function main(ns) {
    * The server this script is running on.
    * @type {MyServer}
    */
-  var host = new MyServer(ns, ns.getHostname());
+  var host = new MyServer(ns, ns.getHostname(), 0.1, 5);
   /**
    * The server that is targeted by this script.
    * @type {MyServer}
@@ -112,7 +112,7 @@ export async function main(ns) {
     if (batch.totalRam <= host.ramAvailable) {
       /** Start a hack action if it will finish within it's allotted time window */
       if (batch.hackThreads > 0 && now > hackStartTime) {
-        let hackRelativeFinish = target.hackTime % period;
+        let hackRelativeFinish = (now + target.hackTime) % period;
         if (hackRelativeFinish == 0) {
           ns.run(
             "botsSingleHack.js",
@@ -125,7 +125,7 @@ export async function main(ns) {
       }
       /** Start a grow action if it will finish within it's allotted time window */
       if (batch.growThreads > 0 && now > growStartTime) {
-        let growRelativeFinish = target.growTime % period;
+        let growRelativeFinish = (now + target.growTime) % period;
         if (growRelativeFinish == timePerAction) {
           ns.run(
             "botsSingleGrow.js",
@@ -138,7 +138,7 @@ export async function main(ns) {
       }
       /** Start a weaken action if it will finish within it's allotted time window */
       if (batch.weakenThreads > 0) {
-        let weakenRelativeFinish = target.weakenTime % period;
+        let weakenRelativeFinish = (now + target.weakenTime) % period;
         if (weakenRelativeFinish == timePerAction * 2) {
           ns.run(
             "botsSingleWeaken.js",
@@ -165,6 +165,11 @@ export async function main(ns) {
     logPrintVar(ns, "Hack Count", hackCount);
     logPrintVar(ns, "Grow Count", growCount);
     logPrintVar(ns, "Weaken Count", weakenCount);
+    logPrintLine(ns);
+    logPrintVar(ns, "Hack Countdown", Math.max(0, hackStartTime - now));
+    logPrintVar(ns, "Grow Count", Math.max(0, growStartTime - now));
+    logPrintVar(ns, "Hack Time", target.hackTime);
+    logPrintVar(ns, "Grow Time", target.growTime);
     logPrintLine(ns);
 
     await ns.sleep(150);
