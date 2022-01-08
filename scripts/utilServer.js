@@ -184,16 +184,16 @@ export class MyServer {
       /**
        * A server object that is set to min difficulty to get the weaken time
        * for farming mode.
-       * @type {MyServer}
+       * @type {import("..").Server}
        */
-      let minSecTarget = new MyServer(ns, this.name);
-      minSecTarget.server.hackDifficulty = minSecTarget.server.minDifficulty;
+      let minSecTarget = ns.getServer(this.name);
+      minSecTarget.hackDifficulty = minSecTarget.minDifficulty;
 
       /** Check if the player has access to Formulas.exe */
       if (ns.fileExists("Formulas.exe", "home")) {
         score =
-          minSecTarget.server.moneyMax /
-          ns.formulas.hacking.weakenTime(minSecTarget.server, player);
+          minSecTarget.moneyMax /
+          ns.formulas.hacking.weakenTime(minSecTarget, player);
         /** Consider the success chance of hacking */
         score *= ns.formulas.hacking.hackChance(minSecTarget, player);
       } else {
