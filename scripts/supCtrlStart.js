@@ -90,6 +90,9 @@ export async function main(ns) {
         /** Update the status of the target bevore it is examined */
         vialbleTargets[i].update(ns);
 
+        /** Update the status of the host */
+        hostServer.update(ns);
+
         /** Check if there is already a controller targeting this server */
         isTargeted = ns.isRunning(
           controller,
@@ -124,6 +127,7 @@ export async function main(ns) {
         logPrintLine(ns);
         logPrintVar(ns, "Last Investigated", vialbleTargets[i].name);
         logPrintVar(ns, "Already Targeted", isTargeted);
+        logPrintVar(ns, "Score", vialbleTargets[i].calcScore(ns));
         if (minSecBatch && minSecBatch.targetName == vialbleTargets[i].name) {
           logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
         } else {
