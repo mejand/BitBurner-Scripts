@@ -3,7 +3,7 @@ import { MyServer } from "./utilServer.js";
 import { logPrintVar } from "./utilLog.js";
 
 /**
- * Handle a single batch at a time on the local host server.
+ * Handle a single batch, timed so that the actions finish as close together as possible.
  * @param {import("..").NS } ns
  */
 export async function main(ns) {
