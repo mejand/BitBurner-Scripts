@@ -91,6 +91,7 @@ export async function main(ns) {
         "botsSingleGrow.js",
         "botsSingleHack.js",
         "botsSingleWeaken.js",
+        "botsTimedSelect.js",
       ];
 
       /** Copy the hacking scripts to the new server */
