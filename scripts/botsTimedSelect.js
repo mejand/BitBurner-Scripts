@@ -7,8 +7,6 @@ import { getTimeInRaster } from "./utilTime.js";
  * @param {import("..").NS} ns
  */
 export async function main(ns) {
-  ns.disableLog("ALL");
-
   /**
    * The name of the target server.
    * @type {string}
