@@ -75,14 +75,19 @@ export class TimedBatch {
      * @type {Number}
      */
     var weakenTime = getTimeInRaster(ns.getWeakenTime(this.targetName));
+    /**
+     * The time at which the batch shall be finished.
+     * @type {Number}
+     */
+    var finishTime = ns.getTimeSinceLastAug() + weakenTime;
 
     if (hosts) {
-      this.hack.execute(ns, this.targetName, weakenTime, this.id, hosts);
-      this.grow.execute(ns, this.targetName, weakenTime, this.id, hosts);
-      this.weaken.execute(ns, this.targetName, weakenTime, this.id, hosts);
+      this.hack.execute(ns, this.targetName, finishTime, this.id, hosts);
+      this.grow.execute(ns, this.targetName, finishTime, this.id, hosts);
+      this.weaken.execute(ns, this.targetName, finishTime, this.id, hosts);
     }
 
-    return ns.getTimeSinceLastAug() + weakenTime;
+    return finishTime;
   }
 }
 
