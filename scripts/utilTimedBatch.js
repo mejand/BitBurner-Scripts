@@ -282,7 +282,7 @@ class TimedAction {
     while (this.threadsRemaining > 0 && i < hosts.length) {
       /** Analyze the current host */
       ramAvaialble =
-        ns.getServerMaxRam(hosts[i]) - ns.getServerUsedRam(hosts[i].ramUsed);
+        ns.getServerMaxRam(hosts[i]) - ns.getServerUsedRam(hosts[i]);
       threads = Math.min(
         this.threadsRemaining,
         Math.floor(ramAvaialble / this._ramPerThread)
