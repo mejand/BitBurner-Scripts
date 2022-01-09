@@ -295,7 +295,7 @@ class TimedAction {
        */
       let processId = ns.exec(
         this._script,
-        hosts[i].hostname,
+        hosts[i],
         threads,
         targetName,
         finishTime,
@@ -305,7 +305,6 @@ class TimedAction {
 
       /** Update the status of the host server and the reamining threads */
       if (processId > 0) {
-        hosts[i].ramUsed += threads * this._ramPerThread;
         this.threadsRemaining -= threads;
       }
 
