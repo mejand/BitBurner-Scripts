@@ -1,3 +1,4 @@
+import { getTimeInRaster } from "./utilTime.js";
 /**
  * A batch that shall finish at a specific time.
  */
@@ -61,6 +62,25 @@ export class TimedBatch {
       this.grow.threadsRemaining +
       this.weaken.threadsRemaining
     );
+  }
+  /**
+   * Execute the batch on the given host servers.
+   * @param {import("..").NS} ns
+   * @param {String[]} hosts - The names of the host servers.
+   * @returns {Number} - The time at which the batch execution will be finished.
+   */
+  execute(ns, hosts) {
+    /**
+     * The time it takes to complete the weaken action.
+     * @type {Number}
+     */
+    var weakenTime = getTimeInRaster(ns.getWeakenTime(this.targetName));
+
+    this.hack.execute(ns, this.targetName, weakenTime, this.id, hosts);
+    this.grow.execute(ns, this.targetName, weakenTime, this.id, hosts);
+    this.weaken.execute(ns, this.targetName, weakenTime, this.id, hosts);
+
+    return weakenTime;
   }
 }
 class TimedAction {
