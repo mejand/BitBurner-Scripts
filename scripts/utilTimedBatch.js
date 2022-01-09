@@ -67,7 +67,7 @@ export class TimedBatch {
    * Execute the batch on the given host servers.
    * @param {import("..").NS} ns
    * @param {String[]} hosts - The names of the host servers.
-   * @returns {Number} - The time at which the batch execution will be finished.
+   * @returns {Number} The time at which the batch execution will be finished.
    */
   execute(ns, hosts) {
     /**
