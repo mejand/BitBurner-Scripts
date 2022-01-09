@@ -179,7 +179,8 @@ export class MyServer {
     /** Check if the target can be hacked at all */
     if (
       this.server.requiredHackingSkill <= player.hacking &&
-      ns.hackAnalyze(this.name) > 0
+      ns.hackAnalyze(this.name) > 0 &&
+      this.server.hasAdminRights
     ) {
       /**
        * A server object that is set to min difficulty to get the weaken time
