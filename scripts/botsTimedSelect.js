@@ -70,7 +70,7 @@ export async function main(ns) {
    * The current time.
    * @type {number}
    */
-  var timeNow = 0;
+  var now = 0;
   /**
    * The time it takes for the main operation to finish.
    * @type {number}
@@ -93,12 +93,12 @@ export async function main(ns) {
       case 1:
         debugText.action = "Hack";
         runTimeRaw = ns.getHackTime(targetName);
-        runTime = getTimeInRaster(runTimeRaw);
+        runTime = getTimeInRaster(runTimeRaw) + 800;
         break;
       case 2:
         debugText.action = "Grow";
         runTimeRaw = ns.getGrowTime(targetName);
-        runTime = getTimeInRaster(runTimeRaw);
+        runTime = getTimeInRaster(runTimeRaw) + 400;
         break;
       case 3:
         debugText.action = "Weaken";
@@ -120,12 +120,12 @@ export async function main(ns) {
      * Keep looping until the execution start time has arrived
      */
     while (running) {
-      timeNow = ns.getTimeSinceLastAug();
+      now = ns.getTimeSinceLastAug();
 
-      predictedFinish = timeNow + runTime;
-      predictedFinishRaw = timeNow + runTimeRaw;
+      predictedFinish = now + runTime;
+      predictedFinishRaw = now + runTimeRaw;
 
-      logPrintVar(ns, "Time Now", timeNow);
+      logPrintVar(ns, "Time Now", now);
       logPrintVar(ns, "Predicted Finish", predictedFinish);
 
       if (predictedFinish == finishTime) {
@@ -177,7 +177,7 @@ export async function main(ns) {
         running = false;
 
         /** Update Debug Text */
-        debugText.time = timeNow;
+        debugText.time = now;
         debugText.timeError = finishTime - debugText.time;
         debugText.money =
           (ns.getServerMoneyAvailable(targetName) /
