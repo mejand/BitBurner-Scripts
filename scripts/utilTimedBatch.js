@@ -90,33 +90,33 @@ export class TimedBatch {
  * Calculate the hack, grow and weaken threads to prepare the target for farming.
  * The finish times are not calculated (use updateFinishTimes() to update them).
  * @param {import("..").NS} ns
- * @param {String} targetName - The name of the target server.
- * @param {number} id - The id for the batch.
+ * @param {String} target - The name of the target server.
+ * @param {Number} id - The id for the batch.
  * @returns {TimedBatch} The number of threads needed to steal half the money
  * from the target and grow it back with no impact on security.
  */
-export function getTimedFarmingBatch(ns, targetName, id) {
+export function getTimedFarmingBatch(ns, target, id) {
   /**
    * The batch object holding the result.
    * @type {TimedBatch}
    */
-  var batch = new TimedBatch(ns, targetName, id);
+  var batch = new TimedBatch(ns, target, id);
   /**
    * The security score that will be removed by one thread of the weaken script.
-   * @type {number}
+   * @type {Number}
    */
   var weakenReduction = ns.weakenAnalyze(1);
   /**
    * The security score that needs to be removed to reach min security.
-   * @type {number}
+   * @type {Number}
    */
   var deltaSecurity = 0;
 
   /** Calculate the hack threads needed to steal half the money on the target server */
-  batch.hack.threadsTotal = Math.floor(0.5 / ns.hackAnalyze(targetName));
+  batch.hack.threadsTotal = Math.floor(0.5 / ns.hackAnalyze(target));
 
   /** Calculate the number of threads needed to compensate the stolen money */
-  batch.grow.threadsTotal = Math.ceil(ns.growthAnalyze(targetName, 2.0));
+  batch.grow.threadsTotal = Math.ceil(ns.growthAnalyze(target, 2.0));
 
   /** Add the security impact of hack and grow */
   deltaSecurity += ns.hackAnalyzeSecurity(batch.hack.threadsTotal);
@@ -126,6 +126,51 @@ export function getTimedFarmingBatch(ns, targetName, id) {
   batch.weaken.threadsTotal = Math.ceil(deltaSecurity / weakenReduction);
 
   return batch;
+}
+
+/**
+ * Calculate the grow and weaken threads to prepare the target for farming.
+ * @param {import("..").NS} ns
+ * @param {String} target - The name of the target server.
+ * @param {Number} id - The id for the batch.
+ * @returns {TimedBatch} The number of threads needed to grow the target to max money.
+ */
+export function getTimedPreparationBatch(ns, target, id) {
+  /**
+   * The batch object holding the result.
+   * @type {TimedBatch}
+   */
+  var result = new TimedBatch(ns, target, id);
+  /**
+   * The factor that the money has to be grown with to compensate the hacking.
+   * @type {Number}
+   */
+  var growFactor =
+    ns.getServerMaxMoney(target) / ns.getServerMoneyAvailable(target);
+  /**
+   * The security score that will be removed by one thread of the weaken script.
+   * @type {Number}
+   */
+  var weakenReduction = ns.weakenAnalyze(1);
+  /**
+   * The security score that needs to be removed to reach min security.
+   * @type {Number}
+   */
+  var deltaSecurity =
+    ns.getServerSecurityLevel(target) - ns.getServerMinSecurityLevel(target);
+
+  /** Calculate how many threads are needed to grow the target to max money */
+  result.grow.threadsTotal = Math.ceil(
+    ns.growthAnalyze(target.name, growFactor)
+  );
+
+  /** Calculate the security impact of the grow operation */
+  deltaSecurity += ns.growthAnalyzeSecurity(result.grow.threadsTotal);
+
+  /** Calculate how many threads are needed to reach min security */
+  result.weaken.threadsTotal = Math.ceil(deltaSecurity / weakenReduction);
+
+  return result;
 }
 
 class TimedAction {
