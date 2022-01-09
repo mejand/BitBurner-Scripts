@@ -5,18 +5,18 @@ export class TimedBatch {
   /**
    * Create an instance of a timed batch.
    * @param {import("..").NS} ns
-   * @param {string} targetName - The name of the target server.
-   * @param {number} id - The ID of the is batch (must be a unique number).
+   * @param {String} targetName - The name of the target server.
+   * @param {Number} id - The ID of the is batch (must be a unique number).
    */
   constructor(ns, targetName, id) {
     /**
      * The name of the target server.
-     * @type {string}
+     * @type {String}
      */
     this.targetName = targetName;
     /**
      * The ID of the is batch (must be a unique number).
-     * @type {number}
+     * @type {Number}
      */
     this.id = id;
     /**
@@ -35,42 +35,69 @@ export class TimedBatch {
      */
     this.weaken = new TimedAction(ns, 3);
   }
+  /**
+   * The total RAM needed to execute the batch.
+   * @type {Number}
+   */
+  get totalRam() {
+    return this.hack.ram + this.grow.ram + this.weaken.ram;
+  }
+  /**
+   * The number of threads dedicated to this batch.
+   * @type {Number}
+   */
+  get threadsTotal() {
+    return (
+      this.hack.threadsTotal + this.grow.threadsTotal + this.weaken.threadsTotal
+    );
+  }
+  /**
+   * The number of threads still to be executed.
+   * @type {Number}
+   */
+  get threadsRemaining() {
+    return (
+      this.hack.threadsRemaining +
+      this.grow.threadsRemaining +
+      this.weaken.threadsRemaining
+    );
+  }
 }
 class TimedAction {
   /**
    * Creat an instance of an action.
    * @param {import("..").NS} ns
-   * @param {number} type - The type of action (1 = hack, 2 = grow, 3 = weaken).
+   * @param {Number} type - The type of action (1 = hack, 2 = grow, 3 = weaken).
    */
   constructor(ns, type) {
     /**
      * The type of action (1 = hack, 2 = grow, 3 = weaken).
-     * @type {number}
+     * @type {Number}
      */
     this._type = type;
     /**
      * The name of the script that corresponds to the action.
-     * @type {string}
+     * @type {String}
      */
     this._script = "botsTimedSelect.js";
     /**
      * The amount of RAM needed to execute this action with one thread.
-     * @type {number}
+     * @type {Number}
      */
     this._ramPerThread = ns.getScriptRam(this._script);
     /**
      * The amount of RAM needed to execute this action with all dedicated threads.
-     * @type {number}
+     * @type {Number}
      */
     this._ram = 0;
     /**
      * The number of threads dedicated to the action.
-     * @type {number}
+     * @type {Number}
      */
     this._threadsTotal = 0;
     /**
      * The number of threads that still have to be executed.
-     * @type {number}
+     * @type {Number}
      */
     this._threadsRemaining = 0;
 
@@ -80,28 +107,28 @@ class TimedAction {
   }
   /**
    * The amount of RAM needed to execute this action.
-   * @type {number}
+   * @type {Number}
    */
   get ram() {
     return this._ram;
   }
   /**
    * The number of threads dedicated to the action.
-   * @type {number}
+   * @type {Number}
    */
   get threadsTotal() {
     return this._threadsTotal;
   }
   /**
    * The number of threads that still have to be executed.
-   * @type {number}
+   * @type {Number}
    */
   get threadsRemaining() {
     return this._threadsRemaining;
   }
   /**
    * The number of threads dedicated to the action.
-   * @param {number} number
+   * @param {Number} number
    */
   set threadsTotal(number) {
     this._ram = this._ramPerThread * number;
@@ -110,7 +137,7 @@ class TimedAction {
   }
   /**
    * The number of threads that still have to be executed.
-   * @param {number} number
+   * @param {Number} number
    */
   set threadsRemaining(number) {
     this._ram = this._ramPerThread * number;
@@ -119,25 +146,25 @@ class TimedAction {
   /**
    * Execute the action on the given hosts.
    * @param {import("..").NS} ns
-   * @param {string} targetName - The name of the target server.
-   * @param {number} finishTime - The time at which the action shall be finished.
-   * @param {number} id - The id of the batch this action is a part of.
-   * @param {string[]} hosts - The names of the available host servers.
+   * @param {String} targetName - The name of the target server.
+   * @param {Number} finishTime - The time at which the action shall be finished.
+   * @param {Number} id - The id of the batch this action is a part of.
+   * @param {String[]} hosts - The names of the available host servers.
    */
   execute(ns, targetName, finishTime, id, hosts) {
     /**
      * Index of the host server that is currently being attempted.
-     * @type {number}
+     * @type {Number}
      */
     var i = 0;
     /**
      * The amount of RAM left on the host server.
-     * @type {number}
+     * @type {Number}
      */
     var ramAvaialble = 0;
     /**
      * The number of threads that can be started on the host.
-     * @type {number}
+     * @type {Number}
      */
     var threads = 0;
 
@@ -154,7 +181,7 @@ class TimedAction {
       /**
        * The ID of the script that was just started. Will be 0 if the
        * script could not be stared.
-       * @type {number}
+       * @type {Number}
        */
       let processId = ns.exec(
         this._script,
