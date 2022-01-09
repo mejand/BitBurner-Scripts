@@ -67,6 +67,8 @@ export async function main(ns) {
   batchCount = Math.floor(hackTime / period);
   batchCountRemaining = batchCount;
 
+  ns.tail();
+
   while (batchCountRemaining > 0) {
     now = ns.getTimeSinceLastAug();
 
@@ -77,6 +79,10 @@ export async function main(ns) {
       batchCountRemaining--;
       id++;
     }
+
+    ns.print("hackTime = " + hackTime);
+    ns.print("batchCount = " + batchCount);
+    ns.print("batchCountRemaining = " + batchCountRemaining);
 
     await ns.sleep(150);
   }
