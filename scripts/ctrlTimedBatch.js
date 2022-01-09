@@ -63,6 +63,7 @@ export async function main(ns) {
    * of the first one finishes so that the security on the target server
    * is still at minimum.
    */
+  hackTime = ns.getHackTime(targetName);
   batchCount = Math.floor(hackTime / period);
   batchCountRemaining = batchCount;
 
