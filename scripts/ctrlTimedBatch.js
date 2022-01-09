@@ -19,7 +19,7 @@ export async function main(ns) {
    * The time in milliseconds that shall pass between batch executions.
    * @type {Number}
    */
-  var period = 1200;
+  var period = 1600;
   /**
    * The current time in milliseconds.
    * @type {Number}
@@ -80,6 +80,7 @@ export async function main(ns) {
       id++;
     }
 
+    ns.clearLog();
     ns.print("hackTime = " + hackTime);
     ns.print("batchCount = " + batchCount);
     ns.print("batchCountRemaining = " + batchCountRemaining);
