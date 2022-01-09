@@ -47,11 +47,6 @@ export async function main(ns) {
    */
   var running = true;
   /**
-   * The time at which script execution is predicted to finish.
-   * @type {number}
-   */
-  var predictedFinish = 0;
-  /**
    * The current time.
    * @type {number}
    */
@@ -67,11 +62,6 @@ export async function main(ns) {
    * @type {number}
    */
   var runTimeRaw = 0;
-  /**
-   * The security level above the minimum.
-   * @type {number}
-   */
-  var deltaSecurity = 0;
 
   if (targetName && finishTime && id && scriptType) {
     switch (scriptType) {
@@ -98,12 +88,10 @@ export async function main(ns) {
     while (running) {
       now = ns.getTimeSinceLastAug();
 
-      predictedFinish = now + runTime;
-
-      if (predictedFinish == finishTime) {
-        // stop the while loop
+      if (now + runTime >= finishTime) {
+        /** Stop the while loop */
         running = false;
-
+        /** Start the appropriate action */
         switch (scriptType) {
           case 1:
             await ns.hack(targetName);
@@ -117,8 +105,6 @@ export async function main(ns) {
           default:
             break;
         }
-      } else if (predictedFinish > finishTime) {
-        running = false;
       } else {
         /** If the time is not right yet wait for the next 200ms step */
         await ns.sleep(150);
