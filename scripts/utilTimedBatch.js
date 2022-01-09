@@ -76,11 +76,13 @@ export class TimedBatch {
      */
     var weakenTime = getTimeInRaster(ns.getWeakenTime(this.targetName));
 
-    this.hack.execute(ns, this.targetName, weakenTime, this.id, hosts);
-    this.grow.execute(ns, this.targetName, weakenTime, this.id, hosts);
-    this.weaken.execute(ns, this.targetName, weakenTime, this.id, hosts);
+    if (hosts) {
+      this.hack.execute(ns, this.targetName, weakenTime, this.id, hosts);
+      this.grow.execute(ns, this.targetName, weakenTime, this.id, hosts);
+      this.weaken.execute(ns, this.targetName, weakenTime, this.id, hosts);
+    }
 
-    return weakenTime;
+    return ns.getTimeSinceLastAug() + weakenTime;
   }
 }
 class TimedAction {
