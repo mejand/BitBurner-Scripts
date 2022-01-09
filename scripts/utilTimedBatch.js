@@ -6,8 +6,35 @@ export class TimedBatch {
    * Create an instance of a timed batch.
    * @param {import("..").NS} ns
    * @param {string} targetName - The name of the target server.
+   * @param {number} id - The ID of the is batch (must be a unique number).
    */
-  constructor(ns, targetName) {}
+  constructor(ns, targetName, id) {
+    /**
+     * The name of the target server.
+     * @type {string}
+     */
+    this.targetName = targetName;
+    /**
+     * The ID of the is batch (must be a unique number).
+     * @type {number}
+     */
+    this.id = id;
+    /**
+     * The hack action for this batch.
+     * @type {TimedAction}
+     */
+    this.hack = new TimedAction(ns, 1);
+    /**
+     * The grow action for this batch.
+     * @type {TimedAction}
+     */
+    this.grow = new TimedAction(ns, 2);
+    /**
+     * The weaken action for this batch.
+     * @type {TimedAction}
+     */
+    this.weaken = new TimedAction(ns, 3);
+  }
 }
 class TimedAction {
   /**
