@@ -95,7 +95,7 @@ class TimedAction {
    * @param {string} targetName - The name of the target server.
    * @param {number} finishTime - The time at which the action shall be finished.
    * @param {number} id - The id of the batch this action is a part of.
-   * @param {import("..").Server[]} hosts - The available host servers.
+   * @param {string[]} hosts - The names of the available host servers.
    */
   execute(ns, targetName, finishTime, id, hosts) {
     /**
@@ -112,12 +112,13 @@ class TimedAction {
      * The number of threads that can be started on the host.
      * @type {number}
      */
-    let threads = 0;
+    var threads = 0;
 
     /** Loop as long until there are no more threads or hosts remaning */
     while (this.threadsRemaining > 0 && i < hosts.length) {
       /** Analyze the current host */
-      ramAvaialble = hosts[i].maxRam - hosts[i].ramUsed;
+      ramAvaialble =
+        ns.getServerMaxRam(hosts[i]) - ns.getServerUsedRam(hosts[i].ramUsed);
       threads = Math.min(
         this.threadsRemaining,
         Math.floor(ramAvaialble / this._ramPerThread)
