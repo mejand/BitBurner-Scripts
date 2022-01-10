@@ -3,6 +3,7 @@ import {
   getTimedFarmingBatch,
   getTimedPreparationBatch,
 } from "./utilTimedBatch.js";
+import { logPrintVar, logPrintLine } from "./utilLog.js";
 
 /**
  * Handle a single batch at a time on the local host server.
@@ -87,36 +88,39 @@ export async function main(ns) {
   while (true) {
     /** Get the current time */
     now = ns.getTimeSinceLastAug();
-    /** Update information on the target server */
-    money = ns.getServerMoneyAvailable(target) / ns.getServerMaxMoney(target);
-    money *= 100;
-    security =
-      ns.getServerSecurityLevel(target) - ns.getServerMinSecurityLevel(target);
 
-    ns.clearLog();
-    ns.print("Money = " + money);
-    ns.print("Security = " + security);
-    ns.print("State = " + state);
-
-    switch (state) {
-      case 1:
-        /** ------------- State 1 = Waiting ------------- */
-        ns.print("State = " + "Waiting");
-        ns.print("Wait = " + (waitUntil - now) * 0.01);
-        if (now >= waitUntil) {
-          /** Decide if the target should be prepared or grown */
-          if (money > 90 && security < 1) {
-            state = 3;
-            waitUntil = 0;
-          } else {
-            state = 2;
-            waitUntil = 0;
+    /** Update the state machine if a period has passed */
+    if (now % period == 0) {
+      ns.clearLog();
+      /** Update information on the target server */
+      money = ns.getServerMoneyAvailable(target) / ns.getServerMaxMoney(target);
+      money *= 100;
+      security =
+        ns.getServerSecurityLevel(target) -
+        ns.getServerMinSecurityLevel(target);
+      switch (state) {
+        case 1:
+          /** ------------- State 1 = Waiting ------------- */
+          logPrintLine(ns);
+          logPrintVar(ns, "State", "Waiting");
+          logPrintVar(ns, "Countdown", (waitUntil - now) * 0.01);
+          logPrintLine(ns);
+          if (now >= waitUntil) {
+            /** Decide if the target should be prepared or grown */
+            if (money > 90 && security < 1) {
+              state = 3;
+              waitUntil = 0;
+            } else {
+              state = 2;
+              waitUntil = 0;
+            }
           }
-        }
-        break;
-      case 2:
-        /** ------------- State 1 = Preparation --------- */
-        if (now % period == 0) {
+          break;
+        case 2:
+          /** ------------- State 1 = Preparation --------- */
+          logPrintLine(ns);
+          logPrintVar(ns, "State", "Preparation");
+          logPrintLine(ns);
           /** Start the preparation batch */
           batch = getTimedPreparationBatch(ns, target, id);
           hosts = ns.getPurchasedServers();
@@ -126,12 +130,15 @@ export async function main(ns) {
           state = 1;
           batch = null;
           hosts = null;
-        }
-        break;
-      case 3:
-        /** ------------- State 3 = Farming ------------- */
-        /** Start new batches until there are none remaining */
-        if (now % period == 0) {
+          break;
+        case 3:
+          /** ------------- State 3 = Farming ------------- */
+          /** Start new batches until there are none remaining */
+          logPrintLine(ns);
+          logPrintVar(ns, "State", "Farming");
+          logPrintVar(ns, "Batches Total", batchCount);
+          logPrintVar(ns, "Batches Remaining", batchCountRemaining);
+          logPrintLine(ns);
           if (hackTime) {
             batch = getTimedFarmingBatch(ns, target, id);
             hosts = ns.getPurchasedServers();
@@ -151,18 +158,23 @@ export async function main(ns) {
             batchCount = Math.floor(hackTime / period);
             batchCountRemaining = batchCount;
           }
-        }
-        /** Move to the waiting state after all batches have been started */
-        if (batchCountRemaining == 0) {
-          state = 1;
-          waitUntil += period;
-          /** Reset the batch information to prepare for the next run */
-          batch = null;
-          hackTime = null;
-          batchCount = null;
-          batchCountRemaining = null;
-        }
-        break;
+          /** Move to the waiting state after all batches have been started */
+          if (batchCountRemaining == 0) {
+            state = 1;
+            waitUntil += period;
+            /** Reset the batch information to prepare for the next run */
+            batch = null;
+            hackTime = null;
+            batchCount = null;
+            batchCountRemaining = null;
+          }
+          break;
+      }
+      logPrintLine(ns);
+      logPrintVar(ns, "Money", money);
+      logPrintVar(ns, "Security", security);
+      logPrintVar(ns, "State", state);
+      logPrintLine(ns);
     }
     await ns.sleep(150);
   }
