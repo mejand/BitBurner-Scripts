@@ -84,7 +84,7 @@ export async function main(ns) {
 
   ns.tail();
 
-  while (batchCountRemaining > 0) {
+  while (true) {
     /** Get the current time */
     now = ns.getTimeSinceLastAug();
     /** Update information on the target server */
