@@ -121,7 +121,7 @@ export function getTimedFarmingBatch(ns, target, id) {
   batch.hack.threadsTotal = Math.floor(0.5 / ns.hackAnalyze(target));
 
   /** Calculate the number of threads needed to compensate the stolen money */
-  batch.grow.threadsTotal = Math.ceil(ns.growthAnalyze(target, 2.0));
+  batch.grow.threadsTotal = Math.ceil(ns.growthAnalyze(target, 2.1));
 
   /** Add the security impact of hack and grow */
   deltaSecurity += ns.hackAnalyzeSecurity(batch.hack.threadsTotal);
