@@ -167,6 +167,10 @@ export async function main(ns) {
              */
             hackTime = ns.getHackTime(target);
             batchCount = Math.floor(hackTime / period);
+            /** Remove one batch for safety */
+            if (batchCount > 1) {
+              batchCount--;
+            }
             batchCountRemaining = batchCount;
           }
           logPrintLine(ns);
