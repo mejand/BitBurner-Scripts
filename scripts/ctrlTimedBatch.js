@@ -185,6 +185,6 @@ export async function main(ns) {
       logPrintLine(ns);
     }
     timeCounter++;
-    await ns.sleep(150);
+    await ns.sleep(200);
   }
 }
