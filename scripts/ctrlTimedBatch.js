@@ -96,15 +96,16 @@ export async function main(ns) {
     ns.clearLog();
     ns.print("Money = " + money);
     ns.print("Security = " + security);
+    ns.print("State = " + state);
 
     switch (state) {
       case 1:
         /** ------------- State 1 = Waiting ------------- */
+        ns.print("State = " + "Waiting");
+        ns.print("Wait = " + (waitUntil - now) * 0.01);
         if (now >= waitUntil) {
-          ns.print("State = " + "Preparation");
-          ns.print("Wait = " + (waitUntil - now) * 0.01);
           /** Decide if the target should be prepared or grown */
-          if (money > 0.9 && security < 1) {
+          if (money > 90 && security < 1) {
             state = 3;
             waitUntil = 0;
           } else {
@@ -154,6 +155,7 @@ export async function main(ns) {
         /** Move to the waiting state after all batches have been started */
         if (batchCountRemaining == 0) {
           state = 1;
+          waitUntil += period;
           /** Reset the batch information to prepare for the next run */
           batch = null;
           hackTime = null;
