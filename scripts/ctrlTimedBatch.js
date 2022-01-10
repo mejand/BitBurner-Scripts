@@ -24,7 +24,7 @@ export async function main(ns) {
    * The time in milliseconds that shall pass between batch executions.
    * @type {Number}
    */
-  var period = 1600;
+  var period = 1200;
   /**
    * The current time in milliseconds.
    * @type {Number}
@@ -50,7 +50,7 @@ export async function main(ns) {
    * The amount of time in milliseconds it takes to complete a hack action.
    * @type {Number}
    */
-  var hackTime = 0;
+  var hackTime = null;
   /**
    * The batch that shall be executed.
    * @type {TimedBatch}
@@ -128,6 +128,7 @@ export async function main(ns) {
           logPrintLine(ns);
           /** Move to the waiting state to re-evalute once its done */
           state = 1;
+          waitUntil += period;
           batch = null;
           hosts = null;
           break;
