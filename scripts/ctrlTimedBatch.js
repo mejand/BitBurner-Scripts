@@ -82,6 +82,13 @@ export async function main(ns) {
    * @type {Number}
    */
   var security = 0;
+  /**
+   * A counter that is incremented at every calculation step until it reaches 6.
+   * The counter governs when the state machine is executed (every 1200ms = every
+   * time the counter reaches 6).
+   * @type {Number}
+   */
+  var timeCounter = 0;
 
   ns.tail();
 
@@ -90,8 +97,10 @@ export async function main(ns) {
     now = ns.getTimeSinceLastAug();
 
     /** Update the state machine if a period has passed */
-    if (now % period == 0) {
+    if (timeCounter == 6) {
       ns.clearLog();
+      /** Reset the time counter */
+      timeCounter = 0;
       /** Update information on the target server */
       money = ns.getServerMoneyAvailable(target) / ns.getServerMaxMoney(target);
       money *= 100;
@@ -175,6 +184,7 @@ export async function main(ns) {
       logPrintVar(ns, "State", state);
       logPrintLine(ns);
     }
+    timeCounter++;
     await ns.sleep(150);
   }
 }
