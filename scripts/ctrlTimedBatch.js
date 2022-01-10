@@ -146,7 +146,6 @@ export async function main(ns) {
           logPrintLine(ns);
           /** Move to the waiting state to re-evalute once its done */
           state = 1;
-          waitUntil += period;
           batch = null;
           hosts = null;
           break;
@@ -178,7 +177,6 @@ export async function main(ns) {
           /** Move to the waiting state after all batches have been started */
           if (batchCountRemaining == 0) {
             state = 1;
-            waitUntil += period;
             /** Reset the batch information to prepare for the next run */
             batch = null;
             hackTime = null;
