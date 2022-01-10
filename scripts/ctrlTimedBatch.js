@@ -101,10 +101,6 @@ export async function main(ns) {
       switch (state) {
         case 1:
           /** ------------- State 1 = Waiting ------------- */
-          logPrintLine(ns);
-          logPrintVar(ns, "State", "Waiting");
-          logPrintVar(ns, "Countdown", (waitUntil - now) * 0.01);
-          logPrintLine(ns);
           if (now >= waitUntil) {
             /** Decide if the target should be prepared or grown */
             if (money > 90 && security < 1) {
@@ -115,17 +111,23 @@ export async function main(ns) {
               waitUntil = 0;
             }
           }
+          logPrintLine(ns);
+          logPrintVar(ns, "State", "Waiting");
+          logPrintVar(ns, "Countdown", (waitUntil - now) * 0.01);
+          logPrintLine(ns);
           break;
         case 2:
           /** ------------- State 1 = Preparation --------- */
-          logPrintLine(ns);
-          logPrintVar(ns, "State", "Preparation");
-          logPrintLine(ns);
           /** Start the preparation batch */
           batch = getTimedPreparationBatch(ns, target, id);
           hosts = ns.getPurchasedServers();
           waitUntil = batch.execute(ns, hosts);
           id++;
+          logPrintLine(ns);
+          logPrintVar(ns, "State", "Preparation");
+          logPrintVar(ns, "Grow Threads", batch.grow.threadsTotal);
+          logPrintVar(ns, "Weaken Threads", batch.weaken.threadsTotal);
+          logPrintLine(ns);
           /** Move to the waiting state to re-evalute once its done */
           state = 1;
           batch = null;
@@ -134,19 +136,12 @@ export async function main(ns) {
         case 3:
           /** ------------- State 3 = Farming ------------- */
           /** Start new batches until there are none remaining */
-          logPrintLine(ns);
-          logPrintVar(ns, "State", "Farming");
-          logPrintVar(ns, "Batches Total", batchCount);
-          logPrintVar(ns, "Batches Remaining", batchCountRemaining);
-          logPrintLine(ns);
           if (hackTime) {
             batch = getTimedFarmingBatch(ns, target, id);
             hosts = ns.getPurchasedServers();
             waitUntil = batch.execute(ns, hosts);
             batchCountRemaining--;
             id++;
-            ns.print("State = " + "Farming");
-            ns.print("batchCountRemaining = " + batchCountRemaining);
           } else {
             /**
              * Update the number of batches that can be executed:
@@ -158,6 +153,11 @@ export async function main(ns) {
             batchCount = Math.floor(hackTime / period);
             batchCountRemaining = batchCount;
           }
+          logPrintLine(ns);
+          logPrintVar(ns, "State", "Farming");
+          logPrintVar(ns, "Batches Total", batchCount);
+          logPrintVar(ns, "Batches Remaining", batchCountRemaining);
+          logPrintLine(ns);
           /** Move to the waiting state after all batches have been started */
           if (batchCountRemaining == 0) {
             state = 1;
