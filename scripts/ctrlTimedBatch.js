@@ -21,10 +21,26 @@ export async function main(ns) {
     target = ns.args[0];
   }
   /**
+   * The number of time steps that have passed since the last execution of the
+   * state machine.
+   * @type {Number}
+   */
+  var timeStep = 0;
+  /**
+   * The number of time steps between executions of the state machine.
+   * @type {Number}
+   */
+  var timeStepMax = 6;
+  /**
+   * The length of one time step in ms.
+   * @type {Number}
+   */
+  var timeStepLength = 200;
+  /**
    * The time in milliseconds that shall pass between batch executions.
    * @type {Number}
    */
-  var period = 1200;
+  var period = timeStepLength * timeStepMax;
   /**
    * The current time in milliseconds.
    * @type {Number}
@@ -82,13 +98,6 @@ export async function main(ns) {
    * @type {Number}
    */
   var security = 0;
-  /**
-   * A counter that is incremented at every calculation step until it reaches 6.
-   * The counter governs when the state machine is executed (every 1200ms = every
-   * time the counter reaches 6).
-   * @type {Number}
-   */
-  var timeCounter = 0;
 
   ns.tail();
 
@@ -97,10 +106,10 @@ export async function main(ns) {
     now = ns.getTimeSinceLastAug();
 
     /** Update the state machine if a period has passed */
-    if (timeCounter == 6) {
+    if (timeStep == timeStepMax) {
       ns.clearLog();
       /** Reset the time counter */
-      timeCounter = 0;
+      timeStep = 0;
       /** Update information on the target server */
       money = ns.getServerMoneyAvailable(target) / ns.getServerMaxMoney(target);
       money *= 100;
@@ -184,7 +193,7 @@ export async function main(ns) {
       logPrintVar(ns, "State", state);
       logPrintLine(ns);
     }
-    timeCounter++;
-    await ns.sleep(200);
+    timeStep++;
+    await ns.sleep(timeStepLength);
   }
 }
