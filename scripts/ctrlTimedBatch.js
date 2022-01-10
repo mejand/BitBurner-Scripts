@@ -105,10 +105,8 @@ export async function main(ns) {
             /** Decide if the target should be prepared or grown */
             if (money > 90 && security < 1) {
               state = 3;
-              waitUntil = 0;
             } else {
               state = 2;
-              waitUntil = 0;
             }
           }
           logPrintLine(ns);
