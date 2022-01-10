@@ -120,7 +120,7 @@ export async function main(ns) {
           }
           logPrintLine(ns);
           logPrintVar(ns, "State", "Waiting");
-          logPrintVar(ns, "Countdown", (waitUntil - now) * 0.01);
+          logPrintVar(ns, "Countdown", (waitUntil - now) * 0.001);
           logPrintLine(ns);
           break;
         case 2:
