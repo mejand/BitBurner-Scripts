@@ -165,9 +165,7 @@ export function getTimedPreparationBatch(ns, target, id) {
     ns.getServerSecurityLevel(target) - ns.getServerMinSecurityLevel(target);
 
   /** Calculate how many threads are needed to grow the target to max money */
-  result.grow.threadsTotal = Math.ceil(
-    ns.growthAnalyze(target.name, growFactor)
-  );
+  result.grow.threadsTotal = Math.ceil(ns.growthAnalyze(target, growFactor));
 
   /** Calculate the security impact of the grow operation */
   deltaSecurity += ns.growthAnalyzeSecurity(result.grow.threadsTotal);
