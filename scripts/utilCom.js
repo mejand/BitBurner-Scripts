@@ -35,6 +35,40 @@ export function getNetworkMap(ns) {
 }
 
 /**
+ * Get all server names in the network.
+ * @param {import("..").NS} ns
+ * @returns {String[]} A list of all server names in the network.
+ */
+export function getNetworkMapNames(ns) {
+  /**
+   * The rows of network_map.txt
+   * @type {string[]}
+   */
+  var rows = null;
+  /**
+   * The server objects that are in the network.
+   * @type {String[]}
+   */
+  var servers = [];
+
+  if (ns.fileExists("/servers/MappedServers.txt")) {
+    /** Read the contents of the file */
+    rows = ns.read("/servers/MappedServers.txt").split("\r\n");
+
+    /** loop through all server names from the file and add them the array */
+    for (let row of rows) {
+      // Ignore last blank row
+      if (row) {
+        // add the server name to the list
+        servers.push(row);
+      }
+    }
+  }
+
+  return servers;
+}
+
+/**
  * Define all servers in the network for use by other functions.
  * @param {import("..").NS} ns
  * @param {string[]} servers - The names of all servers in the network.
