@@ -11,6 +11,7 @@ import { logPrintVar, logPrintLine } from "./utilLog.js";
  */
 export async function main(ns) {
   ns.disableLog("ALL");
+  ns.enableLog("exec");
   /**
    * The name of the target server. Will be null if the script was started
    * without a target.

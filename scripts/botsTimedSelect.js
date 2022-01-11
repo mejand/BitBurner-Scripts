@@ -53,6 +53,10 @@ export async function main(ns) {
    */
   var runTimeRaw = 0;
 
+  ns.print(targetName);
+  ns.print(finishTime);
+  ns.print(scriptType);
+
   if (targetName && finishTime && scriptType) {
     switch (scriptType) {
       case 1:
