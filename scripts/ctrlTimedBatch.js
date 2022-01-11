@@ -58,11 +58,6 @@ export async function main(ns) {
    */
   var batchCountRemaining = 0;
   /**
-   * A unique ID for each batch.
-   * @type {Number}
-   */
-  var id = 0;
-  /**
    * The amount of time in milliseconds it takes to complete a hack action.
    * @type {Number}
    */
@@ -135,10 +130,9 @@ export async function main(ns) {
         case 2:
           /** ------------- State 1 = Preparation --------- */
           /** Start the preparation batch */
-          batch = getTimedPreparationBatch(ns, target, id);
+          batch = getTimedPreparationBatch(ns, target);
           hosts = ns.getPurchasedServers();
           waitUntil = batch.execute(ns, hosts);
-          id++;
           logPrintLine(ns);
           logPrintVar(ns, "State", "Preparation");
           logPrintVar(ns, "Grow Threads", batch.grow.threadsTotal);
@@ -153,11 +147,10 @@ export async function main(ns) {
           /** ------------- State 3 = Farming ------------- */
           /** Start new batches until there are none remaining */
           if (hackTime) {
-            batch = getTimedFarmingBatch(ns, target, id);
+            batch = getTimedFarmingBatch(ns, target);
             hosts = ns.getPurchasedServers();
             waitUntil = batch.execute(ns, hosts);
             batchCountRemaining--;
-            id++;
           } else {
             /**
              * Update the number of batches that can be executed:

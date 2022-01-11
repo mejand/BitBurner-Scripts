@@ -24,15 +24,7 @@ export async function main(ns) {
     finishTime = ns.args[1];
   }
   /**
-   * The ID of the script instance.
-   * @type {number}
-   */
-  var id = null;
-  if (ns.args.length > 2 && typeof ns.args[2] == "number") {
-    id = ns.args[2];
-  }
-  /**
-   * The type of operation that shall be run: 0 = hack, 1 = grow, 2 = weaken.
+   * The type of operation that shall be run: 1 = hack, 2 = grow, 3 = weaken.
    * @type {number}
    */
   var scriptType = null;
@@ -61,7 +53,7 @@ export async function main(ns) {
    */
   var runTimeRaw = 0;
 
-  if (targetName && finishTime && id && scriptType) {
+  if (targetName && finishTime && scriptType) {
     switch (scriptType) {
       case 1:
         runTimeRaw = ns.getHackTime(targetName);

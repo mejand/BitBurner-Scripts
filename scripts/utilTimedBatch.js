@@ -7,19 +7,13 @@ export class TimedBatch {
    * Create an instance of a timed batch.
    * @param {import("..").NS} ns
    * @param {String} targetName - The name of the target server.
-   * @param {Number} id - The ID of the is batch (must be a unique number).
    */
-  constructor(ns, targetName, id) {
+  constructor(ns, targetName) {
     /**
      * The name of the target server.
      * @type {String}
      */
     this.targetName = targetName;
-    /**
-     * The ID of the is batch (must be a unique number).
-     * @type {Number}
-     */
-    this.id = id;
     /**
      * The hack action for this batch.
      * @type {TimedAction}
@@ -82,9 +76,9 @@ export class TimedBatch {
     var finishTime = ns.getTimeSinceLastAug() + weakenTime;
 
     if (hosts) {
-      this.hack.execute(ns, this.targetName, finishTime, this.id, hosts);
-      this.grow.execute(ns, this.targetName, finishTime, this.id, hosts);
-      this.weaken.execute(ns, this.targetName, finishTime, this.id, hosts);
+      this.hack.execute(ns, this.targetName, finishTime, hosts);
+      this.grow.execute(ns, this.targetName, finishTime, hosts);
+      this.weaken.execute(ns, this.targetName, finishTime, hosts);
     }
 
     return finishTime;
@@ -96,16 +90,15 @@ export class TimedBatch {
  * The finish times are not calculated (use updateFinishTimes() to update them).
  * @param {import("..").NS} ns
  * @param {String} target - The name of the target server.
- * @param {Number} id - The id for the batch.
  * @returns {TimedBatch} The number of threads needed to steal half the money
  * from the target and grow it back with no impact on security.
  */
-export function getTimedFarmingBatch(ns, target, id) {
+export function getTimedFarmingBatch(ns, target) {
   /**
    * The batch object holding the result.
    * @type {TimedBatch}
    */
-  var batch = new TimedBatch(ns, target, id);
+  var batch = new TimedBatch(ns, target);
   /**
    * The security score that will be removed by one thread of the weaken script.
    * @type {Number}
@@ -137,15 +130,14 @@ export function getTimedFarmingBatch(ns, target, id) {
  * Calculate the grow and weaken threads to prepare the target for farming.
  * @param {import("..").NS} ns
  * @param {String} target - The name of the target server.
- * @param {Number} id - The id for the batch.
  * @returns {TimedBatch} The number of threads needed to grow the target to max money.
  */
-export function getTimedPreparationBatch(ns, target, id) {
+export function getTimedPreparationBatch(ns, target) {
   /**
    * The batch object holding the result.
    * @type {TimedBatch}
    */
-  var result = new TimedBatch(ns, target, id);
+  var result = new TimedBatch(ns, target);
   /**
    * The factor that the money has to be grown with to compensate the hacking.
    * @type {Number}
@@ -261,10 +253,9 @@ class TimedAction {
    * @param {import("..").NS} ns
    * @param {String} targetName - The name of the target server.
    * @param {Number} finishTime - The time at which the action shall be finished.
-   * @param {Number} id - The id of the batch this action is a part of.
    * @param {String[]} hosts - The names of the available host servers.
    */
-  execute(ns, targetName, finishTime, id, hosts) {
+  execute(ns, targetName, finishTime, hosts) {
     /**
      * Index of the host server that is currently being attempted.
      * @type {Number}
@@ -302,7 +293,6 @@ class TimedAction {
         threads,
         targetName,
         finishTime,
-        id,
         this._type
       );
 
