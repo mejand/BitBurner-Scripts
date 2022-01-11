@@ -282,23 +282,25 @@ class TimedAction {
         Math.floor(ramAvaialble / this._ramPerThread)
       );
 
-      /**
-       * The ID of the script that was just started. Will be 0 if the
-       * script could not be stared.
-       * @type {Number}
-       */
-      let processId = ns.exec(
-        this._script,
-        hosts[i],
-        threads,
-        targetName,
-        finishTime,
-        this._type
-      );
+      if (threads > 0) {
+        /**
+         * The ID of the script that was just started. Will be 0 if the
+         * script could not be stared.
+         * @type {Number}
+         */
+        let processId = ns.exec(
+          this._script,
+          hosts[i],
+          threads,
+          targetName,
+          finishTime,
+          this._type
+        );
 
-      /** Update the status of the host server and the reamining threads */
-      if (processId > 0) {
-        this.threadsRemaining -= threads;
+        /** Update the status of the host server and the reamining threads */
+        if (processId > 0) {
+          this.threadsRemaining -= threads;
+        }
       }
 
       /** Increment the counter to look at the next host */
