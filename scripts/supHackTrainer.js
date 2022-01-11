@@ -41,17 +41,23 @@ export async function main(ns) {
    */
   var id = 0;
   /**
+   * The fraction of the maximum RAM on the host that is allowed to be used
+   * by this script.
+   * @type {Number}
+   */
+  var ramFactor = 0.9;
+  /**
    * The maximum amount of RAM that is allowed to be used by the script.
    * @type {Number}
    */
-  var maximumRam = ns.getServerMaxRam(host) * 0.9;
+  var maximumRam = ns.getServerMaxRam(host) * ramFactor;
 
   while (true) {
     /** Calculate how many threads can be used (only use a ) */
-    maximumRam = ns.getServerMaxRam(host) * 0.9;
+    maximumRam = ns.getServerMaxRam(host) * ramFactor;
     ramAvailable = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
     ramAvailable = Math.min(ramAvailable, maximumRam);
-    threads = Math.floor((ramAvailable * 0.9) / weakenRam);
+    threads = Math.floor(ramAvailable / weakenRam);
     /** Start the weaken script if enough RAM is available */
     if (threads > 0) {
       ns.run(weaken, threads, target, id);
