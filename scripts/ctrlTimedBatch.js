@@ -95,8 +95,6 @@ export async function main(ns) {
    */
   var security = 0;
 
-  ns.tail();
-
   while (true) {
     /** Get the current time */
     now = ns.getTimeSinceLastAug();

@@ -1,6 +1,4 @@
-import { MyServer } from "./utilServer.js";
-import { SingleBatch, getFarmingBatch } from "./utilBatch.js";
-import { getNetworkMap, getAvailableServers } from "./utilCom.js";
+import { getNetworkMapNames } from "./utilCom.js";
 import { logPrintLine, logPrintVar } from "./utilLog.js";
 
 /**
@@ -10,115 +8,95 @@ import { logPrintLine, logPrintVar } from "./utilLog.js";
 export async function main(ns) {
   ns.disableLog("ALL");
   /**
-   * All potential target servers.
-   * @type {MyServer[]}
+   * The names of all potential target servers.
+   * @type {String[]}
    */
-  var potentialTargets = getNetworkMap(ns);
+  var potentialTargets = getNetworkMapNames(ns);
   /**
-   * All viable target servers.
-   * @type {MyServer[]}
+   * The names of all viable target servers.
+   * @type {String[]}
    */
   var vialbleTargets = [];
   /**
-   * All available host servers.
-   * @type {MyServer[]}
+   * The names of all available host servers.
+   * @type {String[]}
    */
-  var availableHosts = getAvailableServers(ns);
+  var pServers = ns.getPurchasedServers();
   /**
    * Counter indicating which potential target is under investigation.
-   * @type {number}
+   * @type {Number}
    */
   var i = 0;
   /**
    * The maximum amount of RAM theoretically available to hack the target.
-   * @type {number}
+   * @type {Number}
    */
   var ramMaxAvailable = 0;
   /**
-   * The target with minimal security level.
-   * @type {MyServer}
-   */
-  var minSecTarget = null;
-  /**
-   * The batch needed to hack the target at minimum security.
-   * @type {SingleBatch}
-   */
-  var minSecBatch = null;
-  /**
    * The server this script is running on.
-   * @type {MyServer}
+   * @type {String}
    */
-  var hostServer = new MyServer(ns, ns.getHostname());
+  var host = ns.getHostname();
   /**
    * Is the potential target already being hacked.
-   * @type {boolean}
+   * @type {Boolean}
    */
   var isTargeted = false;
   /**
    * The name of the control script that manages the hacking.
-   * @type {string}
+   * @type {String}
    */
-  var controller = "ctrlSingleBatch.js";
+  var controller = "ctrlTimedBatch.js";
   /**
    * The amount of RAM needed to run the controller script.
-   * @type {number}
+   * @type {Number}
    */
   var controllerRam = 0;
+  /**
+   * The amount of ram available on the host server.
+   * @type {Number}
+   */
+  var ramAvaialble = 0;
 
   /** Only continue if the controller script is available on the host */
-  if (ns.fileExists(controller, hostServer.name)) {
-    controllerRam = ns.getScriptRam(controller, hostServer.name);
+  if (ns.fileExists(controller, host)) {
+    controllerRam = ns.getScriptRam(controller, host);
 
     /** Select the viable targets from all potential ones */
     for (let server of potentialTargets) {
-      if (server.name != "home" && server.server.moneyMax > 0) {
+      if (server != "home" && ns.getServerMaxMoney(server) > 0) {
         vialbleTargets.push(server);
       }
     }
 
     if (vialbleTargets) {
       while (true) {
+        /** Calculate how much RAM is free on the host */
+        ramAvaialble = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
+
         /** Update the list of available servers */
-        availableHosts = getAvailableServers(ns);
+        pServers = ns.getPurchasedServers();
 
         /** Calculate the amount of RAM theoretically available */
         ramMaxAvailable = 0;
-        for (let host of availableHosts) {
-          ramMaxAvailable += host.server.maxRam;
+        for (let pServer of pServers) {
+          ramMaxAvailable += ns.getServerMaxRam(pServer);
         }
 
-        /** Update the status of the target bevore it is examined */
-        vialbleTargets[i].update(ns);
-
-        /** Update the status of the host */
-        hostServer.update(ns);
-
         /** Check if there is already a controller targeting this server */
-        isTargeted = ns.isRunning(
-          controller,
-          hostServer.name,
-          vialbleTargets[i].name
-        );
+        isTargeted = ns.isRunning(controller, host, vialbleTargets[i]);
 
         /**
          * Check if the server could be targeted if it is not targeted yet
          * and there is enough free RAM on the host to start the controller
          */
-        if (!isTargeted && hostServer.ramAvailable > controllerRam) {
-          /** Check if there is enough free RAM only if the server is generally viable */
-          if (vialbleTargets[i].calcScore(ns) > 0) {
-            /** Get a representation of the server that has minimum security */
-            minSecTarget = new MyServer(ns, vialbleTargets[i].name);
-            minSecTarget.server.hackDifficulty =
-              minSecTarget.server.minDifficulty;
-
-            /** Get the batch that would be needed to farm the server at minimum security */
-            minSecBatch = getFarmingBatch(ns, minSecTarget, 0, 0.5);
-
-            /** Target the server if the ram needed to hack it is less than half the available ram */
-            if (minSecBatch.totalRam < ramMaxAvailable * 0.5) {
-              ns.run(controller, 1, vialbleTargets[i].name);
-            }
+        if (!isTargeted && ramAvaialble > controllerRam) {
+          /** Check if the target can be hacked */
+          if (
+            ns.getServerRequiredHackingLevel(vialbleTargets[i]) <
+            ns.getHackingLevel()
+          ) {
+            ns.run(controller, 1, vialbleTargets[i].name);
           }
         }
 
@@ -127,15 +105,9 @@ export async function main(ns) {
         logPrintLine(ns);
         logPrintVar(ns, "Last Investigated", vialbleTargets[i].name);
         logPrintVar(ns, "Already Targeted", isTargeted);
-        logPrintVar(ns, "Score", vialbleTargets[i].calcScore(ns));
-        if (minSecBatch && minSecBatch.targetName == vialbleTargets[i].name) {
-          logPrintVar(ns, "RAM needed", minSecBatch.totalRam);
-        } else {
-          logPrintVar(ns, "RAM needed", "-");
-        }
         logPrintLine(ns);
         logPrintVar(ns, "Number of Targets", vialbleTargets.length);
-        logPrintVar(ns, "Number of Hosts", availableHosts.length);
+        logPrintVar(ns, "Number of Hosts", pServers.length);
         logPrintVar(ns, "RAM available", ramMaxAvailable);
         logPrintLine(ns);
 
