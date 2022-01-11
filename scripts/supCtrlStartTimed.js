@@ -1,5 +1,6 @@
 import { getNetworkMapNames } from "./utilCom.js";
 import { logPrintLine, logPrintVar } from "./utilLog.js";
+import { getAvailableServerNames } from "./utilCom.js";
 
 /**
  * Start timed controllers against available targets.
@@ -21,7 +22,7 @@ export async function main(ns) {
    * The names of all available host servers.
    * @type {String[]}
    */
-  var pServers = ns.getPurchasedServers();
+  var hServers = getAvailableServerNames(ns);
   /**
    * Counter indicating which potential target is under investigation.
    * @type {Number}
@@ -75,11 +76,11 @@ export async function main(ns) {
         ramAvaialble = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
 
         /** Update the list of available servers */
-        pServers = ns.getPurchasedServers();
+        hServers = getAvailableServerNames(ns);
 
         /** Calculate the amount of RAM theoretically available */
         ramMaxAvailable = 0;
-        for (let pServer of pServers) {
+        for (let pServer of hServers) {
           ramMaxAvailable += ns.getServerMaxRam(pServer);
         }
 
@@ -107,7 +108,7 @@ export async function main(ns) {
         logPrintVar(ns, "Already Targeted", isTargeted);
         logPrintLine(ns);
         logPrintVar(ns, "Number of Targets", vialbleTargets.length);
-        logPrintVar(ns, "Number of Hosts", pServers.length);
+        logPrintVar(ns, "Number of Hosts", hServers.length);
         logPrintVar(ns, "RAM available", ramMaxAvailable);
         logPrintLine(ns);
 

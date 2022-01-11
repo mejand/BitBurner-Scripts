@@ -3,6 +3,7 @@ import {
   getTimedFarmingBatch,
   getTimedPreparationBatch,
 } from "./utilTimedBatch.js";
+import { getAvailableServerNames } from "./utilCom.js";
 import { logPrintVar, logPrintLine } from "./utilLog.js";
 
 /**
@@ -130,7 +131,7 @@ export async function main(ns) {
           /** ------------- State 1 = Preparation --------- */
           /** Start the preparation batch */
           batch = getTimedPreparationBatch(ns, target);
-          hosts = ns.getPurchasedServers();
+          hosts = getAvailableServerNames(ns);
           waitUntil = batch.execute(ns, hosts);
           logPrintLine(ns);
           logPrintVar(ns, "State", "Preparation");
@@ -147,7 +148,7 @@ export async function main(ns) {
           /** Start new batches until there are none remaining */
           if (hackTime) {
             batch = getTimedFarmingBatch(ns, target);
-            hosts = ns.getPurchasedServers();
+            hosts = getAvailableServerNames(ns);
             waitUntil = batch.execute(ns, hosts);
             batchCountRemaining--;
           } else {
