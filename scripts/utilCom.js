@@ -191,7 +191,7 @@ export function getAvailableServerNames(ns) {
     /** loop through all server names from the file and add them the array */
     for (let rawServer of rawServers) {
       /** Ignore last blank row */
-      if (rawServer) {
+      if (rawServer && rawServer != "home") {
         ramAvailable =
           ns.getServerMaxRam(rawServer) - ns.getServerUsedRam(rawServer);
         /** Add the server name to the list if there is ram available */
