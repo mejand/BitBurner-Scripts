@@ -96,14 +96,14 @@ export async function main(ns) {
             ns.getServerRequiredHackingLevel(vialbleTargets[i]) <
             ns.getHackingLevel()
           ) {
-            ns.run(controller, 1, vialbleTargets[i].name);
+            ns.run(controller, 1, vialbleTargets[i]);
           }
         }
 
         /** Print information to the debug window and set the target for other scripts */
         ns.clearLog();
         logPrintLine(ns);
-        logPrintVar(ns, "Last Investigated", vialbleTargets[i].name);
+        logPrintVar(ns, "Last Investigated", vialbleTargets[i]);
         logPrintVar(ns, "Already Targeted", isTargeted);
         logPrintLine(ns);
         logPrintVar(ns, "Number of Targets", vialbleTargets.length);
