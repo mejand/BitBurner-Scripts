@@ -28,8 +28,8 @@ export async function main(ns) {
    * @type {number}
    */
   var scriptType = null;
-  if (ns.args.length > 3 && typeof ns.args[3] == "number") {
-    scriptType = ns.args[3];
+  if (ns.args.length > 2 && typeof ns.args[2] == "number") {
+    scriptType = ns.args[2];
   }
   /**
    * The script is waiting for the right time to start its operation.
