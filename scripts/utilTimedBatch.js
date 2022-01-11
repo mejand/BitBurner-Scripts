@@ -74,8 +74,30 @@ export class TimedBatch {
      * @type {Number}
      */
     var finishTime = ns.getTimeSinceLastAug() + weakenTime;
+    /**
+     * The amount of RAM available on all hosts.
+     * @type {Number}
+     */
+    var ramAvaialble = 0;
+    /**
+     * The scaling factor needed to make the batch fit the free RAM.
+     * @type {Number}
+     */
+    var factor = 0;
 
     if (hosts) {
+      /** Calculate how much RAM is free */
+      for (let host of hosts) {
+        ramAvaialble += ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
+      }
+
+      /** Scale the batch size to the available RAM */
+      factor = Math.min(1.0, ramAvaialble / this.totalRam);
+      this.hack.scale(factor);
+      this.grow.scale(factor);
+      this.weaken.scale(factor);
+
+      /** Execute the actions */
       this.hack.execute(ns, this.targetName, finishTime, hosts);
       this.grow.execute(ns, this.targetName, finishTime, hosts);
       this.weaken.execute(ns, this.targetName, finishTime, hosts);
@@ -306,5 +328,12 @@ class TimedAction {
       /** Increment the counter to look at the next host */
       i++;
     }
+  }
+  /**
+   * Scale the total number of threads with a given factor.
+   * @param {Number} factor - The scaling factor that shall be applied.
+   */
+  scale(factor) {
+    this.threadsTotal = Math.floor(this.threadsTotal * factor);
   }
 }
