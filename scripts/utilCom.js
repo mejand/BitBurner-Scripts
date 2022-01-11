@@ -159,6 +159,53 @@ export function getAvailableServers(ns) {
 }
 
 /**
+ * Get a list of the names of all unlocked servers that have free RAM.
+ * @param {import("..").NS} ns
+ * @returns {String[]} A list of the names of all unlocked servers ready for
+ * tasking, sorted by available RAM (highest comes first).
+ */
+export function getAvailableServerNames(ns) {
+  /**
+   * The rows of network_map.txt
+   * @type {string[]}
+   */
+  var rawServers = [];
+  /**
+   * The server objects that are in the network.
+   * @type {String[]}
+   */
+  var servers = [];
+  /**
+   * The amount of RAM available on a server.
+   * @type {Number}
+   */
+  var ramAvailable = 0;
+
+  if (ns.fileExists("/servers/UnlockedServers.txt")) {
+    /** Read the contents of the file */
+    rawServers = ns.read("/servers/UnlockedServers.txt").split("\r\n");
+
+    /** Add the purchased servers to the raw server names */
+    rawServers.concat(ns.getPurchasedServers());
+
+    /** loop through all server names from the file and add them the array */
+    for (let rawServer of rawServers) {
+      /** Ignore last blank row */
+      if (rawServer) {
+        ramAvailable =
+          ns.getServerMaxRam(rawServer) - ns.getServerUsedRam(rawServer);
+        /** Add the server name to the list if there is ram available */
+        if (ramAvailable > 0) {
+          servers.push(rawServer);
+        }
+      }
+    }
+  }
+
+  return servers;
+}
+
+/**
  * Define the most profitable hack target for use by other functions.
  * @param {import("..").NS} ns
  * @param {MyServer} server - The target server.
