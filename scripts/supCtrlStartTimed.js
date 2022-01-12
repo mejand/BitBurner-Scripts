@@ -95,7 +95,8 @@ export async function main(ns) {
           /** Check if the target can be hacked */
           if (
             ns.getServerRequiredHackingLevel(vialbleTargets[i]) <
-            ns.getHackingLevel()
+              ns.getHackingLevel() &&
+            ns.hasRootAccess(vialbleTargets[i])
           ) {
             ns.run(controller, 1, vialbleTargets[i]);
           }
