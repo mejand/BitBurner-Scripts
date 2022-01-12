@@ -96,12 +96,12 @@ export async function main(ns) {
   var security = 0;
 
   while (true) {
-    ns.clearLog();
     /** Get the current time */
     now = ns.getTimeSinceLastAug();
 
     /** Update the state machine if a period has passed */
     if (timeStep == timeStepMax) {
+      ns.clearLog();
       /** Reset the time counter */
       timeStep = 0;
       /** Update information on the target server */
@@ -181,12 +181,12 @@ export async function main(ns) {
           }
           break;
       }
+      logPrintLine(ns);
+      logPrintVar(ns, "Money", money);
+      logPrintVar(ns, "Security", security);
+      logPrintVar(ns, "State", state);
+      logPrintLine(ns);
     }
-    logPrintLine(ns);
-    logPrintVar(ns, "Money", money);
-    logPrintVar(ns, "Security", security);
-    logPrintVar(ns, "State", state);
-    logPrintLine(ns);
     timeStep++;
     await ns.sleep(timeStepLength);
   }
