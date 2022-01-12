@@ -186,7 +186,7 @@ export function getAvailableServerNames(ns) {
     rawServers = ns.read("/servers/UnlockedServers.txt").split("\r\n");
 
     /** Add the purchased servers to the raw server names */
-    rawServers.concat(ns.getPurchasedServers());
+    rawServers = rawServers.concat(ns.getPurchasedServers());
 
     /** loop through all server names from the file and add them the array */
     for (let rawServer of rawServers) {
