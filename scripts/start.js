@@ -27,6 +27,7 @@ export async function main(ns) {
   var scripts = [
     "supSpider.js",
     "supUnlock.js",
+    "wormXP.js",
     "supHacknet.js",
     "supServerPurchase.js",
     "supCtrlStart.js",
