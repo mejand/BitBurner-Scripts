@@ -53,6 +53,8 @@ export async function main(ns) {
               "botsSingleGrow.js",
               "botsSingleHack.js",
               "botsSingleWeaken.js",
+              "botsTimedSelect.js",
+              "utilTime.js",
             ];
             await ns.scp(filesToCopy, "home", server.name);
           }
