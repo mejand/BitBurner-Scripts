@@ -72,15 +72,17 @@ export async function main(ns) {
         }
       }
       let success = false;
-      /** Copy the worm to the server and start it */
-      if (ns.hasRootAccess(server) && !ns.scriptRunning(script, server)) {
-        /** Copy the script */
-        if (await ns.scp(script, host, server)) {
-          /** Start the script with all available threads */
-          let threads = Math.floor(ns.getServerMaxRam(server) / ram);
-          if (threads > 0) {
-            if (ns.exec(script, server, threads) > 0) {
-              success = true;
+      if (server != "home") {
+        /** Copy the worm to the server and start it */
+        if (ns.hasRootAccess(server) && !ns.scriptRunning(script, server)) {
+          /** Copy the script */
+          if (await ns.scp(script, host, server)) {
+            /** Start the script with all available threads */
+            let threads = Math.floor(ns.getServerMaxRam(server) / ram);
+            if (threads > 0) {
+              if (ns.exec(script, server, threads) > 0) {
+                success = true;
+              }
             }
           }
         }
