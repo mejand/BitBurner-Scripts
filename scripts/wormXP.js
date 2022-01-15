@@ -13,6 +13,7 @@ export async function main(ns) {
   var running = true;
 
   while (running) {
+    ns.clearLog();
     /**
      * If the script runs on the home server it shall only
      * spread to the next servers
@@ -20,6 +21,7 @@ export async function main(ns) {
     if (host == "home") {
       running = false;
     }
+    ns.print("running" + running);
     /** Try to spread to neighbouring servers */
     for (let server of connected) {
       /** Try to get access to the server */
@@ -45,17 +47,24 @@ export async function main(ns) {
           ns.nuke(server);
         }
       }
+      let success = false;
       /** Copy the worm to the server and start it */
-      if (ns.hasRootAccess(server) && !ns.fileExists(script, server)) {
+      if (ns.hasRootAccess(server) && !ns.scriptRunning(script, server)) {
         /** Copy the script */
         if (await ns.scp(script, host, server)) {
           /** Start the script with all available threads */
           let threads = Math.floor(ns.getServerMaxRam(server) / ram);
           if (threads > 0) {
-            ns.exec(script, server, threads);
+            if (ns.exec(script, server, threads) > 0) {
+              success = true;
+            }
           }
         }
       }
+      ns.print("Server" + server);
+      ns.print("Access" + ns.hasRootAccess(server));
+      ns.print("Script Running" + ns.scriptRunning(script, server));
+      ns.print("Script Started" + success);
     }
     if (running) {
       /**
