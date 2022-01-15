@@ -10,8 +10,16 @@ export async function main(ns) {
   var target = "n00dles";
   var script = ns.getScriptName();
   var ram = ns.getScriptRam(script);
+  var running = true;
 
-  while (true) {
+  while (running) {
+    /**
+     * If the script runs on the home server it shall only
+     * spread to the next servers
+     */
+    if (host == "home") {
+      running = false;
+    }
     /** Try to spread to neighbouring servers */
     for (let server of connected) {
       /** Try to get access to the server */
@@ -49,10 +57,12 @@ export async function main(ns) {
         }
       }
     }
-    /**
-     * Weaken the target server to gain hacking XP without
-     * interfering with other hack scripts
-     */
-    await ns.weaken(target);
+    if (running) {
+      /**
+       * Weaken the target server to gain hacking XP without
+       * interfering with other hack scripts.
+       */
+      await ns.weaken(target);
+    }
   }
 }
