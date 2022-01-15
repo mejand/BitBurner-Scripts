@@ -88,7 +88,7 @@ export async function main(ns) {
       ns.print("Server " + server);
       ns.print("-- Access " + ns.hasRootAccess(server));
       ns.print("-- Script Running " + ns.scriptRunning(script, server));
-      ns.print("-- Script Started" + success);
+      ns.print("-- Script Started " + success);
     }
     if (running) {
       /**
