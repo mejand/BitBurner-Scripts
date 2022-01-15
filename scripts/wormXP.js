@@ -21,7 +21,7 @@ export async function main(ns) {
     if (host == "home") {
       running = false;
     }
-    ns.print("running" + running);
+    ns.print("Running " + running);
     /** Try to spread to neighbouring servers */
     for (let server of connected) {
       /** Try to get access to the server */
@@ -61,10 +61,10 @@ export async function main(ns) {
           }
         }
       }
-      ns.print("Server" + server);
-      ns.print("Access" + ns.hasRootAccess(server));
-      ns.print("Script Running" + ns.scriptRunning(script, server));
-      ns.print("Script Started" + success);
+      ns.print("Server " + server);
+      ns.print("-- Access " + ns.hasRootAccess(server));
+      ns.print("-- Script Running " + ns.scriptRunning(script, server));
+      ns.print("-- Script Started" + success);
     }
     if (running) {
       /**
