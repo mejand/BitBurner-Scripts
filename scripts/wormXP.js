@@ -5,11 +5,35 @@
  */
 export async function main(ns) {
   ns.disableLog("ALL");
+  /**
+   * The name of the host server the script is running on.
+   * @type {String}
+   */
   var host = ns.getHostname();
+  /**
+   * The names of the servers connected to the host server.
+   * @type {String[]}
+   */
   var connected = ns.scan();
+  /**
+   * The name of the server that shall be targeted with weaken.
+   * @type {String}
+   */
   var target = "n00dles";
+  /**
+   * The name of this script.
+   * @type {String}
+   */
   var script = ns.getScriptName();
+  /**
+   * The amount of RAM needed to run one thread of this script.
+   * @type {Number}
+   */
   var ram = ns.getScriptRam(script);
+  /**
+   * Is this script running.
+   * @type {Boolean}
+   */
   var running = true;
 
   while (running) {
