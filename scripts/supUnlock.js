@@ -37,9 +37,6 @@ export async function main(ns) {
     if (servers) {
       /** loop through all servers in the network and check if they are unlocked */
       for (let server of servers) {
-        /** Update the server objects to reflect their current state */
-        server.update(ns);
-
         /** Try and unlock the server (nothing will happen if it is already unlocked) */
         if (ns.hasRootAccess(server)) {
           /** Add the server to the unlocked servers */
@@ -62,7 +59,6 @@ export async function main(ns) {
       logPrintVar(ns, "No Server Map", "-");
       logPrintLine(ns);
     }
-
     await ns.sleep(period);
   }
 }
