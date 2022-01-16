@@ -92,12 +92,16 @@ export async function main(ns) {
       ns.print("-- Script Running " + ns.scriptRunning(script, server));
       ns.print("-- Script Started " + success);
     }
-    if (running && ns.hasRootAccess(target)) {
-      /**
-       * Weaken the target server to gain hacking XP without
-       * interfering with other hack scripts.
-       */
-      await ns.weaken(target);
+    if (running) {
+      if (ns.hasRootAccess(target)) {
+        /**
+         * Weaken the target server to gain hacking XP without
+         * interfering with other hack scripts.
+         */
+        await ns.weaken(target);
+      } else {
+        await ns.sleep(1000);
+      }
     }
   }
 }
