@@ -66,7 +66,7 @@ export async function main(ns) {
           ns.sqlinject(server);
         }
         /** check if enough ports could be opened */
-        if (ns.hasRootAccess(server)) {
+        if (!ns.hasRootAccess(server)) {
           /** get root access */
           ns.nuke(server);
         }
