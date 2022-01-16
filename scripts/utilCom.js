@@ -87,16 +87,16 @@ export async function setNetworkMap(ns, servers) {
 /**
  * Define a list of unlocked servers for other functions to use.
  * @param {import("..").NS} ns
- * @param {MyServer[]} servers - All unlocked servers.
+ * @param {String[]} servers - All names of unlocked servers.
  */
 export async function setUnlockedServers(ns, servers) {
   /** Clear the file before writing to it */
   ns.clear("/servers/UnlockedServers.txt");
   for (let server of servers) {
     /** Add the server to the list of unlocked servers if root access is enabled */
-    if (server.server.hasAdminRights) {
+    if (ns.hasRootAccess(server)) {
       /** save the server to file */
-      await ns.write("/servers/UnlockedServers.txt", server.name + "\r\n", "a");
+      await ns.write("/servers/UnlockedServers.txt", server + "\r\n", "a");
     }
   }
 }

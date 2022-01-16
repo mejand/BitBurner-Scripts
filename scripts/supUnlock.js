@@ -1,5 +1,4 @@
-import { MyServer } from "./utilServer.js";
-import { getNetworkMap, setUnlockedServers } from "./utilCom.js";
+import { getNetworkMapNames, setUnlockedServers } from "./utilCom.js";
 import { logPrintVar, logPrintLine } from "./utilLog.js";
 
 /**
@@ -18,15 +17,15 @@ export async function main(ns) {
     period = ns.args[0];
   }
   /**
-   * All current unlock servers.
-   * @type {MyServer[]}
+   * All names of currently unlock servers.
+   * @type {String[]}
    */
   var unlockedServers = [];
   /**
-   * All servers that are in the network.
-   * @type {MyServer[]}
+   * All server names that are in the network.
+   * @type {String[]}
    */
-  var servers = getNetworkMap(ns);
+  var servers = getNetworkMapNames(ns);
 
   while (true) {
     ns.clearLog();
@@ -42,22 +41,7 @@ export async function main(ns) {
         server.update(ns);
 
         /** Try and unlock the server (nothing will happen if it is already unlocked) */
-        if (server.getRootAccess(ns)) {
-          /** Copy the simple bot scripts to the unlocked server */
-          if (server.name != "home") {
-            /**
-             * The names of all files on the server.
-             * @type {string[]}
-             */
-            let filesToCopy = [
-              "botsSingleGrow.js",
-              "botsSingleHack.js",
-              "botsSingleWeaken.js",
-              "botsTimedSelect.js",
-              "utilTime.js",
-            ];
-            await ns.scp(filesToCopy, "home", server.name);
-          }
+        if (ns.hasRootAccess(server)) {
           /** Add the server to the unlocked servers */
           unlockedServers.push(server);
         }
@@ -72,7 +56,7 @@ export async function main(ns) {
       await setUnlockedServers(ns, unlockedServers);
     } else {
       /** Attempt to update the mapped servers */
-      servers = getNetworkMap(ns);
+      servers = getNetworkMapNames(ns);
 
       logPrintLine(ns);
       logPrintVar(ns, "No Server Map", "-");
