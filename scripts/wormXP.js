@@ -92,7 +92,7 @@ export async function main(ns) {
       ns.print("-- Script Running " + ns.scriptRunning(script, server));
       ns.print("-- Script Started " + success);
     }
-    if (running) {
+    if (running && ns.hasRootAccess(target)) {
       /**
        * Weaken the target server to gain hacking XP without
        * interfering with other hack scripts.
