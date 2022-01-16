@@ -51,7 +51,7 @@ export async function main(ns) {
           /** Copy the XP gaining bot to the unlocked server */
           if (
             server.name != "home" &&
-            ns.scriptRunning("botsXP.js", server.name) &&
+            !ns.scriptRunning("botsXP.js", server.name) &&
             server.ramAvailable > 0
           ) {
             if (await ns.scp("botsXP.js", "home", server.name)) {
