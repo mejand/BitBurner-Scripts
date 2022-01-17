@@ -40,7 +40,7 @@ export async function main(ns) {
    * The current time.
    * @type {number}
    */
-  var now = 0;
+  var now = ns.getTimeSinceLastAug();
   /**
    * The time it takes for the main operation to finish.
    * @type {number}
@@ -57,51 +57,54 @@ export async function main(ns) {
   ns.print(finishTime);
   ns.print(scriptType);
 
-  if (targetName && finishTime && scriptType) {
-    switch (scriptType) {
-      case 1:
-        runTimeRaw = ns.getHackTime(targetName);
-        runTime = getTimeInRaster(runTimeRaw) + 800;
-        break;
-      case 2:
-        runTimeRaw = ns.getGrowTime(targetName);
-        runTime = getTimeInRaster(runTimeRaw) + 400;
-        break;
-      case 3:
-        runTimeRaw = ns.getWeakenTime(targetName);
-        runTime = getTimeInRaster(runTimeRaw);
-        break;
-      default:
-        running = false;
-        break;
-    }
+  /** Stop the script if it was started before loading a save */
+  if (now < finishTime) {
+    if (targetName && finishTime && scriptType) {
+      switch (scriptType) {
+        case 1:
+          runTimeRaw = ns.getHackTime(targetName);
+          runTime = getTimeInRaster(runTimeRaw) + 800;
+          break;
+        case 2:
+          runTimeRaw = ns.getGrowTime(targetName);
+          runTime = getTimeInRaster(runTimeRaw) + 400;
+          break;
+        case 3:
+          runTimeRaw = ns.getWeakenTime(targetName);
+          runTime = getTimeInRaster(runTimeRaw);
+          break;
+        default:
+          running = false;
+          break;
+      }
 
-    /**
-     * Keep looping until the execution start time has arrived
-     */
-    while (running) {
-      now = ns.getTimeSinceLastAug();
+      /**
+       * Keep looping until the execution start time has arrived
+       */
+      while (running) {
+        now = ns.getTimeSinceLastAug();
 
-      if (now + runTime >= finishTime) {
-        /** Stop the while loop */
-        running = false;
-        /** Start the appropriate action */
-        switch (scriptType) {
-          case 1:
-            await ns.hack(targetName);
-            break;
-          case 2:
-            await ns.grow(targetName);
-            break;
-          case 3:
-            await ns.weaken(targetName);
-            break;
-          default:
-            break;
+        if (now + runTime >= finishTime) {
+          /** Stop the while loop */
+          running = false;
+          /** Start the appropriate action */
+          switch (scriptType) {
+            case 1:
+              await ns.hack(targetName);
+              break;
+            case 2:
+              await ns.grow(targetName);
+              break;
+            case 3:
+              await ns.weaken(targetName);
+              break;
+            default:
+              break;
+          }
+        } else {
+          /** If the time is not right yet wait for the next 200ms step */
+          await ns.sleep(150);
         }
-      } else {
-        /** If the time is not right yet wait for the next 200ms step */
-        await ns.sleep(150);
       }
     }
   }
