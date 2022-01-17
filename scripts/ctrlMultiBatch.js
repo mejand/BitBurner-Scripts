@@ -14,6 +14,7 @@ export async function main(ns) {
   if (ns.args.length > 0 && typeof (ns.args[0] == "string")) {
     target = ns.args[0];
   }
+  var period = 3 * 400;
   var host = ns.getHostname();
   var ramFree = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
   var actions = [
@@ -21,6 +22,15 @@ export async function main(ns) {
     new Action(ns, 2, 0),
     new Action(ns, 3, 0),
   ];
+  /** Calculate how big one batch should be */
+  /** Calculate how many batches can be started (don't forget to subtract one for safety) */
+  /** Calculate the RAM needed to run all batches */
+  /** Scale the number of batches if not enough RAM is available */
+  /** Check if growing is necessary */
+  /** Calculate a growing batch if growing is necessary */
+  /** Scale the size of the batch if not enough RAM is available */
+  /** Execute the batches with a space of one period in between */
+  /** Wait until the next multi batch can be started and then stop the script */
 }
 
 class Action {
