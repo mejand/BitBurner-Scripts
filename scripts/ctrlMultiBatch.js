@@ -52,7 +52,7 @@ class Action {
      * @type {Boolean}
      */
     var success = false;
-    if (this.threads > 0) {
+    if (this.threads > 0 && ns.hasRootAccess(target)) {
       if (ns.exec(this.script, host, this.threads, target, time, this.type)) {
         success = true;
       }
