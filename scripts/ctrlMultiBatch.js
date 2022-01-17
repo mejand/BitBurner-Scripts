@@ -16,13 +16,18 @@ export async function main(ns) {
   }
   var host = ns.getHostname();
   var ramFree = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
+  var actions = [
+    new Action(ns, 1, 0),
+    new Action(ns, 2, 0),
+    new Action(ns, 3, 0),
+  ];
 }
 
 class Action {
   /**
    * Create an instance of an action.
    * @param {import("..").NS} ns
-   * @param {String} type - The type of the script (hack, grow, weaken).
+   * @param {Number} type - The type of the script (hack, grow, weaken).
    * @param {Number} threads - The number of threads dedicated to the action.
    */
   constructor(ns, type, threads) {
