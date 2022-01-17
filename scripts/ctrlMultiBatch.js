@@ -17,3 +17,46 @@ export async function main(ns) {
   var host = ns.getHostname();
   var ramFree = ns.getServerMaxRam(host) - ns.getServerUsedRam(host);
 }
+
+class Action {
+  /**
+   * Create an instance of an action.
+   * @param {import("..").NS} ns
+   * @param {String} type - The type of the script (hack, grow, weaken).
+   * @param {Number} threads - The number of threads dedicated to the action.
+   */
+  constructor(ns, type, threads) {
+    this.script = "botsTimedSelect.js";
+    this.type = type;
+    this.ram = ns.getScriptRam(this.script);
+    this.threads = threads;
+  }
+  /**
+   * The total amount of RAM needed to execute the action with all threads.
+   * @type {Number}
+   */
+  get totalRam() {
+    return this.ram * this.threads;
+  }
+  /**
+   * Execute the action against the target server.
+   * @param {import("..").NS} ns
+   * @param {Stri} target - The name of the target server.
+   * @param {String} host - The name of the host server.
+   * @param {Number} time - The time at which the action shall finish.
+   * @returns {Boolean} True if the action was executed.
+   */
+  execute(ns, target, host, time) {
+    /**
+     * The action was executed successfully.
+     * @type {Boolean}
+     */
+    var success = false;
+    if (this.threads > 0) {
+      if (ns.exec(this.script, host, this.threads, target, time, this.type)) {
+        success = true;
+      }
+    }
+    return true;
+  }
+}
