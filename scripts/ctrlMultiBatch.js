@@ -31,6 +31,7 @@ export async function main(ns) {
   /** Scale the size of the batch if not enough RAM is available */
   /** Execute the batches with a space of one period in between */
   /** Wait until the next multi batch can be started and then stop the script */
+  /** Print the values of each variable to the log for debugging */
 }
 
 class Action {
