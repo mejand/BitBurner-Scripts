@@ -18,6 +18,11 @@ export async function main(ns) {
    * @type {Order}
    */
   var order = null;
+  /**
+   * How long the script has been idle;
+   * @type {Number}
+   */
+  var idleCounter = 0;
 
   /** Register the script as free on start up */
   setIdle(ns, portIdle);
@@ -25,10 +30,17 @@ export async function main(ns) {
   while (true) {
     /** Try to get an available order (null if none are there) */
     order = getOrder(ns, portOrder);
+    /** Grind XP if there is no order and the script has been idle for too long */
+    if (!order && idleCounter > 100) {
+      order = new Order("n00dles,0,weaken,1");
+      order.time = ns.getTimeSinceLastAug() + ns.getWeakenTime("n00dles") + 400;
+    }
     /** Try to execute the order if one was retrieved */
     if (order) {
       /** Report that the script is busy */
       setBusy(ns, portIdle);
+      /** Reset the idle counter if an action is being executed */
+      idleCounter = 0;
       /** Execute the order */
       await executeOrder(ns, order);
       /** Report that the script is idle */
@@ -36,6 +48,7 @@ export async function main(ns) {
     } else {
       /** Sleep if no order was available */
       await ns.sleep(200);
+      idleCounter++;
     }
   }
 }
