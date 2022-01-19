@@ -19,6 +19,9 @@ export async function main(ns) {
    */
   var order = null;
 
+  /** Register the script as free on start up */
+  setIdle(ns, portIdle);
+
   while (true) {
     /** Try to get an available order (null if none are there) */
     order = getOrder(ns, portOrder);
