@@ -111,4 +111,21 @@ class Order {
      */
     this.threads = parseInt(data[3]);
   }
+  /**
+   * The data of the order in a single string for upload to a port.
+   * @type {String}
+   */
+  get data() {
+    /**
+     * The data of the instance in a single array.
+     * @type {String[]}
+     */
+    var data = [this.target, this.time, this.type, this.threads];
+    /**
+     * The data converted to a single string.
+     * @type {String}
+     */
+    var dataString = data.join(",");
+    return dataString;
+  }
 }
