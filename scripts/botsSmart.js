@@ -58,7 +58,59 @@ function getOrder(ns, port) {
  * @returns {Boolean} True if the order was executed successfully.
  */
 async function executeOrder(ns, order) {
-  return false;
+  /**
+   * Order was successfully executed.
+   * @type {Boolean}
+   */
+  var success = true;
+  /**
+   * The current time stamp.
+   * @type {Number}
+   */
+  var now = ns.getTimeSinceLastAug();
+  /**
+   * The time the script needs to sleep to meet the target time.
+   * @type {Number}
+   */
+  var sleep = 0;
+
+  /** Decide which action shall be carried out */
+  if (order.type == "hack" && ns.serverExists(order.target)) {
+    sleep = order.time - now - ns.getHackTime(order.target);
+    if (sleep >= 0) {
+      await ns.sleep(sleep);
+      await ns.hack(order.target);
+    } else {
+      /** Sleep if target time was not valid */
+      success = false;
+      await ns.sleep(200);
+    }
+  } else if (order.type == "grow" && ns.serverExists(order.target)) {
+    sleep = order.time - now - ns.getGrowTime(order.target);
+    if (sleep >= 0) {
+      await ns.sleep(sleep);
+      await ns.grow(order.grow);
+    } else {
+      /** Sleep if target time was not valid */
+      success = false;
+      await ns.sleep(200);
+    }
+  } else if (order.type == "weaken" && ns.serverExists(order.target)) {
+    sleep = order.time - now - ns.getWeakenTime(order.target);
+    if (sleep >= 0) {
+      await ns.sleep(sleep);
+      await ns.weaken(order.grow);
+    } else {
+      /** Sleep if target time was not valid */
+      success = false;
+      await ns.sleep(200);
+    }
+  } else {
+    /** Sleep if order type or target was not valid */
+    success = false;
+    await ns.sleep(200);
+  }
+  return success;
 }
 /**
  * Report this script as idle.
