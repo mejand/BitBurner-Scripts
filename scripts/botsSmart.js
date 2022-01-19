@@ -123,7 +123,12 @@ class Order {
      * The data of the instance in a single array.
      * @type {String[]}
      */
-    var data = [this.target, this.time, this.type, this.threads];
+    var data = [
+      this.target,
+      this.time.toString(),
+      this.type,
+      this.threads.toString,
+    ];
     /**
      * The data converted to a single string.
      * @type {String}
