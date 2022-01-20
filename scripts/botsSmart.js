@@ -54,7 +54,7 @@ export async function main(ns) {
 }
 
 /**
- * Try to get a targting order.
+ * Try to get a targting order and validate it.
  * @param {any[]} port - The port handler object.
  * @returns {Order | null} An order that needs to be executed or null if
  * no orders are available.
@@ -200,22 +200,36 @@ class Order {
      * The name of the target server.
      * @type {String}
      */
-    this.target = data[0];
+    this.target = null;
     /**
      * The time at which the action shall be finished.
      * @type {Number}
      */
-    this.time = parseInt(data[1]);
+    this.time = null;
     /**
      * The type of action that shall be executed.
      * @type {String}
      */
-    this.type = data[2];
+    this.type = null;
     /**
      * The numer of threads that shall be dedicated to the action.
      * @type {Number}
      */
-    this.threads = parseInt(data[3]);
+    this.threads = null;
+
+    /** Save the data if it exists */
+    if (data.length > 0) {
+      this.target = data[0];
+    }
+    if (data.length > 1) {
+      this.time = parseInt(data[1]);
+    }
+    if (data.length > 2) {
+      this.type = data[2];
+    }
+    if (data.length) {
+      this.threads = parseInt(data[3]);
+    }
   }
   /**
    * The data of the order in a single string for upload to a port.
