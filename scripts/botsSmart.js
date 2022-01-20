@@ -147,7 +147,7 @@ async function executeOrder(ns, order) {
   var sleep = 0;
 
   /** Decide which action shall be carried out */
-  if (order.type == "hack" && ns.serverExists(order.target)) {
+  if (order.type == "hack") {
     sleep = order.time - now - ns.getHackTime(order.target);
     if (sleep >= 0) {
       await ns.sleep(sleep);
@@ -157,7 +157,7 @@ async function executeOrder(ns, order) {
       success = false;
       await ns.sleep(200);
     }
-  } else if (order.type == "grow" && ns.serverExists(order.target)) {
+  } else if (order.type == "grow") {
     sleep = order.time - now - ns.getGrowTime(order.target);
     if (sleep >= 0) {
       await ns.sleep(sleep);
@@ -167,7 +167,7 @@ async function executeOrder(ns, order) {
       success = false;
       await ns.sleep(200);
     }
-  } else if (order.type == "weaken" && ns.serverExists(order.target)) {
+  } else if (order.type == "weaken") {
     sleep = order.time - now - ns.getWeakenTime(order.target);
     if (sleep >= 0) {
       await ns.sleep(sleep);
