@@ -38,7 +38,7 @@ export async function main(ns) {
     /** Try to execute the order if one was retrieved */
     if (order) {
       /** Report that the script is busy */
-      setBusy(ns, portIdle);
+      setBusy(portIdle);
       /** Reset the idle counter if an action is being executed */
       idleCounter = 0;
       /** Execute the order */
@@ -147,12 +147,23 @@ function setIdle(port) {
 }
 /**
  * Report this script as busy.
- * @param {import("..").NS} ns
  * @param {any[]} port - The port object used for communication.
  * @returns {Boolean} True if the idle state was updated.
  */
-function setBusy(ns, port) {
-  return false;
+function setBusy(port) {
+  /**
+   * The number of the currently idle functions.
+   * @type {Number}
+   */
+  var idleCount = 1;
+  /** Retrieve the current count if there is data on the port */
+  if (!port.empty()) {
+    idleCount = port.read();
+  }
+  /** Increment the idle count */
+  idleCount--;
+  /** Try to write the count back to the port */
+  return port.tryWrite(idleCount);
 }
 
 /**
