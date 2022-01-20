@@ -131,14 +131,19 @@ async function executeOrder(ns, order) {
  * @returns {Boolean} True if the idle state was updated.
  */
 function setIdle(port) {
+  /**
+   * The number of the currently idle functions.
+   * @type {Number}
+   */
+  var idleCount = 0;
+  /** Retrieve the current count if there is data on the port */
   if (!port.empty()) {
-    let data = port.read();
-    data++;
-    port.write(data);
-  } else {
-    port.write(1);
+    idleCount = port.read();
   }
-  return false;
+  /** Increment the idle count */
+  idleCount++;
+  /** Try to write the count back to the port */
+  return port.tryWrite(idleCount);
 }
 /**
  * Report this script as busy.
