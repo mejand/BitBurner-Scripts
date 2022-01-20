@@ -25,7 +25,7 @@ export async function main(ns) {
   var idleCounter = 0;
 
   /** Register the script as free on start up */
-  setIdle(ns, portIdle);
+  setIdle(portIdle);
 
   while (true) {
     /** Try to get an available order (null if none are there) */
@@ -44,7 +44,7 @@ export async function main(ns) {
       /** Execute the order */
       await executeOrder(ns, order);
       /** Report that the script is idle */
-      setIdle(ns, portIdle);
+      setIdle(portIdle);
     } else {
       /** Sleep if no order was available */
       await ns.sleep(200);
@@ -127,11 +127,17 @@ async function executeOrder(ns, order) {
 }
 /**
  * Report this script as idle.
- * @param {import("..").NS} ns
  * @param {any[]} port - The port object used for communication.
  * @returns {Boolean} True if the idle state was updated.
  */
-function setIdle(ns, port) {
+function setIdle(port) {
+  if (!port.empty()) {
+    let data = port.read();
+    data++;
+    port.write(data);
+  } else {
+    port.write(1);
+  }
   return false;
 }
 /**
