@@ -29,7 +29,7 @@ export async function main(ns) {
 
   while (true) {
     /** Try to get an available order (null if none are there) */
-    order = getOrder(ns, portOrder);
+    order = getOrder(portOrder);
     /** Grind XP if there is no order and the script has been idle for too long */
     if (!order && idleCounter > 100) {
       order = new Order("n00dles,0,weaken,1");
@@ -55,14 +55,30 @@ export async function main(ns) {
 
 /**
  * Try to get a targting order.
- * @param {import("..").NS} ns
  * @param {any[]} port - The port handler object.
  * @returns {Order | null} An order that needs to be executed or null if
  * no orders are available.
  */
-function getOrder(ns, port) {
-  /** One thread has to be removed from the order on the port */
-  return null;
+function getOrder(port) {
+  /**
+   * The order that is retrieved from the port.
+   * @type {Order}
+   */
+  var order = null;
+  /** Try to retrieve the order if the the port is not empty */
+  if (!port.empty()) {
+    /** Create a new order with the data retrieved from the port */
+    order = new Order(port.read());
+    if (order.threads > 0) {
+      /** Decrement the thread counter to show that this script will execute the action */
+      order.threads--;
+      /** Write the order back to the port if threads remain */
+      if (order.threads > 0) {
+        port.tryWrite(order.data);
+      }
+    }
+  }
+  return order;
 }
 /**
  * Execute a given order.
