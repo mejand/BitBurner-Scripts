@@ -55,21 +55,64 @@ export async function main(ns) {
 
 /**
  * Try to get a targting order and validate it.
+ * @param {import("..").NS} ns
  * @param {any[]} port - The port handler object.
  * @returns {Order | null} An order that needs to be executed or null if
  * no orders are available.
  */
-function getOrder(port) {
+function getOrder(ns, port) {
   /**
    * The order that is retrieved from the port.
    * @type {Order}
    */
   var order = null;
+  /**
+   * The order is valid.
+   * @type {Boolean}
+   */
+  var valid = true;
   /** Try to retrieve the order if the the port is not empty */
   if (!port.empty()) {
     /** Create a new order with the data retrieved from the port */
     order = new Order(port.read());
-    if (order.threads > 0) {
+    /** Validate the name of the target */
+    if (order.target) {
+      if (!ns.serverExists(order.target)) {
+        valid = false;
+      }
+    } else {
+      valid = false;
+    }
+    /** Validate the target time */
+    if (order.time) {
+      if (order.time <= ns.getTimeSinceLastAug()) {
+        valid = false;
+      }
+    } else {
+      valid = false;
+    }
+    /** Validate the type */
+    if (order.type) {
+      if (
+        order.type != "hack" &&
+        order.type != "grow" &&
+        order.type != "weaken"
+      ) {
+        valid = false;
+      }
+    } else {
+      valid = false;
+    }
+    /** Validate the threads */
+    if (order.threads) {
+      if (order.threads <= 0) {
+        valid = false;
+      }
+    } else {
+      valid = false;
+    }
+    /** Handle the order if it is valid */
+    if (valid) {
       /** Decrement the thread counter to show that this script will execute the action */
       order.threads--;
       /** Write the order back to the port if threads remain */
