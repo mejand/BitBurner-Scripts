@@ -86,7 +86,7 @@ export async function main(ns) {
 
       /** Copy the hacking scripts to the new server */
       let filesToCopy = ["botsTimedSelect.js", "utilTime.js"];
-      await ns.scp(filesToCopy, "home", server.name);
+      await ns.scp(filesToCopy, "home", newServerName);
 
       /** Print the name for debugging purposes */
       logPrintLine(ns);
