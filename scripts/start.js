@@ -29,7 +29,7 @@ export async function main(ns) {
     "supUnlock.js",
     "supHacknet.js",
     "supServerPurchase.js",
-    "supCtrlStart.js",
+    "supCtrlStartTimed.js",
   ];
 
   ns.tail();
