@@ -48,10 +48,10 @@ export async function main(ns) {
    */
   var maxServerCount = ns.getPurchasedServerLimit();
   /**
-   * The amount of RAM needed to run the XP bot script.
-   * @type {Number}
+   * The names of scripts on the home server.
+   * @type {String[]}
    */
-  var botRam = ns.getScriptRam("botsXP.js");
+  var filesToCopy = ns.ls("home", ".js");
 
   /** Start the loop to periodically try to purchase a server */
   while (true) {
@@ -90,13 +90,7 @@ export async function main(ns) {
       let newServerName = ns.purchaseServer("owned-server", maxAffordableRam);
 
       /** Copy the hacking scripts to the new server */
-      await ns.scp("botsXP.js", "home", newServerName);
-
-      /** Start the bot script */
-      let threads = Math.floor(ns.getServerMaxRam(newServerName) / botRam);
-      if (threads > 0) {
-        ns.exec("botsXP.js", newServerName, threads);
-      }
+      await ns.scp(filesToCopy, "home", newServerName);
 
       /** Print the name for debugging purposes */
       logPrintLine(ns);

@@ -131,6 +131,7 @@ export async function main(ns) {
           /** Start the preparation batch */
           batch = getTimedPreparationBatch(ns, target);
           hosts = getAvailableServerNames(ns);
+          hosts.push("home");
           waitUntil = batch.execute(ns, hosts);
           logPrintLine(ns);
           logPrintVar(ns, "State", "Preparation");
@@ -148,6 +149,7 @@ export async function main(ns) {
           if (hackTime) {
             batch = getTimedFarmingBatch(ns, target);
             hosts = getAvailableServerNames(ns);
+            hosts.push("home");
             waitUntil = batch.execute(ns, hosts);
             batchCountRemaining--;
           } else {

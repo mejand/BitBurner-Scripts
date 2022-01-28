@@ -11,7 +11,7 @@ export async function main(ns) {
    * The time between the upgrade of hacknet nodes.
    * @param {number}
    */
-  var period = 1000;
+  var period = 200;
   if (ns.args.length > 0 && typeof (ns.args[0] == "number")) {
     period = ns.args[0];
   }
@@ -19,7 +19,7 @@ export async function main(ns) {
    * The fraction of the earnings of hacknet nodes that shall be used for upgrades.
    * @type {number}
    */
-  var moneyFactor = 0.25;
+  var moneyFactor = 1.0;
   if (ns.args.length > 1 && typeof (ns.args[1] == "number")) {
     moneyFactor = ns.args[1];
   }
@@ -29,13 +29,9 @@ export async function main(ns) {
    */
   var budget = ns.getServerMoneyAvailable("home");
 
-  /**adjust the money factor for the period of the script production is given in $/s
-   * -> if the period is longer than 1 second then more than one second of production
-   * has to be considered */
-  moneyFactor = moneyFactor * (period / 1000);
-
   /** Start the loop to periodically upgrade the hacknet servers */
   while (true) {
+    budget = ns.getServerMoneyAvailable("home");
     /**
      * All possible upgrade options currently available.
      * @type {Upgrade[]}
@@ -47,9 +43,6 @@ export async function main(ns) {
 
     /** Loop through all nodes and gather the different upgrade options */
     for (var i = 0; i < ns.hacknet.numNodes(); i++) {
-      /** Add the servers production to the available budget */
-      budget += ns.hacknet.getNodeStats(i).production * moneyFactor;
-
       /**
        * The cost for an upgrade option (is Infinity if the option is maxed out).
        * @type {number}

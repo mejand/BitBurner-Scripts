@@ -28,10 +28,10 @@ export async function main(ns) {
    */
   var servers = getNetworkMap(ns);
   /**
-   * The amount of RAM needed to run the XP bot script.
-   * @type {Number}
+   * The names of scripts on the home server.
+   * @type {String[]}
    */
-  var botRam = ns.getScriptRam("botsXP.js");
+  var filesToCopy = ns.ls("home", ".js");
 
   while (true) {
     ns.clearLog();
@@ -48,19 +48,9 @@ export async function main(ns) {
 
         /** Try and unlock the server (nothing will happen if it is already unlocked) */
         if (server.getRootAccess(ns)) {
-          /** Copy the XP gaining bot to the unlocked server */
-          if (
-            server.name != "home" &&
-            !ns.scriptRunning("botsXP.js", server.name) &&
-            server.ramAvailable > 0
-          ) {
-            if (await ns.scp("botsXP.js", "home", server.name)) {
-              /** Start the bot script if copying was successful */
-              let threads = Math.floor(server.ramAvailable / botRam);
-              if (threads > 0) {
-                ns.exec("botsXP.js", server.name, threads);
-              }
-            }
+          /** Copy the hacking bot to the unlocked server */
+          if (server.name != "home") {
+            await ns.scp(filesToCopy, "home", server.name);
           }
           /** Add the server to the unlocked servers */
           unlockedServers.push(server);
