@@ -47,6 +47,11 @@ export async function main(ns) {
    * @type {number}
    */
   var maxServerCount = ns.getPurchasedServerLimit();
+  /**
+   * The names of scripts on the home server.
+   * @type {String[]}
+   */
+  var filesToCopy = ns.ls("home", ".js");
 
   /** Start the loop to periodically try to purchase a server */
   while (true) {
@@ -85,7 +90,6 @@ export async function main(ns) {
       let newServerName = ns.purchaseServer("owned-server", maxAffordableRam);
 
       /** Copy the hacking scripts to the new server */
-      let filesToCopy = ["botsTimedSelect.js", "utilTime.js"];
       await ns.scp(filesToCopy, "home", newServerName);
 
       /** Print the name for debugging purposes */

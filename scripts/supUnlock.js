@@ -27,6 +27,11 @@ export async function main(ns) {
    * @type {MyServer[]}
    */
   var servers = getNetworkMap(ns);
+  /**
+   * The names of scripts on the home server.
+   * @type {String[]}
+   */
+  var filesToCopy = ns.ls("home", ".js");
 
   while (true) {
     ns.clearLog();
@@ -45,7 +50,6 @@ export async function main(ns) {
         if (server.getRootAccess(ns)) {
           /** Copy the hacking bot to the unlocked server */
           if (server.name != "home") {
-            let filesToCopy = ["botsTimedSelect.js", "utilTime.js"];
             await ns.scp(filesToCopy, "home", server.name);
           }
           /** Add the server to the unlocked servers */
