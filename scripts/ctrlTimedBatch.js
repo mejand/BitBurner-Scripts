@@ -160,7 +160,7 @@ export async function main(ns) {
              * is still at minimum.
              */
             hackTime = ns.getHackTime(target);
-            batchCount = Math.floor(hackTime / period);
+            batchCount = Math.max(Math.floor(hackTime / period), 1);
             /** Remove one batch for safety */
             if (batchCount > 1) {
               batchCount--;
